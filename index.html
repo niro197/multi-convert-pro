@@ -3,79 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileConvert Pro - Convertisseur de fichiers en ligne</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>FileConvert Pro | Le clone SmallPDF</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <a href="#" class="logo">FileConvert</a>
-            <nav class="nav">
-                <a href="#features">Caractéristiques</a>
-                <a href="#pricing">Tarification</a>
-                <a href="#faq">FAQ</a>
-            </nav>
-            <div class="header-right">
-                <button class="btn-login" id="btnHeaderLogin" onclick="showSection('auth')">Connexion</button>
-                <button class="btn-primary" onclick="showSection('auth')">Essai gratuit</button>
+        <nav class="container">
+            <div class="logo">File<span>Convert</span></div>
+            <div class="nav-links">
+                <a href="#convert">Convertir</a>
+                <a href="#pricing">Prix</a>
+                <button class="btn-secondary">Connexion</button>
+                <button class="btn-primary">Essai Gratuit</button>
             </div>
-        </div>
+        </nav>
     </header>
 
-    <section id="auth" class="section active">
-        <div class="auth-container">
-            <div class="auth-card">
-                <div id="loginForm">
-                    <h2>Bienvenue</h2>
-                    <p class="subtitle">Convertissez vos fichiers en quelques secondes</p>
-                    <div class="form-group">
-                        <label>Adresse email</label>
-                        <input type="email" id="loginEmail" placeholder="vous@example.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Mot de passe</label>
-                        <input type="password" id="loginPassword" placeholder="••••••••">
-                    </div>
-                    <button class="btn-primary" onclick="handleLogin()" style="width: 100%; margin-top: 0.5rem;">Se connecter</button>
-                    <div class="toggle-auth">Pas de compte ? <button onclick="toggleAuth()">Créer un compte</button></div>
+    <main>
+        <section id="convert" class="hero">
+            <h1>Convertisseur PDF tout-en-un</h1>
+            <p>Convertissez vos documents en PDF ou vice-versa en un clic.</p>
+            
+            <div class="upload-container" id="dropZone">
+                <div class="upload-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon" width="60">
+                    <p>Glissez-déposez vos fichiers ici</p>
+                    <span>ou</span>
+                    <label for="fileInput" class="btn-upload">Choisir un fichier</label>
+                    <input type="file" id="fileInput" hidden>
+                </div>
+                <div id="fileList"></div>
+            </div>
+        </section>
+
+        <section id="pricing" class="pricing">
+            <h2>Prêt à passer au niveau supérieur ?</h2>
+            <div class="pricing-grid">
+                <div class="card">
+                    <h3>Gratuit</h3>
+                    <div class="price">$0</div>
+                    <ul>
+                        <li>2 conversions / jour</li>
+                        <li>Max 5 MB par fichier</li>
+                    </ul>
+                    <button class="btn-outline">Plan Actuel</button>
+                </div>
+
+                <div class="card featured">
+                    <div class="badge">MEILLEUR PRIX</div>
+                    <h3>Pro</h3>
+                    <div class="price">$0.99<span>/mois</span></div>
+                    <ul>
+                        <li>Conversions illimitées</li>
+                        <li>Vitesse ultra-rapide</li>
+                        <li>Aucune publicité</li>
+                        <li>Support prioritaire</li>
+                    </ul>
+                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                        <input type="hidden" name="amount" value="0.99">
+                        <button type="submit" class="btn-primary">Passer en Pro</button>
+                    </form>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <section id="dashboard" class="section">
-        <div class="container">
-            <div id="pricing" class="pricing-section">
-                <h2 class="pricing-title">Tarification simple</h2>
-                <div class="pricing-grid">
-                    <div class="pricing-card">
-                        <h3>Starter</h3>
-                        <div class="price">$0</div>
-                        <button class="btn-primary" disabled style="width: 100%; opacity: 0.5;">Plan actuel</button>
-                    </div>
-                    <div class="pricing-card featured">
-                        <div class="pricing-badge">POPULAIRE</div>
-                        <h3>Premium</h3>
-                        <div class="price">$0.99</div>
-                        <p class="price-period">par mois</p>
-                        <form method="post" action="https://www.paypal.com/cgi-bin/webscr" style="width: 100%;">
-                            <input type="hidden" name="cmd" value="_xclick">
-                            <input type="hidden" name="business" value="votre-email@paypal.com">
-                            <input type="hidden" name="item_name" value="FileConvert Pro - Premium Monthly">
-                            <input type="hidden" name="amount" value="0.99">
-                            <input type="hidden" name="currency_code" value="USD">
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.8rem;">S'abonner maintenant</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <footer>
+        <p>© 2026 FileConvert Pro - Micheal Edition</p>
+    </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
