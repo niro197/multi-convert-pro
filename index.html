@@ -1,71 +1,23 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro | Édition Limitée</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-</head>
-<body>
-    <div class="background-animate"></div>
-    
-    <nav class="glass-nav">
-        <div class="logo">Multi<span>Convert</span></div>
-        <div class="status">Hébergé sur niro197</div>
-    </nav>
-
-    <div class="hero-text">
-        <h1>Transformez vos fichiers instantanément.</h1>
-        <p>Sécurisé, rapide et sans publicité.</p>
+<!-- Remplace la section <section class="grid"> par celle-ci -->
+<div class="grid">
+    <div class="tool-card" onclick="openTool('img-pdf')">
+        <div class="icon-box red">📄</div>
+        <h3>Image vers PDF</h3>
+        <p>Photos vers documents PDF.</p>
     </div>
-
-    <main class="container">
-        <div class="grid">
-            <div class="tool-card" onclick="openTool('img-pdf')">
-                <div class="icon-box red">📄</div>
-                <h3>Image vers PDF</h3>
-                <p>Convertissez vos photos en documents.</p>
-            </div>
-            <div class="tool-card" onclick="openTool('compress')">
-                <div class="icon-box purple">🗜️</div>
-                <h3>Compression ZIP</h3>
-                <p>Réduisez la taille de vos dossiers.</p>
-            </div>
-            <div class="tool-card" onclick="openTool('video')">
-                <div class="icon-box blue">🎬</div>
-                <h3>Optimiseur Vidéo</h3>
-                <p>Prêt pour les réseaux sociaux.</p>
-            </div>
-            <div class="tool-card coming-soon">
-                <div class="icon-box green">✨</div>
-                <h3>Éditeur IA</h3>
-                <p>Bientôt disponible...</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal de traitement (Pop-up moderne) -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-content glass">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title">Outil</h2>
-            <div class="drop-zone" id="drop-zone">
-                <div class="cloud-icon">☁️</div>
-                <p>Glissez votre fichier ou cliquez pour explorer</p>
-                <input type="file" id="fileInput" hidden>
-                <button class="btn-main" onclick="document.getElementById('fileInput').click()">Parcourir</button>
-            </div>
-            <div id="file-info" class="hidden">
-                <div class="file-card">
-                    <span id="file-name">Fichier.pdf</span>
-                    <button class="btn-action" id="execute-btn">Convertir maintenant</button>
-                </div>
-            </div>
-        </div>
+    <div class="tool-card" onclick="openTool('png-jpg')">
+        <div class="icon-box blue">🖼️</div>
+        <h3>PNG vers JPG</h3>
+        <p>Change le format de tes images.</p>
     </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+    <div class="tool-card" onclick="openTool('txt-pdf')">
+        <div class="icon-box green">📝</div>
+        <h3>Texte vers PDF</h3>
+        <p>Crée un PDF à partir d'un fichier texte.</p>
+    </div>
+    <div class="tool-card" onclick="openTool('compress')">
+        <div class="icon-box purple">🗜️</div>
+        <h3>Compression ZIP</h3>
+        <p>Réduisez la taille des dossiers.</p>
+    </div>
+</div>
