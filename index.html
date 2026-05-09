@@ -3,81 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro - Outil Tout-en-Un</title>
+    <title>MultiConvert Pro | Édition Limitée</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Bibliothèques pour le traitement -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
 </head>
 <body>
-    <!-- Design Liquid Gradient -->
-    <div class="liquid-bg">
-        <div class="blob"></div>
-        <div class="blob"></div>
-        <div class="blob"></div>
-    </div>
-
-    <nav>
-        <div class="logo">MULTI<b>CONVERT</b></div>
+    <div class="background-animate"></div>
+    
+    <nav class="glass-nav">
+        <div class="logo">Multi<span>Convert</span></div>
+        <div class="status">Hébergé sur niro197</div>
     </nav>
 
-    <main id="app-container">
-        <!-- Grille des Catégories -->
-        <section id="categories-grid" class="grid">
-            <div class="card" onclick="openTool('img-pdf', 'Image vers PDF')">
-                <div class="icon">🖼️</div>
+    <div class="hero-text">
+        <h1>Transformez vos fichiers instantanément.</h1>
+        <p>Sécurisé, rapide et sans publicité.</p>
+    </div>
+
+    <main class="container">
+        <div class="grid">
+            <div class="tool-card" onclick="openTool('img-pdf')">
+                <div class="icon-box red">📄</div>
                 <h3>Image vers PDF</h3>
+                <p>Convertissez vos photos en documents.</p>
             </div>
-            <div class="card" onclick="openTool('compress', 'Compresser (ZIP)')">
-                <div class="icon">🗜️</div>
-                <h3>Compression</h3>
+            <div class="tool-card" onclick="openTool('compress')">
+                <div class="icon-box purple">🗜️</div>
+                <h3>Compression ZIP</h3>
+                <p>Réduisez la taille de vos dossiers.</p>
             </div>
-            <div class="card" onclick="openTool('extract', 'Décompresser (ZIP)')">
-                <div class="icon">📦</div>
-                <h3>Décompression</h3>
+            <div class="tool-card" onclick="openTool('video')">
+                <div class="icon-box blue">🎬</div>
+                <h3>Optimiseur Vidéo</h3>
+                <p>Prêt pour les réseaux sociaux.</p>
             </div>
-            <div class="card" onclick="openTool('pdf-edit', 'Modifier PDF')">
-                <div class="icon">📝</div>
-                <h3>Modifier PDF</h3>
+            <div class="tool-card coming-soon">
+                <div class="icon-box green">✨</div>
+                <h3>Éditeur IA</h3>
+                <p>Bientôt disponible...</p>
             </div>
-        </section>
+        </div>
+    </main>
 
-        <!-- Zone de Traitement -->
-        <section id="work-zone" class="hidden">
-            <div class="tool-header">
-                <button class="btn-back" onclick="goBack()">← Retour</button>
-                <h2 id="tool-title">Outil</h2>
-            </div>
-
-            <div class="upload-area" id="drop-area">
-                <p>Cliquez ou glissez votre fichier ici</p>
+    <!-- Modal de traitement (Pop-up moderne) -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title">Outil</h2>
+            <div class="drop-zone" id="drop-zone">
+                <div class="cloud-icon">☁️</div>
+                <p>Glissez votre fichier ou cliquez pour explorer</p>
                 <input type="file" id="fileInput" hidden>
-                <button class="btn-primary" onclick="document.getElementById('fileInput').click()">Choisir un fichier</button>
+                <button class="btn-main" onclick="document.getElementById('fileInput').click()">Parcourir</button>
             </div>
-
-            <!-- Aperçu et Actions -->
-            <div id="preview-zone" class="hidden">
-                <div class="preview-card">
-                    <h3>Aperçu</h3>
-                    <p id="file-name-display"></p>
-                    
-                    <div id="compression-options" class="hidden">
-                        <label>Niveau :</label>
-                        <select id="comp-level">
-                            <option value="1">Faible</option>
-                            <option value="6" selected>Moyen</option>
-                            <option value="9">Fort</option>
-                        </select>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button class="btn-cancel" onclick="goBack()">Annuler</button>
-                        <button class="btn-action" id="main-action-btn">Lancer</button>
-                    </div>
+            <div id="file-info" class="hidden">
+                <div class="file-card">
+                    <span id="file-name">Fichier.pdf</span>
+                    <button class="btn-action" id="execute-btn">Convertir maintenant</button>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
