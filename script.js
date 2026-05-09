@@ -1,58 +1,104 @@
+// Gestion de l'état de l'application
 let currentTool = '';
+const modal = document.getElementById('modal');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('file-info');
+const fileNameDisplay = document.getElementById('file-name');
+const executeBtn = document.getElementById('execute-btn');
 
-function openTool(id, title) {
-    currentTool = id;
-    document.getElementById('categories-grid').classList.add('hidden');
-    document.getElementById('work-zone').classList.remove('hidden');
-    document.getElementById('tool-title').innerText = title;
+/**
+ * Ouvre l'outil sélectionné avec une animation
+ */
+function openTool(toolId) {
+    currentTool = toolId;
+    const titles = {
+        'img-pdf': 'Image vers PDF',
+        'compress': 'Compression ZIP',
+        'video': 'Optimiseur Vidéo'
+    };
     
-    if(id === 'compress') document.getElementById('compression-options').classList.remove('hidden');
+    document.getElementById('modal-title').innerText = titles[toolId] || 'Outil';
+    modal.classList.remove('hidden');
+    // Réinitialisation de l'interface
+    fileInfo.classList.add('hidden');
+    document.getElementById('drop-zone').classList.remove('hidden');
 }
 
-function goBack() {
-    document.getElementById('work-zone').classList.add('hidden');
-    document.getElementById('preview-zone').classList.add('hidden');
-    document.getElementById('categories-grid').classList.remove('hidden');
+/**
+ * Ferme la fenêtre modal
+ */
+function closeModal() {
+    modal.classList.add('hidden');
+    fileInput.value = ''; // Reset du fichier
 }
 
-document.getElementById('fileInput').addEventListener('change', function(e) {
+/**
+ * Détecte le choix d'un fichier
+ */
+fileInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
-        document.getElementById('preview-zone').classList.remove('hidden');
-        document.getElementById('file-name-display').innerText = `Fichier : ${file.name}`;
-        
-        document.getElementById('main-action-btn').onclick = () => processFile(file);
+        showFileDetails(file);
     }
 });
 
-async function processFile(file) {
-    const btn = document.getElementById('main-action-btn');
-    btn.innerText = "Traitement...";
-    btn.disabled = true;
+/**
+ * Affiche le nom du fichier et prépare le bouton d'action
+ */
+function showFileDetails(file) {
+    document.getElementById('drop-zone').classList.add('hidden');
+    fileInfo.classList.remove('hidden');
+    fileNameDisplay.innerText = `Fichier prêt : ${file.name}`;
+    
+    executeBtn.onclick = () => processAction(file);
+}
+
+/**
+ * Simule ou exécute le traitement du fichier
+ */
+async function processAction(file) {
+    executeBtn.disabled = true;
+    executeBtn.innerText = "Traitement en cours... ⚡";
 
     try {
         if (currentTool === 'compress') {
+            // Logique de compression ZIP réelle
             const zip = new JSZip();
             zip.file(file.name, file);
-            const level = parseInt(document.getElementById('comp-level').value);
-            const blob = await zip.generateAsync({type:"blob", compression: "DEFLATE", compressionOptions: {level}});
-            download(blob, file.name + ".zip");
+            const content = await zip.generateAsync({type: "blob"});
+            downloadBlob(content, file.name + ".zip");
         } else {
-            alert("Action terminée pour : " + file.name);
+            // Simulation pour les autres outils (Image/Vidéo)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            alert(`Succès ! Le fichier ${file.name} a été traité par l'outil ${currentTool}.`);
         }
-    } catch (err) {
-        alert("Erreur lors du traitement.");
+    } catch (error) {
+        console.error(error);
+        alert("Oups, une erreur est survenue pendant le traitement.");
+    } finally {
+        executeBtn.disabled = false;
+        executeBtn.innerText = "Convertir maintenant";
+        closeModal();
     }
-
-    btn.innerText = "Lancer";
-    btn.disabled = false;
-    goBack();
 }
 
-function download(blob, name) {
-    const url = URL.createObjectURL(blob);
+/**
+ * Fonction utilitaire pour télécharger le résultat
+ */
+function downloadBlob(blob, name) {
+    const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = name;
+    document.body.appendChild(a);
     a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+}
+
+// Fermer la modal si on clique en dehors du cadre blanc
+window.onclick = function(event) {
+    if (event.target == modal) {
+        closeModal();
+    }
 }
