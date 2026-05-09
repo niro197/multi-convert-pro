@@ -1,83 +1,188 @@
 :root {
-    --bg: #0a0a0c;
-    --glass: rgba(255, 255, 255, 0.05);
-    --primary: #6366f1;
-    --accent: #a855f7;
-    --text: #ffffff;
+    --bg-dark: #050505;
+    --card-bg: rgba(18, 18, 23, 0.7);
+    --primary-neon: #00f2ff;
+    --accent-neon: #7000ff;
+    --text-main: #ffffff;
+    --text-dim: #a0a0a0;
+    --border-glow: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: 'Inter', sans-serif; overflow-x: hidden;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* Background animé */
-.background-animate {
-    position: fixed; width: 100vw; height: 100vh; z-index: -1;
-    background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0a0a0c 100%);
+/* Fond avec particules lumineuses */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, rgba(112, 0, 255, 0.05) 0%, transparent 40%);
+    z-index: -1;
 }
 
-.background-animate::after {
-    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-    opacity: 0.1;
-}
-
+/* Barre de navigation stylisée */
 .glass-nav {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 10%; background: var(--glass);
-    backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-glow);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
-.logo span { color: var(--primary); }
+.logo {
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
 
-.hero-text { text-align: center; padding: 60px 20px; }
-.hero-text h1 { font-size: 3rem; margin-bottom: 10px; background: linear-gradient(to right, #fff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo span {
+    color: var(--primary-neon);
+    text-shadow: 0 0 15px var(--primary-neon);
+}
 
-.container { max-width: 1100px; margin: auto; padding: 20px; }
+/* Hero Section */
+.hero-text {
+    text-align: center;
+    padding: 80px 20px 40px;
+}
 
+.hero-text h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    background: linear-gradient(to right, #fff, var(--primary-neon), var(--accent-neon));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+/* Grille de cartes futuriste */
 .grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 40px 8%;
+    max-width: 1400px;
+    margin: auto;
 }
 
 .tool-card {
-    background: var(--glass); padding: 30px; border-radius: 24px;
-    border: 1px solid rgba(255,255,255,0.1); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer; position: relative; overflow: hidden;
+    background: var(--card-bg);
+    border: 1px solid var(--border-glow);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: left;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
 }
 
 .tool-card:hover {
-    transform: translateY(-10px); background: rgba(255,255,255,0.08);
-    border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--primary-neon);
+    box-shadow: 0 10px 40px rgba(0, 242, 255, 0.15);
+}
+
+/* Effet de brillance au survol */
+.tool-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: 0.5s;
+}
+
+.tool-card:hover::before {
+    left: 100%;
 }
 
 .icon-box {
-    width: 50px; height: 50px; border-radius: 12px; display: flex;
-    align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
 }
 
-.purple { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
-.blue { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-.red { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.tool-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #fff;
+}
 
-/* Modal */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 100; }
-.modal-content { padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; position: relative; text-align: center; }
-.hidden { display: none; }
+.tool-card p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+}
+
+/* Fenêtre Modal (Pop-up) */
+.modal {
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+}
+
+.modal-content.glass {
+    background: #111116;
+    border: 1px solid var(--primary-neon);
+    box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+    color: white;
+}
 
 .drop-zone {
-    border: 2px dashed rgba(255,255,255,0.2); padding: 40px; border-radius: 20px;
-    margin: 20px 0; transition: 0.3s;
+    border: 2px dashed #333;
+    background: rgba(255,255,255,0.02);
+    transition: 0.3s;
 }
 
-.btn-main {
-    background: var(--primary); color: white; border: none; padding: 12px 30px;
-    border-radius: 50px; font-weight: 600; cursor: pointer; margin-top: 15px;
+.drop-zone:hover {
+    border-color: var(--primary-neon);
+    background: rgba(0, 242, 255, 0.05);
 }
 
-.btn-action {
-    background: linear-gradient(45deg, var(--primary), var(--accent));
-    color: white; border: none; padding: 15px 40px; border-radius: 12px;
-    width: 100%; margin-top: 20px; cursor: pointer; font-weight: bold;
+/* Boutons */
+.btn-main, .btn-action {
+    background: linear-gradient(45deg, var(--primary-neon), var(--accent-neon));
+    color: #000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+}
+
+.btn-main:hover, .btn-action:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+    box-shadow: 0 6px 20px rgba(112, 0, 255, 0.4);
+}
+
+/* Badge "Coming Soon" */
+.coming-soon {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Responsive pour ton Samsung A06 */
+@media (max-width: 768px) {
+    .hero-text h1 { font-size: 2.2rem; }
+    .grid { padding: 20px 5%; }
 }
