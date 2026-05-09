@@ -1,62 +1,53 @@
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
+const statusDiv = document.getElementById('uploadStatus');
 
-// Empêcher le comportement par défaut du navigateur
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    dropZone.addEventListener(eventName, preventDefaults, false);
-});
-
-function preventDefaults(e) {
+// Drag & Drop effects
+dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    e.stopPropagation();
-}
+    dropZone.style.borderColor = "#4F46E5";
+    dropZone.style.background = "#F5F3FF";
+});
 
-// Animation au survol
-dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('dragleave', () => {
+    dropZone.style.borderColor = "#E2E8F0";
+    dropZone.style.background = "white";
+});
 
-// Gestion du dépôt de fichier
 dropZone.addEventListener('drop', (e) => {
-    dropZone.classList.remove('dragover');
+    e.preventDefault();
     const files = e.dataTransfer.files;
-    handleFiles(files);
+    handleUpload(files[0]);
 });
 
-fileInput.addEventListener('change', function() {
-    handleFiles(this.files);
+fileInput.addEventListener('change', (e) => {
+    handleUpload(e.target.files[0]);
 });
 
-function handleFiles(files) {
-    if (files.length > 0) {
-        const file = files[0];
-        fileList.innerHTML = `
-            <div style="margin-top:20px; padding:15px; background:#e2e8f0; border-radius:10px;">
-                <strong>Fichier sélectionné :</strong> ${file.name} <br>
-                <progress id="progressBar" value="0" max="100" style="width:100%; margin-top:10px;"></progress>
-                <p id="status">Préparation de la conversion...</p>
-            </div>
-        `;
-        simulateConversion();
-    }
-}
-
-function simulateConversion() {
+function handleUpload(file) {
+    if (!file) return;
+    
+    // Cacher les textes et montrer la barre de progression
+    statusDiv.classList.remove('hidden');
+    document.querySelector('.drop-icon').classList.add('hidden');
+    document.querySelector('.btn-select').classList.add('hidden');
+    
     let progress = 0;
-    const bar = document.getElementById('progressBar');
-    const status = document.getElementById('status');
+    const progressBar = document.querySelector('.progress');
+    const statusText = document.getElementById('statusText');
 
     const interval = setInterval(() => {
-        progress += 5;
-        bar.value = progress;
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
         
-        if (progress === 40) status.innerText = "Analyse du document...";
-        if (progress === 70) status.innerText = "Génération du PDF...";
+        progressBar.style.width = progress + "%";
         
-        if (progress >= 100) {
+        if (progress < 40) statusText.innerText = "Téléchargement de " + file.name + "...";
+        else if (progress < 80) statusText.innerText = "Conversion en cours...";
+        else if (progress < 100) statusText.innerText = "Finalisation...";
+        else {
             clearInterval(interval);
-            status.innerHTML = "✨ <strong>Conversion terminée !</strong>";
-            alert("Conversion réussie ! (Ceci est une démo)");
+            statusText.innerHTML = "✅ Terminé ! <a href='#' style='color:#4F46E5'>Télécharger ici</a>";
         }
-    }, 150);
+    }, 400);
 }
