@@ -3,53 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro | Le Smallpdf Rapide</title>
+    <title>MultiConvert Pro | Simple & Rapide</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <nav class="navbar">
         <div class="logo">Multi<span>Convert</span></div>
+        <div class="nav-links">
+            <a href="#premium" class="btn-premium-nav">Passer au Premium</a>
+        </div>
     </nav>
 
-    <main class="main-content">
-        <div class="header-section">
-            <h1 id="main-title">Convertir en PDF</h1>
-            <p>Le convertisseur de fichiers en ligne n°1 de niro197</p>
+    <main class="container">
+        <div class="hero">
+            <h1 id="tool-title">Convertisseur de fichiers</h1>
+            <p>La solution gratuite pour vos PDF, Images et ZIP.</p>
         </div>
 
-        <!-- Zone de dépôt style Smallpdf -->
-        <div class="converter-container" id="drop-zone">
-            <div class="inner-dropzone">
-                <div class="icon-illustration">📂</div>
+        <!-- Zone de transfert style Smallpdf -->
+        <div class="dropzone-container" id="main-zone">
+            <div id="upload-view">
+                <div class="icon-folder">📂</div>
                 <button class="btn-choose" onclick="document.getElementById('fileInput').click()">Choisir les fichiers</button>
-                <p class="drop-text">ou glissez-déposez les fichiers ici</p>
+                <p>ou glissez-déposez ici</p>
                 <input type="file" id="fileInput" hidden>
             </div>
-            
-            <!-- Zone de chargement cachée -->
-            <div id="processing-zone" class="hidden">
-                <div class="loader"></div>
-                <p id="file-name-display"></p>
-                <button id="execute-btn" class="btn-action">Convertir maintenant</button>
+
+            <div id="process-view" class="hidden">
+                <div class="file-icon">📄</div>
+                <p id="file-name"></p>
+                <button id="convert-btn" class="btn-convert">Démarrer la conversion</button>
             </div>
         </div>
 
-        <!-- Menu des outils en bas -->
-        <div class="tools-grid">
-            <div class="tool-item active" onclick="setTool('txt-pdf', 'Texte en PDF', '#e74c3c')">
-                <span class="tool-icon">📄</span> Texte vers PDF
-            </div>
-            <div class="tool-item" onclick="setTool('compress', 'Compresser PDF', '#f1c40f')">
-                <span class="tool-icon">🗜️</span> Compresser ZIP
-            </div>
-            <div class="tool-item" onclick="setTool('png-jpg', 'Image en JPG', '#3498db')">
-                <span class="tool-icon">🖼️</span> PNG vers JPG
-            </div>
-        </div>
+        <!-- Section Abonnement -->
+        <section id="premium" class="subscription-card">
+            <h2>MultiConvert <span>Pro Premium</span></h2>
+            <p class="price">1$ <span>/ mois</span></p>
+            <ul>
+                <li>✅ Conversions illimitées</li>
+                <li>✅ Taille de fichier jusqu'à 1 Go</li>
+                <li>✅ Support prioritaire</li>
+            </ul>
+            <!-- BOUTON PAYPAL (À CONFIGURER) -->
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                <input type="hidden" name="cmd" value="_xclick-subscriptions">
+                <input type="hidden" name="business" value="TON_EMAIL_PAYPAL@GMAIL.COM"> <!-- METS TON EMAIL ICI -->
+                <input type="hidden" name="item_name" value="Abonnement MultiConvert Pro">
+                <input type="hidden" name="currency_code" value="USD">
+                <input type="hidden" name="a3" value="1.00">
+                <input type="hidden" name="p3" value="1">
+                <input type="hidden" name="t3" value="M">
+                <input type="hidden" name="src" value="1">
+                <button type="submit" class="btn-paypal">S'abonner avec PayPal</button>
+            </form>
+        </section>
     </main>
 
     <script src="script.js"></script>
