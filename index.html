@@ -3,85 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileConvert Pro | Édition Ultra</title>
+    <title>FileConvert Pro | Premium</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <nav class="glass-nav">
         <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-file-pdf"></i> File<span>Convert</span>
-            </div>
+            <div class="logo"><i class="fas fa-file-pdf"></i> File<span>Convert</span></div>
             <div class="nav-menu">
-                <a href="#tools">Outils</a>
                 <a href="#pricing">Prix</a>
-                <div class="nav-auth">
-                    <button class="btn-ghost">Connexion</button>
-                    <button class="btn-primary-gradient">Essai Gratuit</button>
-                </div>
+                <button class="btn-primary-gradient">Essai Gratuit</button>
             </div>
         </div>
     </nav>
 
     <section class="hero-section">
-        <div class="circles">
-            <div class="circle circle-1"></div>
-            <div class="circle circle-2"></div>
-        </div>
-        
         <div class="hero-content">
-            <h1>Libérez vos documents.</h1>
-            <p>La solution la plus rapide pour convertir, compresser et éditer vos fichiers PDF.</p>
-            
+            <h1>Convertissez sans limite.</h1>
             <div class="drop-card" id="dropZone">
-                <div class="drop-icon">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                </div>
+                <i class="fas fa-cloud-upload-alt drop-icon"></i>
                 <h3>Glissez vos fichiers ici</h3>
-                <p>ou cliquez pour parcourir votre ordinateur</p>
                 <input type="file" id="fileInput" hidden>
-                <button class="btn-select" onclick="document.getElementById('fileInput').click()">Choisir un fichier</button>
+                <button class="btn-select" onclick="document.getElementById('fileInput').click()">Parcourir</button>
                 
                 <div id="uploadStatus" class="hidden">
                     <div class="loader-bar"><div class="progress"></div></div>
-                    <p id="statusText">Traitement en cours...</p>
+                    <p id="statusText">Traitement...</p>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="pricing" class="pricing-section">
-        <div class="section-header">
-            <h2>Un prix imbattable</h2>
-            <p>Accédez à tous les outils premium sans vous ruiner.</p>
-        </div>
-
         <div class="pricing-container">
-            <div class="price-card">
-                <h3>Standard</h3>
-                <div class="amount">$0<span>/mois</span></div>
-                <ul class="features">
-                    <li><i class="fas fa-check"></i> 2 fichiers par jour</li>
-                    <li><i class="fas fa-check"></i> Taille max 10MB</li>
-                </ul>
-                <button class="btn-secondary">Plan Actuel</button>
-            </div>
-
             <div class="price-card featured">
-                <div class="popular-tag">RECOMMANDÉ</div>
-                <h3>Pro Plan</h3>
+                <div class="popular-tag">OFFRE SPÉCIALE</div>
+                <h3>Plan Pro</h3>
                 <div class="amount">$0.99<span>/mois</span></div>
                 <ul class="features">
-                    <li><i class="fas fa-check"></i> Conversions illimitées</li>
-                    <li><i class="fas fa-check"></i> Taille max 500MB</li>
-                    <li><i class="fas fa-check"></i> OCR (Reconnaissance de texte)</li>
-                    <li><i class="fas fa-check"></i> Sans aucune publicité</li>
+                    <li><i class="fas fa-check"></i> Illimité</li>
+                    <li><i class="fas fa-check"></i> Haute vitesse</li>
                 </ul>
                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                    <input type="hidden" name="cmd" value="_xclick">
+                    <input type="hidden" name="business" value="TON_EMAIL_PAYPAL@GMAIL.COM">
+                    <input type="hidden" name="item_name" value="FileConvert Pro">
                     <input type="hidden" name="amount" value="0.99">
-                    <button type="submit" class="btn-primary-gradient">Devenir Pro</button>
+                    <input type="hidden" name="currency_code" value="USD">
+                    <button type="submit" class="btn-primary-gradient">S'abonner maintenant</button>
                 </form>
             </div>
         </div>
