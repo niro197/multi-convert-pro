@@ -3,75 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileConvert Pro | Le clone SmallPDF</title>
+    <title>FileConvert Pro | Édition Ultra</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">File<span>Convert</span></div>
-            <div class="nav-links">
-                <a href="#convert">Convertir</a>
+    <nav class="glass-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-file-pdf"></i> File<span>Convert</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#tools">Outils</a>
                 <a href="#pricing">Prix</a>
-                <button class="btn-secondary">Connexion</button>
-                <button class="btn-primary">Essai Gratuit</button>
+                <div class="nav-auth">
+                    <button class="btn-ghost">Connexion</button>
+                    <button class="btn-primary-gradient">Essai Gratuit</button>
+                </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
 
-    <main>
-        <section id="convert" class="hero">
-            <h1>Convertisseur PDF tout-en-un</h1>
-            <p>Convertissez vos documents en PDF ou vice-versa en un clic.</p>
+    <section class="hero-section">
+        <div class="circles">
+            <div class="circle circle-1"></div>
+            <div class="circle circle-2"></div>
+        </div>
+        
+        <div class="hero-content">
+            <h1>Libérez vos documents.</h1>
+            <p>La solution la plus rapide pour convertir, compresser et éditer vos fichiers PDF.</p>
             
-            <div class="upload-container" id="dropZone">
-                <div class="upload-box">
-                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="PDF Icon" width="60">
-                    <p>Glissez-déposez vos fichiers ici</p>
-                    <span>ou</span>
-                    <label for="fileInput" class="btn-upload">Choisir un fichier</label>
-                    <input type="file" id="fileInput" hidden>
+            <div class="drop-card" id="dropZone">
+                <div class="drop-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
                 </div>
-                <div id="fileList"></div>
-            </div>
-        </section>
-
-        <section id="pricing" class="pricing">
-            <h2>Prêt à passer au niveau supérieur ?</h2>
-            <div class="pricing-grid">
-                <div class="card">
-                    <h3>Gratuit</h3>
-                    <div class="price">$0</div>
-                    <ul>
-                        <li>2 conversions / jour</li>
-                        <li>Max 5 MB par fichier</li>
-                    </ul>
-                    <button class="btn-outline">Plan Actuel</button>
-                </div>
-
-                <div class="card featured">
-                    <div class="badge">MEILLEUR PRIX</div>
-                    <h3>Pro</h3>
-                    <div class="price">$0.99<span>/mois</span></div>
-                    <ul>
-                        <li>Conversions illimitées</li>
-                        <li>Vitesse ultra-rapide</li>
-                        <li>Aucune publicité</li>
-                        <li>Support prioritaire</li>
-                    </ul>
-                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                        <input type="hidden" name="amount" value="0.99">
-                        <button type="submit" class="btn-primary">Passer en Pro</button>
-                    </form>
+                <h3>Glissez vos fichiers ici</h3>
+                <p>ou cliquez pour parcourir votre ordinateur</p>
+                <input type="file" id="fileInput" hidden>
+                <button class="btn-select" onclick="document.getElementById('fileInput').click()">Choisir un fichier</button>
+                
+                <div id="uploadStatus" class="hidden">
+                    <div class="loader-bar"><div class="progress"></div></div>
+                    <p id="statusText">Traitement en cours...</p>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <footer>
-        <p>© 2026 FileConvert Pro - Micheal Edition</p>
-    </footer>
+    <section id="pricing" class="pricing-section">
+        <div class="section-header">
+            <h2>Un prix imbattable</h2>
+            <p>Accédez à tous les outils premium sans vous ruiner.</p>
+        </div>
+
+        <div class="pricing-container">
+            <div class="price-card">
+                <h3>Standard</h3>
+                <div class="amount">$0<span>/mois</span></div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> 2 fichiers par jour</li>
+                    <li><i class="fas fa-check"></i> Taille max 10MB</li>
+                </ul>
+                <button class="btn-secondary">Plan Actuel</button>
+            </div>
+
+            <div class="price-card featured">
+                <div class="popular-tag">RECOMMANDÉ</div>
+                <h3>Pro Plan</h3>
+                <div class="amount">$0.99<span>/mois</span></div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> Conversions illimitées</li>
+                    <li><i class="fas fa-check"></i> Taille max 500MB</li>
+                    <li><i class="fas fa-check"></i> OCR (Reconnaissance de texte)</li>
+                    <li><i class="fas fa-check"></i> Sans aucune publicité</li>
+                </ul>
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                    <input type="hidden" name="amount" value="0.99">
+                    <button type="submit" class="btn-primary-gradient">Devenir Pro</button>
+                </form>
+            </div>
+        </div>
+    </section>
 
     <script src="script.js"></script>
 </body>
