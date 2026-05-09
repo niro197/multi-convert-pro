@@ -3,100 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro | Plateforme de Conversion Haute Performance</title>
-    
-    <!-- Lien vers ton CSS -->
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Polices Google Fonts Premium -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Bibliothèques de traitement (Indispensables pour JS) -->
+    <title>MultiConvert Pro | Le Smallpdf Rapide</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Navigation Vitrée -->
-    <nav class="glass-nav">
+    <nav class="navbar">
         <div class="logo">Multi<span>Convert</span></div>
-        <div class="status">v2.0 Beta</div>
     </nav>
 
-    <!-- En-tête Hero -->
-    <header class="hero-text">
-        <h1>Édition de fichiers nouvelle génération.</h1>
-        <p>Rapide. Privé. Sans installation.</p>
-    </header>
-
-    <!-- Grille des outils -->
-    <main class="grid">
-        <!-- Outil 1 -->
-        <div class="tool-card" onclick="openTool('img-pdf')">
-            <div class="icon-box">📄</div>
-            <h3>Image vers PDF</h3>
-            <p>Fusionnez vos photos dans un document PDF propre.</p>
+    <main class="main-content">
+        <div class="header-section">
+            <h1 id="main-title">Convertir en PDF</h1>
+            <p>Le convertisseur de fichiers en ligne n°1 de niro197</p>
         </div>
 
-        <!-- Outil 2 -->
-        <div class="tool-card" onclick="openTool('png-jpg')">
-            <div class="icon-box">🖼️</div>
-            <h3>PNG vers JPG</h3>
-            <p>Convertissez vos images lourdes pour le web.</p>
+        <!-- Zone de dépôt style Smallpdf -->
+        <div class="converter-container" id="drop-zone">
+            <div class="inner-dropzone">
+                <div class="icon-illustration">📂</div>
+                <button class="btn-choose" onclick="document.getElementById('fileInput').click()">Choisir les fichiers</button>
+                <p class="drop-text">ou glissez-déposez les fichiers ici</p>
+                <input type="file" id="fileInput" hidden>
+            </div>
+            
+            <!-- Zone de chargement cachée -->
+            <div id="processing-zone" class="hidden">
+                <div class="loader"></div>
+                <p id="file-name-display"></p>
+                <button id="execute-btn" class="btn-action">Convertir maintenant</button>
+            </div>
         </div>
 
-        <!-- Outil 3 -->
-        <div class="tool-card" onclick="openTool('txt-pdf')">
-            <div class="icon-box">📝</div>
-            <h3>Texte vers PDF</h3>
-            <p>Transformez vos notes .txt en PDF officiels.</p>
-        </div>
-
-        <!-- Outil 4 -->
-        <div class="tool-card" onclick="openTool('compress')">
-            <div class="icon-box">🗜️</div>
-            <h3>Compression ZIP</h3>
-            <p>Regroupez et réduisez la taille de vos fichiers.</p>
-        </div>
-
-        <!-- Outil 5 (Bientôt disponible) -->
-        <div class="tool-card coming-soon">
-            <div class="icon-box">🎬</div>
-            <h3>MP4 vers GIF</h3>
-            <p>Bientôt disponible...</p>
-        </div>
-
-        <!-- Outil 6 (Bientôt disponible) -->
-        <div class="tool-card coming-soon">
-            <div class="icon-box">🔊</div>
-            <h3>Extracteur Audio</h3>
-            <p>Bientôt disponible...</p>
+        <!-- Menu des outils en bas -->
+        <div class="tools-grid">
+            <div class="tool-item active" onclick="setTool('txt-pdf', 'Texte en PDF', '#e74c3c')">
+                <span class="tool-icon">📄</span> Texte vers PDF
+            </div>
+            <div class="tool-item" onclick="setTool('compress', 'Compresser PDF', '#f1c40f')">
+                <span class="tool-icon">🗜️</span> Compresser ZIP
+            </div>
+            <div class="tool-item" onclick="setTool('png-jpg', 'Image en JPG', '#3498db')">
+                <span class="tool-icon">🖼️</span> PNG vers JPG
+            </div>
         </div>
     </main>
 
-    <!-- Fenêtre de traitement (Modal) -->
-    <div id="modal" class="modal hidden">
-        <div class="modal-content glass">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title">Outil de conversion</h2>
-            
-            <div class="drop-zone" id="drop-zone">
-                <div class="icon-box">📤</div>
-                <p>Cliquez pour importer votre fichier</p>
-                <input type="file" id="fileInput" hidden>
-                <button class="btn-main" onclick="document.getElementById('fileInput').click()">Sélectionner</button>
-            </div>
-
-            <div id="file-info" class="hidden">
-                <div class="file-card">
-                    <p id="file-name">Nom du fichier</p>
-                    <button class="btn-action" id="execute-btn">Démarrer la conversion</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lien vers ton JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
