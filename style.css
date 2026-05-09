@@ -1,188 +1,99 @@
 :root {
-    --bg-dark: #050505;
-    --card-bg: rgba(18, 18, 23, 0.7);
-    --primary-neon: #00f2ff;
-    --accent-neon: #7000ff;
-    --text-main: #ffffff;
-    --text-dim: #a0a0a0;
-    --border-glow: rgba(255, 255, 255, 0.1);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+    --primary-blue: #3498db;
+    --bg-light: #f0f3f9;
+    --text-dark: #333d47;
 }
 
 body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Fond avec particules lumineuses */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: 
-        radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 80% 70%, rgba(112, 0, 255, 0.05) 0%, transparent 40%);
-    z-index: -1;
-}
-
-/* Barre de navigation stylisée */
-.glass-nav {
+.navbar {
+    background: white;
+    padding: 15px 5%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 20px 8%;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border-glow);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.logo {
-    font-size: 1.4rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
+.logo { font-size: 1.5rem; font-weight: 700; color: #e74c3c; }
+.logo span { color: #333d47; }
 
-.logo span {
-    color: var(--primary-neon);
-    text-shadow: 0 0 15px var(--primary-neon);
-}
-
-/* Hero Section */
-.hero-text {
+.main-content {
+    max-width: 900px;
+    margin: 60px auto;
     text-align: center;
-    padding: 80px 20px 40px;
+    padding: 0 20px;
 }
 
-.hero-text h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    background: linear-gradient(to right, #fff, var(--primary-neon), var(--accent-neon));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-    margin-bottom: 15px;
-}
+.header-section h1 { font-size: 2.5rem; margin-bottom: 10px; }
+.header-section p { color: #6d7b8a; font-size: 1.1rem; margin-bottom: 40px; }
 
-/* Grille de cartes futuriste */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    padding: 40px 8%;
-    max-width: 1400px;
-    margin: auto;
-}
-
-.tool-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-glow);
-    border-radius: 24px;
-    padding: 40px 30px;
-    text-align: left;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.tool-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    border-color: var(--primary-neon);
-    box-shadow: 0 10px 40px rgba(0, 242, 255, 0.15);
-}
-
-/* Effet de brillance au survol */
-.tool-card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: -100%; width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    transition: 0.5s;
-}
-
-.tool-card:hover::before {
-    left: 100%;
-}
-
-.icon-box {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    display: inline-block;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-}
-
-.tool-card h3 {
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.tool-card p {
-    color: var(--text-dim);
-    font-size: 0.95rem;
-}
-
-/* Fenêtre Modal (Pop-up) */
-.modal {
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-}
-
-.modal-content.glass {
-    background: #111116;
-    border: 1px solid var(--primary-neon);
-    box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+/* La Zone de Drop style Smallpdf */
+.converter-container {
+    background: #e74c3c; /* Rouge par défaut */
+    border-radius: 20px;
+    padding: 60px 20px;
     color: white;
+    transition: background 0.3s ease;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.drop-zone {
-    border: 2px dashed #333;
-    background: rgba(255,255,255,0.02);
-    transition: 0.3s;
-}
+.inner-dropzone { border: 2px dashed rgba(255,255,255,0.3); border-radius: 15px; padding: 40px; }
 
-.drop-zone:hover {
-    border-color: var(--primary-neon);
-    background: rgba(0, 242, 255, 0.05);
-}
+.icon-illustration { font-size: 4rem; margin-bottom: 20px; }
 
-/* Boutons */
-.btn-main, .btn-action {
-    background: linear-gradient(45deg, var(--primary-neon), var(--accent-neon));
-    color: #000;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.btn-choose {
+    background: white;
+    color: #333;
     border: none;
-    transition: 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.btn-main:hover, .btn-action:hover {
-    transform: scale(1.05);
-    filter: brightness(1.2);
-    box-shadow: 0 6px 20px rgba(112, 0, 255, 0.4);
+.drop-text { margin-top: 15px; font-weight: 400; opacity: 0.9; }
+
+/* Grille d'outils secondaire */
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 40px;
 }
 
-/* Badge "Coming Soon" */
-.coming-soon {
-    opacity: 0.6;
-    cursor: not-allowed;
+.tool-item {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.2s;
+    border: 1px solid #e0e4e9;
 }
 
-/* Responsive pour ton Samsung A06 */
-@media (max-width: 768px) {
-    .hero-text h1 { font-size: 2.2rem; }
-    .grid { padding: 20px 5%; }
+.tool-item:hover { transform: translateY(-5px); border-color: #e74c3c; }
+
+.hidden { display: none !important; }
+
+.btn-action {
+    background: #2ecc71;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 20px;
 }
