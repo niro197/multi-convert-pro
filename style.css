@@ -3,7 +3,7 @@
     --dark: #0F172A;
 }
 
-body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #F8FAFC; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #F8FAFC; color: var(--dark); }
 
 .glass-nav {
     background: rgba(255, 255, 255, 0.8);
@@ -14,7 +14,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #F8F
 }
 
 .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; }
-
 .logo { font-size: 22px; font-weight: 800; }
 .logo span { color: var(--primary); }
 
@@ -24,6 +23,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #F8F
     background: white; border: 2px dashed #CBD5E0;
     padding: 50px; border-radius: 20px; max-width: 600px; margin: 40px auto;
 }
+
+.drop-icon { font-size: 40px; color: var(--primary); margin-bottom: 15px; }
 
 .btn-primary-gradient {
     background: linear-gradient(135deg, #4F46E5, #4338CA);
