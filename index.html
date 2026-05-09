@@ -3,67 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiConvert Pro | Simple & Rapide</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>FileConvert Pro - Convertisseur de fichiers en ligne</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============ RESET & VARIABLES ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+ 
+        :root {
+            --primary: #0055FF;
+            --primary-light: #E8F0FF;
+            --primary-dark: #003DBE;
+            --secondary: #FF6B6B;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5a5a5a;
+            --text-muted: #8a8a8a;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #f0f2f5;
+            --border-color: #e0e0e0;
+            --success: #10b981;
+        }
+ 
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-primary: #f5f5f5;
+                --text-secondary: #d0d0d0;
+                --text-muted: #a0a0a0;
+                --bg-primary: #0a0e27;
+                --bg-secondary: #131820;
+                --bg-tertiary: #1a2238;
+                --border-color: #2a3142;
+            }
+        }
+ 
+        html, body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+ 
+        /* ============ HEADER ============ */
+        header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+ 
+        @media (prefers-color-scheme: dark) {
+            header { background-color: rgba(10, 14, 39, 0.95); }
+        }
+ 
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+ 
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+ 
+        .nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+        }
+ 
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+ 
+        .nav a:hover { color: var(--primary); }
+ 
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+ 
+        /* ============ BUTTONS ============ */
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+ 
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 85, 255, 0.3);
+        }
+ 
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 0.6rem 1.3rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+ 
+        /* ============ SECTIONS ============ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+ 
+        .section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+ 
+        .section.active { display: block; }
+ 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+ 
+        /* ============ PRICING ============ */
+        .pricing-section { padding: 4rem 0; }
+        .pricing-title { text-align: center; font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+        .pricing-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 3rem; }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+ 
+        .pricing-card {
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+ 
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+ 
+        .price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+ 
+        .features-list {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+ 
+        .features-list li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+ 
+        .features-list li::before {
+            content: "✓ ";
+            color: var(--success);
+            font-weight: 800;
+            margin-right: 0.8rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
-
-    <nav class="navbar">
-        <div class="logo">Multi<span>Convert</span></div>
-        <div class="nav-links">
-            <a href="#premium" class="btn-premium-nav">Passer au Premium</a>
-        </div>
-    </nav>
-
-    <main class="container">
-        <div class="hero">
-            <h1 id="tool-title">Convertisseur de fichiers</h1>
-            <p>La solution gratuite pour vos PDF, Images et ZIP.</p>
-        </div>
-
-        <!-- Zone de transfert style Smallpdf -->
-        <div class="dropzone-container" id="main-zone">
-            <div id="upload-view">
-                <div class="icon-folder">📂</div>
-                <button class="btn-choose" onclick="document.getElementById('fileInput').click()">Choisir les fichiers</button>
-                <p>ou glissez-déposez ici</p>
-                <input type="file" id="fileInput" hidden>
-            </div>
-
-            <div id="process-view" class="hidden">
-                <div class="file-icon">📄</div>
-                <p id="file-name"></p>
-                <button id="convert-btn" class="btn-convert">Démarrer la conversion</button>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">FileConvert</a>
+            <nav class="nav">
+                <a href="#features">Caractéristiques</a>
+                <a href="#pricing">Tarification</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+            <div class="header-right">
+                <button class="btn-primary" onclick="showSection('dashboard')">Accéder au Dashboard</button>
             </div>
         </div>
-
-        <!-- Section Abonnement -->
-        <section id="premium" class="subscription-card">
-            <h2>MultiConvert <span>Pro Premium</span></h2>
-            <p class="price">1$ <span>/ mois</span></p>
-            <ul>
-                <li>✅ Conversions illimitées</li>
-                <li>✅ Taille de fichier jusqu'à 1 Go</li>
-                <li>✅ Support prioritaire</li>
-            </ul>
-            <!-- BOUTON PAYPAL (À CONFIGURER) -->
-            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                <input type="hidden" name="cmd" value="_xclick-subscriptions">
-                <input type="hidden" name="business" value="TON_EMAIL_PAYPAL@GMAIL.COM"> <!-- METS TON EMAIL ICI -->
-                <input type="hidden" name="item_name" value="Abonnement MultiConvert Pro">
-                <input type="hidden" name="currency_code" value="USD">
-                <input type="hidden" name="a3" value="1.00">
-                <input type="hidden" name="p3" value="1">
-                <input type="hidden" name="t3" value="M">
-                <input type="hidden" name="src" value="1">
-                <button type="submit" class="btn-paypal">S'abonner avec PayPal</button>
-            </form>
-        </section>
-    </main>
-
-    <script src="script.js"></script>
+    </header>
+ 
+    <section id="dashboard" class="section active">
+        <div class="pricing-section" id="pricing">
+            <div class="container">
+                <h2 class="pricing-title">Tarification simple et transparente</h2>
+                <p class="pricing-subtitle">Choisissez le plan qui vous convient</p>
+                
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Starter</h3>
+                        <div class="price">$0</div>
+                        <div class="price-period">Pour toujours</div>
+                        <ul class="features-list">
+                            <li>5 conversions par jour</li>
+                            <li>Max 10 MB par fichier</li>
+                            <li>Tous les formats courants</li>
+                        </ul>
+                        <button class="btn-primary" disabled style="width: 100%; opacity: 0.5;">Plan actuel</button>
+                    </div>
+ 
+                    <div class="pricing-card featured">
+                        <h3>Premium</h3>
+                        <div class="price">$0.99</div> <div class="price-period">par mois</div>
+                        <ul class="features-list">
+                            <li>Conversions illimitées</li>
+                            <li>Max 200 MB par fichier</li>
+                            <li>Tous les formats</li>
+                            <li>Support prioritaire 24/7</li>
+                        </ul>
+                        
+                        <form method="post" action="https://www.paypal.com/cgi-bin/webscr" style="width: 100%;">
+                            <input type="hidden" name="cmd" value="_xclick">
+                            <input type="hidden" name="business" value="votre-email@paypal.com">
+                            <input type="hidden" name="item_name" value="FileConvert Pro - Premium Monthly">
+                            <input type="hidden" name="amount" value="0.99"> <input type="hidden" name="currency_code" value="USD">
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 0.8rem;">S'abonner maintenant</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+ 
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+ 
+        // Initialisation si nécessaire
+        window.onload = function() {
+            console.log("FileConvert Pro prêt avec le nouveau prix de 0.99$");
+        };
+    </script>
 </body>
 </html>
