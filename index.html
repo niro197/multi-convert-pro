@@ -5,32 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDFShift — Convertisseur PDF en ligne</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Toast Container -->
+  <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ========== NAVIGATION ========== -->
+  <!-- ===== OVERLAY CONVERSION PLEIN ECRAN ===== -->
+  <div class="cv-overlay" id="cvOverlay">
+    <div class="cv-bg-particles" id="cvParticles"></div>
+    <div class="cv-content">
+      <div class="cv-formats">
+        <div class="cv-fmt cv-fmt-in" id="cvFmtIn">
+          <i class="fas fa-file-pdf"></i>
+          <span>PDF</span>
+        </div>
+        <div class="cv-arrow-wrap">
+          <div class="cv-arrow-line"></div>
+          <div class="cv-arrow-dot"></div>
+          <div class="cv-arrow-dot" style="animation-delay:0.3s;"></div>
+          <div class="cv-arrow-dot" style="animation-delay:0.6s;"></div>
+        </div>
+        <div class="cv-fmt cv-fmt-out" id="cvFmtOut">
+          <i class="fas fa-file-alt"></i>
+          <span>TXT</span>
+        </div>
+      </div>
+      <div class="cv-ring-wrap">
+        <svg class="cv-ring-svg" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#E5E7EB" stroke-width="5"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#0A7CFF" stroke-width="5"
+            stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/>
+        </svg>
+        <div class="cv-ring-inner" id="cvRingInner">
+          <i class="fas fa-cog fa-spin" id="cvSpinIcon"></i>
+          <i class="fas fa-check" id="cvCheckIcon" style="display:none;"></i>
+        </div>
+      </div>
+      <p class="cv-step" id="cvStepText">Preparation du fichier...</p>
+      <p class="cv-percent" id="cvPercentText">0%</p>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
   <header class="header" id="header">
     <div class="header-inner">
       <a href="#" class="logo" onclick="navigate('home');return false;">
-        <div class="logo-icon">
-          <i class="fas fa-file-pdf"></i>
-        </div>
+        <div class="logo-icon"><i class="fas fa-file-pdf"></i></div>
         <span class="logo-text">PDF<span class="logo-accent">Shift</span></span>
       </a>
-
       <nav class="nav-center" id="navLinks">
         <a class="nav-link active" data-page="home" onclick="navigate('home')">Accueil</a>
         <a class="nav-link" data-page="tools" onclick="navigate('tools')">Outils</a>
         <a class="nav-link" data-page="pricing" onclick="navigate('pricing')">Tarifs</a>
         <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none;">Dashboard</a>
       </nav>
-
       <div class="nav-right" id="navAuth">
         <button class="btn-text" onclick="openModal('login')">Connexion</button>
         <button class="btn-primary-sm" onclick="openModal('register')">S'inscrire</button>
@@ -38,172 +70,70 @@
     </div>
   </header>
 
-  <!-- ========== PAGE ACCUEIL ========== -->
+  <!-- ===== ACCUEIL ===== -->
   <main id="page-home" class="page page-visible">
-    <!-- Hero -->
     <section class="hero">
+      <div class="hero-bg-shapes">
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
+      </div>
       <div class="hero-inner">
-        <h1 class="hero-title">
-          Simplifiez tous vos <span class="text-blue">travaux PDF</span>
-        </h1>
-        <p class="hero-sub">
-          Convertissez, compressez, fusionnez et transformez vos PDF en quelques secondes.
-          Gratuit, rapide et sans inscription obligatoire.
-        </p>
-
-        <!-- Barre d'outils hero -->
-        <div class="hero-tools-grid">
-          <div class="hero-tool-card" onclick="selectTool('pdf-to-text')">
-            <div class="hero-tool-icon" style="background:#EEF4FF;color:#0A7CFF;">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">PDF en Texte</div>
-              <div class="hero-tool-desc">Extraire le texte</div>
-            </div>
-          </div>
-          <div class="hero-tool-card" onclick="selectTool('pdf-to-image')">
-            <div class="hero-tool-icon" style="background:#ECFDF5;color:#059669;">
-              <i class="fas fa-image"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">PDF en Image</div>
-              <div class="hero-tool-desc">Convertir en PNG</div>
-            </div>
-          </div>
-          <div class="hero-tool-card" onclick="selectTool('image-to-pdf')">
-            <div class="hero-tool-icon" style="background:#FFF7ED;color:#EA580C;">
-              <i class="fas fa-file-image"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">Image en PDF</div>
-              <div class="hero-tool-desc">Creer un PDF</div>
-            </div>
-          </div>
-          <div class="hero-tool-card" onclick="selectTool('text-to-pdf')">
-            <div class="hero-tool-icon" style="background:#FEF3C7;color:#D97706;">
-              <i class="fas fa-pen-nib"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">Texte en PDF</div>
-              <div class="hero-tool-desc">Generer un PDF</div>
-            </div>
-          </div>
-          <div class="hero-tool-card" onclick="selectTool('merge-pdf')">
-            <div class="hero-tool-icon" style="background:#FEE2E2;color:#DC2626;">
-              <i class="fas fa-layer-group"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">Fusionner PDF</div>
-              <div class="hero-tool-desc">Combiner des PDF</div>
-            </div>
-          </div>
-          <div class="hero-tool-card" onclick="selectTool('html-to-pdf')">
-            <div class="hero-tool-icon" style="background:#F3E8FF;color:#9333EA;">
-              <i class="fas fa-code"></i>
-            </div>
-            <div>
-              <div class="hero-tool-name">HTML en PDF</div>
-              <div class="hero-tool-desc">Convertir du HTML</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-num" id="statConversions">0</span>
-            <span class="hero-stat-label">Conversions</span>
-          </div>
+        <span class="hero-badge anim-up"><i class="fas fa-bolt"></i> Rapide, gratuit, prive</span>
+        <h1 class="hero-title anim-up anim-up-1">Simplifiez tous vos<br><span class="text-blue">travaux PDF</span></h1>
+        <p class="hero-sub anim-up anim-up-2">Convertissez, compressez, fusionnez et transformez vos PDF en quelques secondes. Traitement 100% local dans votre navigateur.</p>
+        <div class="hero-tools-grid" id="heroToolsGrid"></div>
+        <div class="hero-stats anim-up anim-up-6">
+          <div class="hero-stat"><span class="hero-stat-num" id="statConversions">0</span><span class="hero-stat-label">Conversions</span></div>
           <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">6</span>
-            <span class="hero-stat-label">Outils</span>
-          </div>
+          <div class="hero-stat"><span class="hero-stat-num">12</span><span class="hero-stat-label">Outils</span></div>
           <div class="hero-stat-divider"></div>
-          <div class="hero-stat">
-            <span class="hero-stat-num">100%</span>
-            <span class="hero-stat-label">Local &amp; prive</span>
-          </div>
+          <div class="hero-stat"><span class="hero-stat-num">100%</span><span class="hero-stat-label">Local &amp; prive</span></div>
         </div>
       </div>
     </section>
-
-    <!-- Comment ça marche -->
     <section class="section-how">
       <div class="container">
         <h2 class="section-title">Comment ca marche ?</h2>
         <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-num">1</div>
-            <h3>Choisissez un outil</h3>
-            <p>Selectionnez la conversion que vous souhaitez effectuer parmi nos 6 outils.</p>
-          </div>
-          <div class="step-connector"><i class="fas fa-chevron-right"></i></div>
-          <div class="step-card">
-            <div class="step-num">2</div>
-            <h3>Importez votre fichier</h3>
-            <p>Glissez-deposez votre fichier ou saisissez votre texte directement.</p>
-          </div>
-          <div class="step-connector"><i class="fas fa-chevron-right"></i></div>
-          <div class="step-card">
-            <div class="step-num">3</div>
-            <h3>Telechargez le resultat</h3>
-            <p>Recevez votre fichier converti instantanement, sans attente.</p>
-          </div>
+          <div class="step-card"><div class="step-num">1</div><h3>Choisissez un outil</h3><p>Selectionnez la conversion parmi nos 12 outils disponibles.</p></div>
+          <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card"><div class="step-num">2</div><h3>Importez votre fichier</h3><p>Glissez-deposez ou saisissez votre texte directement.</p></div>
+          <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card"><div class="step-num">3</div><h3>Telechargez le resultat</h3><p>Recevez votre fichier converti instantanement.</p></div>
         </div>
       </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <p>&copy; 2025 PDFShift. Tous les fichiers sont traites localement dans votre navigateur.</p>
-      </div>
-    </footer>
+    <footer class="footer"><div class="container"><p>&copy; 2025 PDFShift — Tous les fichiers sont traites localement.</p></div></footer>
   </main>
 
-  <!-- ========== PAGE OUTILS ========== -->
+  <!-- ===== OUTILS ===== -->
   <main id="page-tools" class="page page-hidden">
     <section class="tool-page">
       <div class="container">
-        <button class="btn-back" onclick="navigate('home')">
-          <i class="fas fa-arrow-left"></i> Retour
-        </button>
-
+        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div class="tool-header" id="toolHeader">
-          <div class="tool-header-icon" id="toolIcon">
-            <i class="fas fa-file-alt"></i>
-          </div>
+          <div class="tool-header-icon" id="toolIcon"><i class="fas fa-file-alt"></i></div>
           <div>
             <h1 id="toolTitle">PDF vers Texte</h1>
             <p id="toolDesc">Extrayez le texte de vos fichiers PDF</p>
           </div>
+          <span id="toolProBadge" class="tool-pro-badge" style="display:none;"><i class="fas fa-crown"></i> Pro</span>
         </div>
-
-        <!-- Limite -->
         <div class="limit-bar" id="limitBanner">
           <div class="limit-bar-left">
             <i class="fas fa-info-circle" style="color:#D97706;"></i>
             <div>
               <span class="limit-text" id="limitText">3 conversions restantes</span>
-              <div class="limit-track">
-                <div class="limit-fill" id="limitProgress"></div>
-              </div>
+              <div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div>
             </div>
           </div>
-          <button class="btn-primary-sm" onclick="navigate('pricing')">
-            <i class="fas fa-crown"></i> Pro
-          </button>
+          <button class="btn-primary-sm" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button>
         </div>
-
-        <!-- Drop zone -->
         <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
           <input type="file" id="fileInput" accept=".pdf" multiple>
           <div id="dropContent">
-            <div class="drop-icon">
-              <i class="fas fa-cloud-upload-alt"></i>
-            </div>
+            <div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div>
             <p class="drop-title">Glissez votre fichier ici</p>
             <p class="drop-sub">ou cliquez pour parcourir</p>
             <p class="drop-formats" id="acceptedFormats">Formats acceptes : PDF</p>
@@ -212,262 +142,165 @@
             <i class="fas fa-file-pdf" style="font-size:36px;color:#0A7CFF;"></i>
             <p id="fileName" class="file-name"></p>
             <p id="fileSize" class="file-size"></p>
-            <button class="btn-text" onclick="event.stopPropagation();clearFile();" style="color:#DC2626;margin-top:8px;">
-              <i class="fas fa-times"></i> Supprimer
-            </button>
+            <button class="btn-text" onclick="event.stopPropagation();clearFile();" style="color:#DC2626;margin-top:8px;"><i class="fas fa-times"></i> Supprimer</button>
           </div>
         </div>
-
-        <!-- Zone texte -->
         <div id="textInputArea" style="display:none;" class="text-input-wrap">
           <textarea class="text-input" id="textInput" rows="12" placeholder="Collez votre contenu ici..."></textarea>
         </div>
-
-        <!-- Bouton convertir -->
+        <!-- Page range pour split -->
+        <div id="pageRangeArea" style="display:none;" class="page-range-wrap">
+          <label class="form-label" style="margin:0 0 6px 0;">Pages a extraire (ex: 1-3, 5, 7-9)</label>
+          <input class="form-input" type="text" id="pageRangeInput" placeholder="1-3" value="1">
+        </div>
+        <!-- Watermark text -->
+        <div id="watermarkArea" style="display:none;" class="page-range-wrap">
+          <label class="form-label" style="margin:0 0 6px 0;">Texte du filigrane</label>
+          <input class="form-input" type="text" id="watermarkInput" placeholder="CONFIDENTIEL" value="CONFIDENTIEL">
+        </div>
         <div class="convert-btn-wrap">
           <button class="btn-convert" id="convertBtn" onclick="startConversion()" disabled>
             <i class="fas fa-sync-alt"></i> Convertir maintenant
           </button>
         </div>
-
-        <!-- Progression -->
-        <div id="progressArea" class="progress-card" style="display:none;">
-          <i class="fas fa-cog fa-spin progress-icon"></i>
-          <p id="progressText" class="progress-text">Conversion en cours...</p>
-          <div class="progress-track">
-            <div class="progress-fill" id="conversionProgress"></div>
-          </div>
-          <p id="progressPercent" class="progress-percent">0%</p>
-        </div>
-
-        <!-- Résultat -->
         <div id="resultArea" class="result-card" style="display:none;">
           <div class="result-header">
-            <div class="result-check">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div>
-              <p class="result-title">Conversion terminee</p>
-              <p class="result-info" id="resultInfo"></p>
-            </div>
+            <div class="result-check"><i class="fas fa-check-circle"></i></div>
+            <div><p class="result-title">Conversion terminee</p><p class="result-info" id="resultInfo"></p></div>
           </div>
-          <div id="textResult" style="display:none;" class="result-preview">
-            <pre id="extractedText"></pre>
-          </div>
-          <button class="btn-download" id="downloadBtn" onclick="downloadResult()">
-            <i class="fas fa-download"></i> Telecharger
-          </button>
+          <div id="textResult" style="display:none;" class="result-preview"><pre id="extractedText"></pre></div>
+          <button class="btn-download" id="downloadBtn" onclick="downloadResult()"><i class="fas fa-download"></i> Telecharger</button>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ========== PAGE TARIFS ========== -->
+  <!-- ===== TARIFS ===== -->
   <main id="page-pricing" class="page page-hidden">
     <section class="pricing-page">
       <div class="container">
-        <button class="btn-back" onclick="navigate('home')">
-          <i class="fas fa-arrow-left"></i> Retour
-        </button>
-
+        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
         <h1 class="pricing-title">Choisissez votre plan</h1>
-        <p class="pricing-sub">Simple, transparent, sans engagement</p>
-
+        <p class="pricing-sub">Debloquez tout le potentiel de PDFShift</p>
         <div class="pricing-grid">
-          <!-- Gratuit -->
           <div class="pricing-card">
             <div class="pricing-card-header">
               <span class="pricing-badge-free">Gratuit</span>
-              <div class="pricing-price">
-                <span class="pricing-amount">0</span>
-                <span class="pricing-currency">&euro;</span>
-              </div>
+              <div class="pricing-price"><span class="pricing-amount">0</span><span class="pricing-currency">&euro;</span></div>
               <p class="pricing-period">Pour toujours</p>
             </div>
             <ul class="pricing-features">
-              <li><i class="fas fa-check"></i> 3 conversions par cycle</li>
-              <li><i class="fas fa-check"></i> Renouvellement toutes les 48h</li>
-              <li><i class="fas fa-check"></i> Tous les outils</li>
+              <li><i class="fas fa-check"></i> 3 outils gratuits</li>
+              <li><i class="fas fa-check"></i> 3 conversions / cycle de 48h</li>
+              <li><i class="fas fa-check"></i> Fichiers max 5 Mo</li>
               <li><i class="fas fa-check"></i> Traitement local</li>
-              <li class="disabled"><i class="fas fa-times"></i> Fichiers max 5 Mo</li>
-              <li class="disabled"><i class="fas fa-times"></i> Sans priorite</li>
+              <li class="disabled"><i class="fas fa-times"></i> 9 outils Pro</li>
+              <li class="disabled"><i class="fas fa-times"></i> Conversions illimitees</li>
             </ul>
             <button class="btn-outline" onclick="handleFreePlan()">Commencer gratuitement</button>
           </div>
-
-          <!-- Pro -->
           <div class="pricing-card pricing-card-popular">
             <div class="popular-tag">POPULAIRE</div>
             <div class="pricing-card-header">
               <span class="pricing-badge-pro"><i class="fas fa-crown"></i> Pro</span>
-              <div class="pricing-price">
-                <span class="pricing-amount">0,99</span>
-                <span class="pricing-currency">&euro;</span>
-                <span class="pricing-period-inline">/mois</span>
-              </div>
+              <div class="pricing-price"><span class="pricing-amount">0,99</span><span class="pricing-currency">&euro;</span><span class="pricing-period-inline">/mois</span></div>
               <p class="pricing-period">Annulable a tout moment</p>
             </div>
             <ul class="pricing-features">
+              <li><i class="fas fa-check"></i> <strong>12 outils</strong> disponibles</li>
               <li><i class="fas fa-check"></i> Conversions illimitees</li>
               <li><i class="fas fa-check"></i> Fichiers max 50 Mo</li>
-              <li><i class="fas fa-check"></i> Tous les outils</li>
               <li><i class="fas fa-check"></i> Traitement prioritaire</li>
+              <li><i class="fas fa-check"></i> Filigrane, rotation, split...</li>
               <li><i class="fas fa-check"></i> Historique complet</li>
-              <li><i class="fas fa-check"></i> Support prioritaire</li>
             </ul>
-            <button class="btn-primary-lg" onclick="handleProPlan()">
-              <i class="fas fa-crown"></i> S'abonner pour 0,99&euro;
-            </button>
+            <button class="btn-primary-lg" onclick="handleProPlan()"><i class="fas fa-crown"></i> S'abonner 0,99&euro;/mois</button>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- ========== PAGE DASHBOARD ========== -->
+  <!-- ===== DASHBOARD ===== -->
   <main id="page-dashboard" class="page page-hidden">
     <section class="dashboard-page">
       <div class="container">
-        <button class="btn-back" onclick="navigate('home')">
-          <i class="fas fa-arrow-left"></i> Retour
-        </button>
-
+        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
         <div class="dash-top">
-          <div>
-            <h1 class="dash-title">Tableau de bord</h1>
-            <p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p>
-          </div>
+          <div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div>
           <div class="dash-top-right">
             <span id="dashBadge" class="badge-free">Gratuit</span>
-            <button class="btn-primary-sm" id="dashUpgradeBtn" onclick="navigate('pricing')">
-              <i class="fas fa-crown"></i> Passer Pro
-            </button>
+            <button class="btn-primary-sm" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Passer Pro</button>
           </div>
         </div>
-
         <div class="dash-stats">
-          <div class="dash-stat-card">
-            <p class="dash-stat-label">Ce cycle</p>
-            <p class="dash-stat-value" id="dashUsed">0</p>
-            <p class="dash-stat-sub" id="dashLimit">sur 3</p>
-          </div>
-          <div class="dash-stat-card">
-            <p class="dash-stat-label">Renouvellement</p>
-            <div class="timer-wrap">
-              <svg class="timer-svg" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="5"/>
-                <circle cx="40" cy="40" r="34" fill="none" stroke="#0A7CFF" stroke-width="5"
-                  stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/>
-              </svg>
-              <span class="timer-text" id="timerText">48h</span>
-            </div>
-          </div>
-          <div class="dash-stat-card">
-            <p class="dash-stat-label">Total</p>
-            <p class="dash-stat-value" id="dashTotal">0</p>
-            <p class="dash-stat-sub" style="color:#059669;"><i class="fas fa-arrow-up"></i> conversions</p>
-          </div>
+          <div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div>
+          <div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#0A7CFF" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div>
+          <div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#059669;"><i class="fas fa-arrow-up"></i> conversions</p></div>
         </div>
-
         <div class="dash-history-card">
-          <div class="dash-history-header">
-            <h3>Historique des conversions</h3>
-            <button class="btn-text" onclick="clearHistory()" style="color:#DC2626;font-size:13px;">
-              <i class="fas fa-trash"></i> Effacer
-            </button>
-          </div>
-          <div class="table-head">
-            <span>Fichier</span>
-            <span>Type</span>
-            <span>Date</span>
-            <span>Statut</span>
-          </div>
-          <div id="historyList" class="table-body">
-            <div class="table-empty">
-              <i class="fas fa-inbox"></i>
-              <p>Aucune conversion pour le moment</p>
-            </div>
-          </div>
+          <div class="dash-history-header"><h3>Historique</h3><button class="btn-text" onclick="clearHistory()" style="color:#DC2626;font-size:13px;"><i class="fas fa-trash"></i> Effacer</button></div>
+          <div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span>Statut</span></div>
+          <div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div>
         </div>
-
-        <div class="dash-logout">
-          <button class="btn-text" onclick="logout()" style="color:#DC2626;">
-            <i class="fas fa-sign-out-alt"></i> Se deconnecter
-          </button>
-        </div>
+        <div class="dash-logout"><button class="btn-text" onclick="logout()" style="color:#DC2626;"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
       </div>
     </section>
   </main>
 
-  <!-- ========== MODALS ========== -->
+  <!-- ===== MODALS ===== -->
   <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-    <!-- Login -->
     <div class="modal" id="modal-login" style="display:none;">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Connexion</h2>
       <form onsubmit="handleLogin(event)">
-        <label class="form-label">Adresse e-mail</label>
+        <label class="form-label">E-mail</label>
         <input class="form-input" type="email" id="loginEmail" placeholder="vous@exemple.com" required>
         <label class="form-label">Mot de passe</label>
-        <div class="password-wrap">
-          <input class="form-input" type="password" id="loginPassword" placeholder="Votre mot de passe" required>
-          <button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)"><i class="fas fa-eye"></i></button>
-        </div>
+        <div class="password-wrap"><input class="form-input" type="password" id="loginPassword" placeholder="Votre mot de passe" required><button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)"><i class="fas fa-eye"></i></button></div>
         <button type="submit" class="btn-primary-lg" style="width:100%;margin-top:8px;">Se connecter</button>
       </form>
       <p class="modal-switch">Pas de compte ? <a href="#" onclick="switchModal('register');return false;">S'inscrire</a></p>
     </div>
-
-    <!-- Register -->
     <div class="modal" id="modal-register" style="display:none;">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Creer un compte</h2>
       <form onsubmit="handleRegister(event)">
-        <label class="form-label">Nom d'utilisateur</label>
+        <label class="form-label">Nom</label>
         <input class="form-input" type="text" id="regName" placeholder="Votre nom" required minlength="2">
-        <label class="form-label">Adresse e-mail</label>
+        <label class="form-label">E-mail</label>
         <input class="form-input" type="email" id="regEmail" placeholder="vous@exemple.com" required>
         <label class="form-label">Mot de passe</label>
-        <div class="password-wrap">
-          <input class="form-input" type="password" id="regPassword" placeholder="Min. 6 caracteres" required minlength="6" oninput="checkPasswordStrength(this.value)">
-          <button type="button" class="password-toggle" onclick="togglePassword('regPassword',this)"><i class="fas fa-eye"></i></button>
-        </div>
-        <div class="strength-bars" id="strengthBars">
-          <div></div><div></div><div></div><div></div>
-        </div>
+        <div class="password-wrap"><input class="form-input" type="password" id="regPassword" placeholder="Min. 6 caracteres" required minlength="6" oninput="checkPasswordStrength(this.value)"><button type="button" class="password-toggle" onclick="togglePassword('regPassword',this)"><i class="fas fa-eye"></i></button></div>
+        <div class="strength-bars" id="strengthBars"><div></div><div></div><div></div><div></div></div>
         <p class="strength-text" id="strengthText"></p>
-        <label class="form-label">Confirmer le mot de passe</label>
-        <input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez le mot de passe" required>
+        <label class="form-label">Confirmer</label>
+        <input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez" required>
         <button type="submit" class="btn-primary-lg" style="width:100%;margin-top:8px;">Creer mon compte</button>
       </form>
       <p class="modal-switch">Deja un compte ? <a href="#" onclick="switchModal('login');return false;">Se connecter</a></p>
     </div>
-
-    <!-- Subscribe -->
     <div class="modal" id="modal-subscribe" style="display:none;">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Abonnement Pro</h2>
-      <div class="sub-summary">
-        <div class="sub-summary-left">
-          <i class="fas fa-crown" style="color:#0A7CFF;font-size:24px;"></i>
-          <div>
-            <p style="font-weight:600;">Plan Pro</p>
-            <p style="font-size:13px;color:#6B7280;">Illimite</p>
-          </div>
-        </div>
-        <div class="sub-summary-price">0,99&euro;<span>/mois</span></div>
+      <div class="sub-summary"><div class="sub-summary-left"><i class="fas fa-crown" style="color:#0A7CFF;font-size:24px;"></i><div><p style="font-weight:600;">Plan Pro</p><p style="font-size:13px;color:#6B7280;">12 outils illimites</p></div></div><div class="sub-summary-price">0,99&euro;<span>/mois</span></div></div>
+      <div class="sub-secure"><i class="fas fa-lock"></i> Paiement securise par Stripe</div>
+      <button class="btn-primary-lg" style="width:100%;" id="stripeCheckoutBtn" onclick="processStripeCheckout()"><i class="fas fa-credit-card"></i> Payer avec Stripe</button>
+      <p class="sub-note">Annulable a tout moment. Versement direct sur votre compte.</p>
+      <div class="stripe-help" id="stripeHelp" style="display:none;"></div>
+    </div>
+    <div class="modal" id="modal-pro-lock" style="display:none;">
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <div style="text-align:center;padding:12px 0;">
+        <div style="width:64px;height:64px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><i class="fas fa-lock" style="font-size:24px;color:#0A7CFF;"></i></div>
+        <h2 class="modal-title" style="text-align:center;">Outil reserve au plan Pro</h2>
+        <p style="color:#6B7280;font-size:14px;margin-bottom:24px;line-height:1.6;">Passez au plan Pro pour debloquer cet outil ainsi que 8 autres outils avances.</p>
+        <button class="btn-primary-lg" style="width:100%;" onclick="closeModal();navigate('pricing');"><i class="fas fa-crown"></i> Passer Pro — 0,99&euro;/mois</button>
+        <button class="btn-text" onclick="closeModal()" style="margin-top:12px;">Peut-etre plus tard</button>
       </div>
-      <div class="sub-secure">
-        <i class="fas fa-lock"></i> Paiement securise par Stripe
-      </div>
-      <button class="btn-primary-lg" style="width:100%;" id="stripeCheckoutBtn" onclick="processStripeCheckout()">
-        <i class="fas fa-credit-card"></i> Payer avec Stripe
-      </button>
-      <p class="sub-note">Annulable a tout moment. L'argent est verse directement sur votre compte Stripe.</p>
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
