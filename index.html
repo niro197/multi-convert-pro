@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDFShift — Convertisseur PDF en ligne</title>
+  <title>PDFShift — Simplifiez la gestion de vos PDF</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -11,41 +11,22 @@
 </head>
 <body>
 
-  <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ===== OVERLAY CONVERSION PLEIN ECRAN ===== -->
+  <!-- ===== OVERLAY CONVERSION ===== -->
   <div class="cv-overlay" id="cvOverlay">
     <div class="cv-bg-particles" id="cvParticles"></div>
     <div class="cv-content">
       <div class="cv-formats">
-        <div class="cv-fmt cv-fmt-in" id="cvFmtIn">
-          <i class="fas fa-file-pdf"></i>
-          <span>PDF</span>
-        </div>
-        <div class="cv-arrow-wrap">
-          <div class="cv-arrow-line"></div>
-          <div class="cv-arrow-dot"></div>
-          <div class="cv-arrow-dot" style="animation-delay:0.3s;"></div>
-          <div class="cv-arrow-dot" style="animation-delay:0.6s;"></div>
-        </div>
-        <div class="cv-fmt cv-fmt-out" id="cvFmtOut">
-          <i class="fas fa-file-alt"></i>
-          <span>TXT</span>
-        </div>
+        <div class="cv-fmt cv-fmt-in" id="cvFmtIn"><i class="fas fa-file-pdf"></i><span>PDF</span></div>
+        <div class="cv-arrow-wrap"><div class="cv-arrow-line"></div><div class="cv-arrow-dot"></div><div class="cv-arrow-dot" style="animation-delay:.3s"></div><div class="cv-arrow-dot" style="animation-delay:.6s"></div></div>
+        <div class="cv-fmt cv-fmt-out" id="cvFmtOut"><i class="fas fa-file-alt"></i><span>TXT</span></div>
       </div>
       <div class="cv-ring-wrap">
-        <svg class="cv-ring-svg" viewBox="0 0 200 200">
-          <circle cx="100" cy="100" r="88" fill="none" stroke="#E5E7EB" stroke-width="5"/>
-          <circle cx="100" cy="100" r="88" fill="none" stroke="#0A7CFF" stroke-width="5"
-            stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/>
-        </svg>
-        <div class="cv-ring-inner" id="cvRingInner">
-          <i class="fas fa-cog fa-spin" id="cvSpinIcon"></i>
-          <i class="fas fa-check" id="cvCheckIcon" style="display:none;"></i>
-        </div>
+        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="#E2E8F0" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
+        <div class="cv-ring-inner" id="cvRingInner"><i class="fas fa-cog fa-spin" id="cvSpinIcon"></i><i class="fas fa-check" id="cvCheckIcon" style="display:none"></i></div>
       </div>
-      <p class="cv-step" id="cvStepText">Preparation du fichier...</p>
+      <p class="cv-step" id="cvStepText">Preparation...</p>
       <p class="cv-percent" id="cvPercentText">0%</p>
     </div>
   </div>
@@ -53,19 +34,25 @@
   <!-- ===== HEADER ===== -->
   <header class="header" id="header">
     <div class="header-inner">
-      <a href="#" class="logo" onclick="navigate('home');return false;">
-        <div class="logo-icon"><i class="fas fa-file-pdf"></i></div>
-        <span class="logo-text">PDF<span class="logo-accent">Shift</span></span>
+      <a class="logo" onclick="navigate('home');return false;" href="#">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2B7BF5"/><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="logo-text">PDF<span class="logo-dot">Shift</span></span>
       </a>
       <nav class="nav-center" id="navLinks">
-        <a class="nav-link active" data-page="home" onclick="navigate('home')">Accueil</a>
-        <a class="nav-link" data-page="tools" onclick="navigate('tools')">Outils</a>
+        <div class="nav-dropdown" id="navDropdown">
+          <a class="nav-link" onclick="toggleDropdown()">Outils <i class="fas fa-chevron-down" style="font-size:10px;margin-left:3px"></i></a>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <div class="dm-col"><p class="dm-title">Convertir</p><a onclick="selectTool('pdf-to-text')">PDF vers Texte</a><a onclick="selectTool('pdf-to-image')">PDF vers Image</a><a onclick="selectTool('pdf-to-word')">PDF vers Word</a><a onclick="selectTool('pdf-to-excel')">PDF vers Excel</a><a onclick="selectTool('image-to-pdf')">Image vers PDF</a><a onclick="selectTool('html-to-pdf')">HTML vers PDF</a></div>
+            <div class="dm-col"><p class="dm-title">Organiser</p><a onclick="selectTool('merge-pdf')">Fusionner PDF</a><a onclick="selectTool('split-pdf')">Diviser PDF</a><a onclick="selectTool('rotate-pdf')">Pivoter PDF</a></div>
+            <div class="dm-col"><p class="dm-title">Optimiser</p><a onclick="selectTool('compress-pdf')">Compresser PDF</a><a onclick="selectTool('watermark-pdf')">Filigrane PDF</a><a onclick="selectTool('text-to-pdf')">Texte vers PDF</a></div>
+          </div>
+        </div>
         <a class="nav-link" data-page="pricing" onclick="navigate('pricing')">Tarifs</a>
-        <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none;">Dashboard</a>
+        <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none">Dashboard</a>
       </nav>
       <div class="nav-right" id="navAuth">
-        <button class="btn-text" onclick="openModal('login')">Connexion</button>
-        <button class="btn-primary-sm" onclick="openModal('register')">S'inscrire</button>
+        <button class="btn-ghost" onclick="openModal('login')">Se connecter</button>
+        <button class="btn-nav-cta" onclick="openModal('register')">Essai gratuit</button>
       </div>
     </div>
   </header>
@@ -73,231 +60,231 @@
   <!-- ===== ACCUEIL ===== -->
   <main id="page-home" class="page page-visible">
     <section class="hero">
-      <div class="hero-bg-shapes">
-        <div class="hero-shape hero-shape-1"></div>
-        <div class="hero-shape hero-shape-2"></div>
-        <div class="hero-shape hero-shape-3"></div>
-      </div>
       <div class="hero-inner">
-        <span class="hero-badge anim-up"><i class="fas fa-bolt"></i> Rapide, gratuit, prive</span>
-        <h1 class="hero-title anim-up anim-up-1">Simplifiez tous vos<br><span class="text-blue">travaux PDF</span></h1>
-        <p class="hero-sub anim-up anim-up-2">Convertissez, compressez, fusionnez et transformez vos PDF en quelques secondes. Traitement 100% local dans votre navigateur.</p>
-        <div class="hero-tools-grid" id="heroToolsGrid"></div>
-        <div class="hero-stats anim-up anim-up-6">
-          <div class="hero-stat"><span class="hero-stat-num" id="statConversions">0</span><span class="hero-stat-label">Conversions</span></div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat"><span class="hero-stat-num">12</span><span class="hero-stat-label">Outils</span></div>
-          <div class="hero-stat-divider"></div>
-          <div class="hero-stat"><span class="hero-stat-num">100%</span><span class="hero-stat-label">Local &amp; prive</span></div>
+        <div class="hero-left">
+          <h1 class="hero-title">Nous simplifions la gestion de <span class="text-blue">vos PDF.</span></h1>
+          <p class="hero-sub">Chaque outil dont vous avez besoin pour travailler avec les PDF dans un seul endroit. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
+          <div class="hero-actions">
+            <button class="btn-hero-primary" onclick="navigate('tools')"><i class="fas fa-rocket"></i> Commencer gratuitement</button>
+            <button class="btn-hero-secondary" onclick="navigate('pricing')">Voir les tarifs <i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="hero-trust">
+            <div class="trust-avatars">
+              <img src="https://picsum.photos/seed/u1/32/32" alt="">
+              <img src="https://picsum.photos/seed/u2/32/32" alt="">
+              <img src="https://picsum.photos/seed/u3/32/32" alt="">
+              <img src="https://picsum.photos/seed/u4/32/32" alt="">
+            </div>
+            <div><p class="trust-text"><strong>12 000+</strong> utilisateurs satisfaits</p><div class="trust-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-mockup">
+            <div class="mockup-bar"><span class="mockup-dot" style="background:#FF5F57"></span><span class="mockup-dot" style="background:#FEBC2E"></span><span class="mockup-dot" style="background:#28C840"></span><span class="mockup-title">Document.pdf</span></div>
+            <div class="mockup-body">
+              <div class="mockup-sidebar">
+                <div class="mockup-thumb active"></div>
+                <div class="mockup-thumb"></div>
+                <div class="mockup-thumb"></div>
+                <div class="mockup-thumb"></div>
+              </div>
+              <div class="mockup-page">
+                <div class="mp-line" style="width:85%"></div>
+                <div class="mp-line" style="width:72%"></div>
+                <div class="mp-line" style="width:90%"></div>
+                <div class="mp-spacer"></div>
+                <div class="mp-line" style="width:60%"></div>
+                <div class="mp-line" style="width:80%"></div>
+                <div class="mp-line" style="width:45%"></div>
+                <div class="mp-spacer"></div>
+                <div class="mp-img"><img src="https://picsum.photos/seed/chart/200/100" alt=""></div>
+                <div class="mp-line" style="width:70%"></div>
+                <div class="mp-line" style="width:55%"></div>
+              </div>
+            </div>
+            <div class="mockup-float-badge"><i class="fas fa-check-circle" style="color:#28C840"></i> Conversion reussie</div>
+          </div>
         </div>
       </div>
     </section>
-    <section class="section-how">
+
+    <!-- Illustration bandeau -->
+    <section class="hero-visual-band">
+      <div class="hvb-inner">
+        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf1/280/180" alt="Convertir PDF"><p>Convertir</p></div>
+        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf2/280/180" alt="Compresser PDF"><p>Compresser</p></div>
+        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf3/280/180" alt="Fusionner PDF"><p>Fusionner</p></div>
+        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf4/280/180" alt="Modifier PDF"><p>Modifier</p></div>
+        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf5/280/180" alt="Signer PDF"><p>Signer</p></div>
+      </div>
+    </section>
+
+    <!-- Grille d'outils -->
+    <section class="tools-section">
+      <div class="container">
+        <div class="tools-section-header">
+          <h2>Tous les outils PDF dont vous avez besoin</h2>
+          <p>Traitement local rapide. Vos fichiers ne quittent jamais votre navigateur.</p>
+        </div>
+        <div class="tools-grid" id="toolsGrid"></div>
+      </div>
+    </section>
+
+    <!-- Comment ça marche -->
+    <section class="how-section">
       <div class="container">
         <h2 class="section-title">Comment ca marche ?</h2>
-        <div class="steps-grid">
-          <div class="step-card"><div class="step-num">1</div><h3>Choisissez un outil</h3><p>Selectionnez la conversion parmi nos 12 outils disponibles.</p></div>
-          <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
-          <div class="step-card"><div class="step-num">2</div><h3>Importez votre fichier</h3><p>Glissez-deposez ou saisissez votre texte directement.</p></div>
-          <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
-          <div class="step-card"><div class="step-num">3</div><h3>Telechargez le resultat</h3><p>Recevez votre fichier converti instantanement.</p></div>
+        <div class="steps-row">
+          <div class="step-card"><div class="step-ico"><i class="fas fa-upload"></i></div><h3>Deposez</h3><p>Glissez votre fichier PDF ou image dans la zone de depot.</p></div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card"><div class="step-ico"><i class="fas fa-magic"></i></div><h3>Choisissez</h3><p>Selectionnez l'outil et les options de conversion souhaitees.</p></div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step-card"><div class="step-ico"><i class="fas fa-download"></i></div><h3>Telechargez</h3><p>Recevez votre fichier converti en quelques secondes.</p></div>
         </div>
       </div>
     </section>
-    <footer class="footer"><div class="container"><p>&copy; 2025 PDFShift — Tous les fichiers sont traites localement.</p></div></footer>
+
+    <!-- Social proof -->
+    <section class="proof-section">
+      <div class="container">
+        <div class="proof-grid">
+          <div class="proof-card"><img src="https://picsum.photos/seed/team1/80/80" alt=""><div><p class="proof-quote">"J'ai converti plus de 500 fichiers sans aucun probleme."</p><p class="proof-author">Marie L. — Graphiste</p></div></div>
+          <div class="proof-card"><img src="https://picsum.photos/seed/team2/80/80" alt=""><div><p class="proof-quote">"La fusion PDF m'a fait gagner des heures chaque semaine."</p><p class="proof-author">Thomas R. — Chef de projet</p></div></div>
+          <div class="proof-card"><img src="https://picsum.photos/seed/team3/80/80" alt=""><div><p class="proof-quote">"Interface intuitive, resultat impeccable a chaque fois."</p><p class="proof-author">Sophie M. — Avocate</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer"><div class="container"><div class="footer-inner"><div class="footer-brand"><svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2B7BF5"/><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>PDFShift</span></div><p>&copy; 2025 PDFShift. Tous les fichiers traites localement.</p></div></div></footer>
   </main>
 
   <!-- ===== OUTILS ===== -->
   <main id="page-tools" class="page page-hidden">
-    <section class="tool-page">
-      <div class="container">
-        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-        <div class="tool-header" id="toolHeader">
-          <div class="tool-header-icon" id="toolIcon"><i class="fas fa-file-alt"></i></div>
-          <div>
-            <h1 id="toolTitle">PDF vers Texte</h1>
-            <p id="toolDesc">Extrayez le texte de vos fichiers PDF</p>
-          </div>
-          <span id="toolProBadge" class="tool-pro-badge" style="display:none;"><i class="fas fa-crown"></i> Pro</span>
-        </div>
-        <div class="limit-bar" id="limitBanner">
-          <div class="limit-bar-left">
-            <i class="fas fa-info-circle" style="color:#D97706;"></i>
-            <div>
-              <span class="limit-text" id="limitText">3 conversions restantes</span>
-              <div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div>
-            </div>
-          </div>
-          <button class="btn-primary-sm" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button>
-        </div>
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-          <input type="file" id="fileInput" accept=".pdf" multiple>
-          <div id="dropContent">
-            <div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-            <p class="drop-title">Glissez votre fichier ici</p>
-            <p class="drop-sub">ou cliquez pour parcourir</p>
-            <p class="drop-formats" id="acceptedFormats">Formats acceptes : PDF</p>
-          </div>
-          <div id="filePreview" style="display:none;" class="file-preview">
-            <i class="fas fa-file-pdf" style="font-size:36px;color:#0A7CFF;"></i>
-            <p id="fileName" class="file-name"></p>
-            <p id="fileSize" class="file-size"></p>
-            <button class="btn-text" onclick="event.stopPropagation();clearFile();" style="color:#DC2626;margin-top:8px;"><i class="fas fa-times"></i> Supprimer</button>
-          </div>
-        </div>
-        <div id="textInputArea" style="display:none;" class="text-input-wrap">
-          <textarea class="text-input" id="textInput" rows="12" placeholder="Collez votre contenu ici..."></textarea>
-        </div>
-        <!-- Page range pour split -->
-        <div id="pageRangeArea" style="display:none;" class="page-range-wrap">
-          <label class="form-label" style="margin:0 0 6px 0;">Pages a extraire (ex: 1-3, 5, 7-9)</label>
-          <input class="form-input" type="text" id="pageRangeInput" placeholder="1-3" value="1">
-        </div>
-        <!-- Watermark text -->
-        <div id="watermarkArea" style="display:none;" class="page-range-wrap">
-          <label class="form-label" style="margin:0 0 6px 0;">Texte du filigrane</label>
-          <input class="form-input" type="text" id="watermarkInput" placeholder="CONFIDENTIEL" value="CONFIDENTIEL">
-        </div>
-        <div class="convert-btn-wrap">
-          <button class="btn-convert" id="convertBtn" onclick="startConversion()" disabled>
-            <i class="fas fa-sync-alt"></i> Convertir maintenant
-          </button>
-        </div>
-        <div id="resultArea" class="result-card" style="display:none;">
-          <div class="result-header">
-            <div class="result-check"><i class="fas fa-check-circle"></i></div>
-            <div><p class="result-title">Conversion terminee</p><p class="result-info" id="resultInfo"></p></div>
-          </div>
-          <div id="textResult" style="display:none;" class="result-preview"><pre id="extractedText"></pre></div>
-          <button class="btn-download" id="downloadBtn" onclick="downloadResult()"><i class="fas fa-download"></i> Telecharger</button>
-        </div>
+    <section class="tool-page"><div class="container">
+      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
+      <div class="tool-header" id="toolHeader">
+        <div class="tool-header-icon" id="toolIcon"><i class="fas fa-file-alt"></i></div>
+        <div><h1 id="toolTitle">PDF vers Texte</h1><p id="toolDesc">Extrayez le texte</p></div>
+        <span id="toolProBadge" class="tool-pro-badge" style="display:none"><i class="fas fa-crown"></i> Pro</span>
       </div>
-    </section>
+      <div class="limit-bar" id="limitBanner"><div class="limit-bar-left"><i class="fas fa-info-circle" style="color:#D97706"></i><div><span class="limit-text" id="limitText">3 restantes</span><div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div></div></div><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div>
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept=".pdf" multiple>
+        <div id="dropContent"><div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div><p class="drop-title">Glissez votre fichier ici</p><p class="drop-sub">ou cliquez pour parcourir</p><p class="drop-formats" id="acceptedFormats">PDF</p></div>
+        <div id="filePreview" style="display:none" class="file-preview"><i class="fas fa-file-pdf" style="font-size:36px;color:#2B7BF5"></i><p id="fileName" class="file-name"></p><p id="fileSize" class="file-size"></p><button class="btn-ghost" onclick="event.stopPropagation();clearFile()" style="color:#DC2626;margin-top:8px"><i class="fas fa-times"></i> Supprimer</button></div>
+      </div>
+      <div id="textInputArea" style="display:none" class="text-input-wrap"><textarea class="text-input" id="textInput" rows="12" placeholder="Collez votre contenu ici..."></textarea></div>
+      <div id="pageRangeArea" style="display:none" class="extra-field"><label class="form-label" style="margin:0 0 6px">Pages (ex: 1-3, 5)</label><input class="form-input" type="text" id="pageRangeInput" placeholder="1-3" value="1"></div>
+      <div id="watermarkArea" style="display:none" class="extra-field"><label class="form-label" style="margin:0 0 6px">Texte du filigrane</label><input class="form-input" type="text" id="watermarkInput" placeholder="CONFIDENTIEL" value="CONFIDENTIEL"></div>
+      <div class="convert-btn-wrap"><button class="btn-convert" id="convertBtn" onclick="startConversion()" disabled><i class="fas fa-sync-alt"></i> Convertir maintenant</button></div>
+      <div id="resultArea" class="result-card" style="display:none"><div class="result-header"><div class="result-check"><i class="fas fa-check-circle"></i></div><div><p class="result-title">Conversion terminee</p><p class="result-info" id="resultInfo"></p></div></div><div id="textResult" style="display:none" class="result-preview"><pre id="extractedText"></pre></div><button class="btn-download" id="downloadBtn" onclick="downloadResult()"><i class="fas fa-download"></i> Telecharger</button></div>
+    </div></section>
   </main>
 
   <!-- ===== TARIFS ===== -->
   <main id="page-pricing" class="page page-hidden">
-    <section class="pricing-page">
-      <div class="container">
-        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-        <h1 class="pricing-title">Choisissez votre plan</h1>
-        <p class="pricing-sub">Debloquez tout le potentiel de PDFShift</p>
-        <div class="pricing-grid">
-          <div class="pricing-card">
-            <div class="pricing-card-header">
-              <span class="pricing-badge-free">Gratuit</span>
-              <div class="pricing-price"><span class="pricing-amount">0</span><span class="pricing-currency">&euro;</span></div>
-              <p class="pricing-period">Pour toujours</p>
-            </div>
-            <ul class="pricing-features">
-              <li><i class="fas fa-check"></i> 3 outils gratuits</li>
-              <li><i class="fas fa-check"></i> 3 conversions / cycle de 48h</li>
-              <li><i class="fas fa-check"></i> Fichiers max 5 Mo</li>
-              <li><i class="fas fa-check"></i> Traitement local</li>
-              <li class="disabled"><i class="fas fa-times"></i> 9 outils Pro</li>
-              <li class="disabled"><i class="fas fa-times"></i> Conversions illimitees</li>
-            </ul>
-            <button class="btn-outline" onclick="handleFreePlan()">Commencer gratuitement</button>
-          </div>
-          <div class="pricing-card pricing-card-popular">
-            <div class="popular-tag">POPULAIRE</div>
-            <div class="pricing-card-header">
-              <span class="pricing-badge-pro"><i class="fas fa-crown"></i> Pro</span>
-              <div class="pricing-price"><span class="pricing-amount">0,99</span><span class="pricing-currency">&euro;</span><span class="pricing-period-inline">/mois</span></div>
-              <p class="pricing-period">Annulable a tout moment</p>
-            </div>
-            <ul class="pricing-features">
-              <li><i class="fas fa-check"></i> <strong>12 outils</strong> disponibles</li>
-              <li><i class="fas fa-check"></i> Conversions illimitees</li>
-              <li><i class="fas fa-check"></i> Fichiers max 50 Mo</li>
-              <li><i class="fas fa-check"></i> Traitement prioritaire</li>
-              <li><i class="fas fa-check"></i> Filigrane, rotation, split...</li>
-              <li><i class="fas fa-check"></i> Historique complet</li>
-            </ul>
-            <button class="btn-primary-lg" onclick="handleProPlan()"><i class="fas fa-crown"></i> S'abonner 0,99&euro;/mois</button>
-          </div>
-        </div>
-      </div>
-    </section>
+    <section class="pricing-page"><div class="container">
+      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
+      <h1 class="pricing-title">Choisissez votre plan</h1>
+      <p class="pricing-sub">Annulez a tout moment. Sans engagement.</p>
+      <div class="pricing-toggle"><button class="pt-btn active" id="ptMonthly" onclick="setPricing('monthly')">Mensuel</button><button class="pt-btn" id="ptYearly" onclick="setPricing('yearly')">Annuel <span class="pt-save">-40%</span></button></div>
+      <div class="pricing-grid" id="pricingGrid"></div>
+    </div></section>
   </main>
 
   <!-- ===== DASHBOARD ===== -->
   <main id="page-dashboard" class="page page-hidden">
-    <section class="dashboard-page">
-      <div class="container">
-        <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-        <div class="dash-top">
-          <div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div>
-          <div class="dash-top-right">
-            <span id="dashBadge" class="badge-free">Gratuit</span>
-            <button class="btn-primary-sm" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Passer Pro</button>
-          </div>
-        </div>
-        <div class="dash-stats">
-          <div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div>
-          <div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#E5E7EB" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#0A7CFF" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div>
-          <div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#059669;"><i class="fas fa-arrow-up"></i> conversions</p></div>
-        </div>
-        <div class="dash-history-card">
-          <div class="dash-history-header"><h3>Historique</h3><button class="btn-text" onclick="clearHistory()" style="color:#DC2626;font-size:13px;"><i class="fas fa-trash"></i> Effacer</button></div>
-          <div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span>Statut</span></div>
-          <div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div>
-        </div>
-        <div class="dash-logout"><button class="btn-text" onclick="logout()" style="color:#DC2626;"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
-      </div>
-    </section>
+    <section class="dashboard-page"><div class="container">
+      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
+      <div class="dash-top"><div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div><div class="dash-top-right"><span id="dashBadge" class="badge-free">Gratuit</span><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div></div>
+      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#E2E8F0" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#059669"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
+      <div class="dash-history-card"><div class="dash-history-header"><h3>Historique</h3><button class="btn-ghost" onclick="clearHistory()" style="color:#DC2626;font-size:13px"><i class="fas fa-trash"></i> Effacer</button></div><div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span></span></div><div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div></div>
+      <div class="dash-logout"><button class="btn-ghost" onclick="logout()" style="color:#DC2626"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
+    </div></section>
   </main>
 
   <!-- ===== MODALS ===== -->
   <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-    <div class="modal" id="modal-login" style="display:none;">
+    <!-- Login -->
+    <div class="modal" id="modal-login" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Connexion</h2>
+      <h2 class="modal-title">Se connecter</h2>
+      <button class="btn-social" onclick="socialLogin('google')"><i class="fab fa-google"></i> Continuer avec Google</button>
+      <button class="btn-social" onclick="socialLogin('microsoft')"><i class="fab fa-microsoft"></i> Continuer avec Microsoft</button>
+      <div class="modal-divider"><span>ou</span></div>
       <form onsubmit="handleLogin(event)">
-        <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" id="loginEmail" placeholder="vous@exemple.com" required>
+        <label class="form-label">E-mail</label><input class="form-input" type="email" id="loginEmail" placeholder="vous@exemple.com" required>
         <label class="form-label">Mot de passe</label>
         <div class="password-wrap"><input class="form-input" type="password" id="loginPassword" placeholder="Votre mot de passe" required><button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)"><i class="fas fa-eye"></i></button></div>
-        <button type="submit" class="btn-primary-lg" style="width:100%;margin-top:8px;">Se connecter</button>
+        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px">Se connecter</button>
       </form>
-      <p class="modal-switch">Pas de compte ? <a href="#" onclick="switchModal('register');return false;">S'inscrire</a></p>
+      <p class="modal-switch">Pas de compte ? <a href="#" onclick="switchModal('register');return false">S'inscrire</a></p>
     </div>
-    <div class="modal" id="modal-register" style="display:none;">
+    <!-- Register -->
+    <div class="modal" id="modal-register" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Creer un compte</h2>
-      <form onsubmit="handleRegister(event)">
-        <label class="form-label">Nom</label>
-        <input class="form-input" type="text" id="regName" placeholder="Votre nom" required minlength="2">
-        <label class="form-label">E-mail</label>
-        <input class="form-input" type="email" id="regEmail" placeholder="vous@exemple.com" required>
+      <h2 class="modal-title">Creer votre compte</h2>
+      <button class="btn-social" onclick="socialLogin('google')"><i class="fab fa-google"></i> Continuer avec Google</button>
+      <button class="btn-social" onclick="socialLogin('microsoft')"><i class="fab fa-microsoft"></i> Continuer avec Microsoft</button>
+      <div class="modal-divider"><span>ou</span></div>
+      <form onsubmit="handleRegister(event)" id="registerForm">
+        <label class="form-label">Nom</label><input class="form-input" type="text" id="regName" placeholder="Votre nom" required minlength="2">
+        <label class="form-label">E-mail</label><input class="form-input" type="email" id="regEmail" placeholder="vous@exemple.com" required>
         <label class="form-label">Mot de passe</label>
         <div class="password-wrap"><input class="form-input" type="password" id="regPassword" placeholder="Min. 6 caracteres" required minlength="6" oninput="checkPasswordStrength(this.value)"><button type="button" class="password-toggle" onclick="togglePassword('regPassword',this)"><i class="fas fa-eye"></i></button></div>
         <div class="strength-bars" id="strengthBars"><div></div><div></div><div></div><div></div></div>
         <p class="strength-text" id="strengthText"></p>
-        <label class="form-label">Confirmer</label>
-        <input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez" required>
-        <button type="submit" class="btn-primary-lg" style="width:100%;margin-top:8px;">Creer mon compte</button>
+        <label class="form-label">Confirmer</label><input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez" required>
+        <div class="captcha-row">
+          <div class="captcha-box" id="captchaBox" onclick="verifyCaptcha()"><i class="fas fa-robot"></i> Je ne suis pas un robot</div>
+          <div class="captcha-check" id="captchaCheck" style="display:none"><i class="fas fa-check-circle" style="color:#059669"></i> Verifie</div>
+        </div>
+        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px" id="regSubmitBtn" disabled>Creer mon compte</button>
       </form>
-      <p class="modal-switch">Deja un compte ? <a href="#" onclick="switchModal('login');return false;">Se connecter</a></p>
+      <p class="modal-switch">Deja un compte ? <a href="#" onclick="switchModal('login');return false">Se connecter</a></p>
+      <p class="modal-legal">En creant un compte, vous acceptez nos <a href="#">CGU</a> et notre <a href="#">politique de confidentialite</a>.</p>
     </div>
-    <div class="modal" id="modal-subscribe" style="display:none;">
+    <!-- Email Verification -->
+    <div class="modal" id="modal-verify" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Abonnement Pro</h2>
-      <div class="sub-summary"><div class="sub-summary-left"><i class="fas fa-crown" style="color:#0A7CFF;font-size:24px;"></i><div><p style="font-weight:600;">Plan Pro</p><p style="font-size:13px;color:#6B7280;">12 outils illimites</p></div></div><div class="sub-summary-price">0,99&euro;<span>/mois</span></div></div>
-      <div class="sub-secure"><i class="fas fa-lock"></i> Paiement securise par Stripe</div>
-      <button class="btn-primary-lg" style="width:100%;" id="stripeCheckoutBtn" onclick="processStripeCheckout()"><i class="fas fa-credit-card"></i> Payer avec Stripe</button>
-      <p class="sub-note">Annulable a tout moment. Versement direct sur votre compte.</p>
-      <div class="stripe-help" id="stripeHelp" style="display:none;"></div>
-    </div>
-    <div class="modal" id="modal-pro-lock" style="display:none;">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <div style="text-align:center;padding:12px 0;">
-        <div style="width:64px;height:64px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><i class="fas fa-lock" style="font-size:24px;color:#0A7CFF;"></i></div>
-        <h2 class="modal-title" style="text-align:center;">Outil reserve au plan Pro</h2>
-        <p style="color:#6B7280;font-size:14px;margin-bottom:24px;line-height:1.6;">Passez au plan Pro pour debloquer cet outil ainsi que 8 autres outils avances.</p>
-        <button class="btn-primary-lg" style="width:100%;" onclick="closeModal();navigate('pricing');"><i class="fas fa-crown"></i> Passer Pro — 0,99&euro;/mois</button>
-        <button class="btn-text" onclick="closeModal()" style="margin-top:12px;">Peut-etre plus tard</button>
+      <div style="text-align:center;padding:8px 0">
+        <div style="width:72px;height:72px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-envelope-open-text" style="font-size:28px;color:#2B7BF5"></i></div>
+        <h2 class="modal-title" style="text-align:center">Verifiez votre e-mail</h2>
+        <p style="color:#64748B;font-size:14px;margin-bottom:8px;line-height:1.6">Un code de verification a ete envoye a :</p>
+        <p style="font-weight:700;color:#0F172A;font-size:15px;margin-bottom:24px" id="verifyEmail"></p>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
+          <input class="form-input" type="text" id="verifyCode1" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode2')">
+          <input class="form-input" type="text" id="verifyCode2" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode3')">
+          <input class="form-input" type="text" id="verifyCode3" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode4')">
+          <input class="form-input" type="text" id="verifyCode4" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode5')">
+          <input class="form-input" type="text" id="verifyCode5" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode6')">
+          <input class="form-input" type="text" id="verifyCode6" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" onkeydown="if(event.key==='Enter')processVerification()">
+        </div>
+        <p style="font-size:13px;color:#64748B;margin-bottom:16px">Code demo : <strong>123456</strong></p>
+        <button class="btn-modal-primary" style="width:100%" onclick="processVerification()">Verifier</button>
+        <button class="btn-ghost" onclick="resendCode()" style="margin-top:12px" id="resendBtn"><i class="fas fa-redo"></i> Renvoyer le code</button>
       </div>
+    </div>
+    <!-- Pro Lock -->
+    <div class="modal" id="modal-pro-lock" style="display:none">
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <div style="text-align:center;padding:12px 0">
+        <div style="width:64px;height:64px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-lock" style="font-size:24px;color:#2B7BF5"></i></div>
+        <h2 class="modal-title" style="text-align:center">Outil reserve au plan Pro</h2>
+        <p style="color:#64748B;font-size:14px;margin-bottom:24px;line-height:1.6">Debloquez cet outil et 8 autres avec le plan Pro.</p>
+        <button class="btn-modal-primary" style="width:100%" onclick="closeModal();navigate('pricing')"><i class="fas fa-crown"></i> Passer Pro — 0,99€/mois</button>
+        <button class="btn-ghost" onclick="closeModal()" style="margin-top:12px">Peut-etre plus tard</button>
+      </div>
+    </div>
+    <!-- Subscribe -->
+    <div class="modal" id="modal-subscribe" style="display:none">
+      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+      <h2 class="modal-title">Confirmer l'abonnement</h2>
+      <div class="sub-summary"><div class="sub-summary-left"><i class="fas fa-crown" style="color:#2B7BF5;font-size:24px"></i><div><p style="font-weight:700" id="subPlanName">Plan Pro</p><p style="font-size:13px;color:#64748B" id="subPlanDesc">Illimite</p></div></div><div class="sub-summary-price" id="subPlanPrice">0,99€<span>/mois</span></div></div>
+      <div class="sub-secure"><i class="fas fa-lock"></i> Paiement securise par Stripe</div>
+      <button class="btn-modal-primary" style="width:100%" id="stripeCheckoutBtn" onclick="processStripeCheckout()"><i class="fas fa-credit-card"></i> Payer avec Stripe</button>
+      <p class="sub-note">Annulable a tout moment. Versement direct sur votre compte.</p>
+      <div class="stripe-help" id="stripeHelp" style="display:none"></div>
     </div>
   </div>
 
