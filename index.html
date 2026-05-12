@@ -1,474 +1,2112 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FileFlow Pro - Convertisseur de Fichiers</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDFShift — Convertisseur PDF Intelligent</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0A0A0B;
+    --bg2: #111113;
+    --card: #161618;
+    --card-hover: #1C1C1F;
+    --border: #252528;
+    --border-light: #333338;
+    --fg: #E8E4DE;
+    --fg-dim: #B5B0A8;
+    --muted: #6E6A63;
+    --accent: #E8A838;
+    --accent-hover: #F0BC5E;
+    --accent-dim: rgba(232,168,56,0.12);
+    --success: #4ADE80;
+    --error: #F87171;
+    --warning: #FBBF24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+  /* Fond atmosphérique */
+  .bg-glow {
+    position: fixed;
+    top: -30%;
+    left: -10%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(232,168,56,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .bg-glow-2 {
+    position: fixed;
+    bottom: -20%;
+    right: -15%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(232,168,56,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scrollbar personnalisée */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(232,168,56,0.15); }
+    50% { box-shadow: 0 0 40px rgba(232,168,56,0.3); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes progress-bar {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+  .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+  .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
+  .animate-float { animation: float 4s ease-in-out infinite; }
+
+  .stagger-1 { animation-delay: 0.1s; opacity: 0; }
+  .stagger-2 { animation-delay: 0.2s; opacity: 0; }
+  .stagger-3 { animation-delay: 0.3s; opacity: 0; }
+  .stagger-4 { animation-delay: 0.4s; opacity: 0; }
+  .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+  .stagger-6 { animation-delay: 0.6s; opacity: 0; }
+
+  /* Boutons */
+  .btn-primary {
+    background: var(--accent);
+    color: #0A0A0B;
+    font-weight: 600;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(232,168,56,0.25);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--fg);
+    font-weight: 500;
+    padding: 12px 28px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-secondary:hover {
+    background: var(--card);
+    border-color: var(--border-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--fg-dim);
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover { background: var(--card); color: var(--fg); }
+
+  /* Cartes */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+  .card:hover {
+    border-color: var(--border-light);
+    background: var(--card-hover);
+  }
+
+  /* Inputs */
+  .input-field {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--fg);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.25s ease;
+    outline: none;
+  }
+  .input-field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  .input-field::placeholder { color: var(--muted); }
+
+  /* Zone de dépôt */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .drop-zone.drag-over::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-dim);
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+  }
+  .modal-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 90%;
+    max-width: 440px;
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  /* Toast */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease-out;
+    min-width: 280px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast-success { background: #14532D; border: 1px solid #166534; color: #BBF7D0; }
+  .toast-error { background: #7F1D1D; border: 1px solid #991B1B; color: #FECACA; }
+  .toast-warning { background: #713F12; border: 1px solid #854D0E; color: #FEF08A; }
+  .toast-info { background: #1E293B; border: 1px solid #334155; color: #CBD5E1; }
+
+  /* Barre de progression */
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background: var(--bg2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-free { background: rgba(110,106,99,0.2); color: var(--muted); }
+  .badge-pro { background: var(--accent-dim); color: var(--accent); }
+
+  /* Barre de navigation */
+  .nav-link {
+    color: var(--fg-dim);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--fg); background: var(--card); }
+  .nav-link.active { color: var(--accent); background: var(--accent-dim); }
+
+  /* Grille de outils */
+  .tool-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .tool-card:hover::before { opacity: 1; }
+
+  /* Pricing highlight */
+  .pricing-highlight {
+    position: relative;
+    border-color: var(--accent) !important;
+  }
+  .pricing-highlight::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, var(--accent), transparent, var(--accent));
+    z-index: -1;
+    opacity: 0.15;
+  }
+
+  /* Timer */
+  .timer-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-ring svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+  }
+
+  /* Particules de fond */
+  .particle {
+    position: fixed;
+    width: 2px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Section visibilité */
+  .section-hidden { display: none; }
+  .section-visible { display: block; }
+
+  /* Sélecteur de fichier stylisé */
+  input[type="file"] { display: none; }
+
+  /* Tableau */
+  .table-row {
+    display: grid;
+    grid-template-columns: 1fr 120px 100px 80px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .table-row:hover { background: var(--card-hover); }
+  .table-header { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  @media (max-width: 768px) {
+    .table-row { grid-template-columns: 1fr 80px 60px; }
+    .table-row > :nth-child(3) { display: none; }
+    .modal-content { padding: 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <div class="theme-toggle">
-        <button id="theme-btn" class="theme-btn">
-            <i class="fas fa-moon"></i>
+
+<!-- Fond atmosphérique -->
+<div class="bg-glow"></div>
+<div class="bg-glow-2"></div>
+<div id="particles"></div>
+
+<!-- Toast -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Navigation -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,11,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);">
+  <div style="max-width:1200px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="navigate('home')">
+      <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-file-pdf" style="color:#0A0A0B;font-size:18px;"></i>
+      </div>
+      <span style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:var(--fg);">PDF<span style="color:var(--accent);">Shift</span></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;" id="navLinks">
+      <a class="nav-link active" data-page="home" onclick="navigate('home')"><i class="fas fa-home" style="margin-right:4px;"></i>Accueil</a>
+      <a class="nav-link" data-page="tools" onclick="navigate('tools')"><i class="fas fa-tools" style="margin-right:4px;"></i>Outils</a>
+      <a class="nav-link" data-page="pricing" onclick="navigate('pricing')"><i class="fas fa-tag" style="margin-right:4px;"></i>Tarifs</a>
+      <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none;"><i class="fas fa-chart-bar" style="margin-right:4px;"></i>Tableau de bord</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;" id="navAuth">
+      <button class="btn-ghost" onclick="openModal('login')">Connexion</button>
+      <button class="btn-primary" onclick="openModal('register')" style="padding:8px 18px;font-size:14px;">S'inscrire</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== PAGE ACCUEIL ===== -->
+<main id="page-home" class="section-visible" style="padding-top:64px;position:relative;z-index:1;">
+  <!-- Hero -->
+  <section style="min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:80px 24px 60px;">
+    <div style="max-width:800px;text-align:center;">
+      <div class="animate-fade-in-up stagger-1" style="margin-bottom:20px;">
+        <span class="badge badge-pro"><i class="fas fa-bolt"></i> Rapide et prive</span>
+      </div>
+      <h1 class="animate-fade-in-up stagger-2" style="font-size:clamp(40px,7vw,72px);font-weight:700;line-height:1.05;margin-bottom:24px;">
+        Convertissez vos <span style="color:var(--accent);position:relative;">PDF<span style="position:absolute;bottom:-4px;left:0;right:0;height:4px;background:var(--accent);border-radius:2px;opacity:0.3;"></span></span><br>en un clic
+      </h1>
+      <p class="animate-fade-in-up stagger-3" style="font-size:18px;color:var(--fg-dim);max-width:560px;margin:0 auto 40px;line-height:1.7;">
+        Transformez vos documents PDF en Word, Excel, images et plus encore. Traitement local, aucun fichier stocke sur nos serveurs.
+      </p>
+      <div class="animate-fade-in-up stagger-4" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="navigate('tools')" style="font-size:16px;padding:16px 36px;">
+          <i class="fas fa-rocket"></i> Commencer gratuitement
         </button>
+        <button class="btn-secondary" onclick="navigate('pricing')" style="font-size:16px;padding:16px 36px;">
+          <i class="fas fa-crown"></i> Voir les tarifs
+        </button>
+      </div>
+      <div class="animate-fade-in-up stagger-5" style="margin-top:60px;display:flex;justify-content:center;gap:48px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="font-family:'Space Grotesk';font-size:32px;font-weight:700;color:var(--accent);" id="statConversions">0</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px;">Conversions realisees</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Space Grotesk';font-size:32px;font-weight:700;color:var(--fg);">6</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px;">Outils disponibles</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Space Grotesk';font-size:32px;font-weight:700;color:var(--success);">100%</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px;">Traitement local</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outils rapides -->
+  <section style="padding:80px 24px;max-width:1200px;margin:0 auto;">
+    <h2 class="animate-fade-in-up" style="font-size:36px;font-weight:700;text-align:center;margin-bottom:12px;">Tous les outils dont vous avez besoin</h2>
+    <p class="animate-fade-in-up stagger-1" style="text-align:center;color:var(--muted);margin-bottom:48px;font-size:16px;">Selectionnez un outil et convertissez votre fichier en quelques secondes</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;">
+      <div class="card tool-card animate-fade-in-up stagger-1" style="padding:28px;cursor:pointer;" onclick="selectTool('pdf-to-text')">
+        <div style="width:48px;height:48px;background:rgba(232,168,56,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-file-alt" style="color:var(--accent);font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">PDF vers Texte</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Extrayez tout le texte contenu dans vos fichiers PDF de maniere simple et rapide.</p>
+      </div>
+      <div class="card tool-card animate-fade-in-up stagger-2" style="padding:28px;cursor:pointer;" onclick="selectTool('pdf-to-image')">
+        <div style="width:48px;height:48px;background:rgba(74,222,128,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-image" style="color:var(--success);font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">PDF vers Image</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Convertissez chaque page de votre PDF en image PNG haute resolution.</p>
+      </div>
+      <div class="card tool-card animate-fade-in-up stagger-3" style="padding:28px;cursor:pointer;" onclick="selectTool('image-to-pdf')">
+        <div style="width:48px;height:48px;background:rgba(96,165,250,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-file-image" style="color:#60A5FA;font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">Image vers PDF</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Regroupez vos images JPG ou PNG en un seul document PDF professionnel.</p>
+      </div>
+      <div class="card tool-card animate-fade-in-up stagger-4" style="padding:28px;cursor:pointer;" onclick="selectTool('text-to-pdf')">
+        <div style="width:48px;height:48px;background:rgba(251,191,36,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-pen-nib" style="color:var(--warning);font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">Texte vers PDF</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Transformez vos textes et notes en documents PDF bien formates.</p>
+      </div>
+      <div class="card tool-card animate-fade-in-up stagger-5" style="padding:28px;cursor:pointer;" onclick="selectTool('merge-pdf')">
+        <div style="width:48px;height:48px;background:rgba(248,113,113,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-object-group" style="color:var(--error);font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">Fusionner des PDF</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Combinez plusieurs fichiers PDF en un seul document continu et ordonne.</p>
+      </div>
+      <div class="card tool-card animate-fade-in-up stagger-6" style="padding:28px;cursor:pointer;" onclick="selectTool('html-to-pdf')">
+        <div style="width:48px;height:48px;background:rgba(168,85,247,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <i class="fas fa-code" style="color:#A855F7;font-size:20px;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">HTML vers PDF</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Convertissez votre code HTML en document PDF avec rendu fidele.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comment ça marche -->
+  <section style="padding:80px 24px;max-width:1000px;margin:0 auto;">
+    <h2 style="font-size:36px;font-weight:700;text-align:center;margin-bottom:48px;">Comment ca marche</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;">
+      <div style="text-align:center;">
+        <div style="width:64px;height:64px;background:var(--accent-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="font-family:'Space Grotesk';font-size:24px;font-weight:700;color:var(--accent);">1</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:8px;">Deposez votre fichier</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Glissez-deposez ou selectionnez votre fichier PDF</p>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:64px;height:64px;background:var(--accent-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="font-family:'Space Grotesk';font-size:24px;font-weight:700;color:var(--accent);">2</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:8px;">Choisissez le format</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Selectionnez le format de sortie souhaite</p>
+      </div>
+      <div style="text-align:center;">
+        <div style="width:64px;height:64px;background:var(--accent-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="font-family:'Space Grotesk';font-size:24px;font-weight:700;color:var(--accent);">3</span>
+        </div>
+        <h3 style="font-size:16px;font-weight:600;margin-bottom:8px;">Telechargez</h3>
+        <p style="font-size:14px;color:var(--muted);line-height:1.6;">Recuperez votre fichier converti instantanement</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top:1px solid var(--border);padding:40px 24px;text-align:center;">
+    <p style="font-size:13px;color:var(--muted);">&copy; 2025 PDFShift. Tous les fichiers sont traites localement et ne quittent jamais votre navigateur.</p>
+  </footer>
+</main>
+
+<!-- ===== PAGE OUTILS ===== -->
+<main id="page-tools" class="section-hidden" style="padding-top:64px;position:relative;z-index:1;">
+  <section style="padding:60px 24px 80px;max-width:800px;margin:0 auto;">
+    <!-- Barre de retour -->
+    <button class="btn-ghost" onclick="navigate('home')" style="margin-bottom:32px;">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <!-- Info outil sélectionné -->
+    <div id="toolHeader" style="margin-bottom:32px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div id="toolIcon" style="width:48px;height:48px;background:var(--accent-dim);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-file-alt" style="color:var(--accent);font-size:20px;"></i>
+        </div>
+        <div>
+          <h1 id="toolTitle" style="font-size:28px;font-weight:700;">PDF vers Texte</h1>
+          <p id="toolDesc" style="font-size:14px;color:var(--muted);">Extrayez le texte de vos PDF</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Navigation Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="logo">
-                <i class="fas fa-file-alt logo-icon"></i>
-                <h1>FileFlow Pro</h1>
-            </div>
-            <nav class="nav-menu">
-                <button id="settings-btn" class="nav-link">
-                    <i class="fas fa-cog"></i> Paramètres
-                </button>
-                <button id="account-btn" class="nav-link">
-                    <i class="fas fa-user"></i> Mon Compte
-                </button>
-                <button id="logout-btn" class="nav-link" style="display: none;">
-                    <i class="fas fa-sign-out-alt"></i> Déconnexion
-                </button>
-            </nav>
+    <!-- Limite d'utilisation -->
+    <div id="limitBanner" class="card" style="padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <i class="fas fa-info-circle" style="color:var(--warning);"></i>
+        <div>
+          <span style="font-size:14px;" id="limitText">3 conversions restantes</span>
+          <div class="progress-track" style="width:160px;margin-top:6px;">
+            <div class="progress-fill" id="limitProgress" style="width:100%;"></div>
+          </div>
         </div>
-    </header>
-
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal">
-        <div class="modal-content settings-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-cog"></i> Paramètres</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="settings-section">
-                <h3><i class="fas fa-palette"></i> Apparence</h3>
-                <div class="theme-options">
-                    <button class="theme-option active" data-theme="light">
-                        <i class="fas fa-sun"></i> Clair
-                    </button>
-                    <button class="theme-option" data-theme="dark">
-                        <i class="fas fa-moon"></i> Sombre
-                    </button>
-                    <button class="theme-option" data-theme="auto">
-                        <i class="fas fa-adjust"></i> Auto
-                    </button>
-                </div>
-            </div>
-            <div class="settings-section">
-                <h3><i class="fas fa-language"></i> Langue</h3>
-                <select id="language-select" class="settings-select">
-                    <option value="fr">Français</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                </select>
-            </div>
-        </div>
+      </div>
+      <button class="btn-primary" onclick="navigate('pricing')" style="padding:8px 16px;font-size:13px;">
+        <i class="fas fa-crown"></i> Passer Pro
+      </button>
     </div>
 
-    <!-- Auth Modal -->
-    <div id="auth-modal" class="modal">
-        <div class="modal-content auth-content">
-            <div class="modal-header">
-                <h2 id="auth-title"><i class="fas fa-sign-in-alt"></i> Connexion</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <form id="auth-form">
-                <div class="form-group">
-                    <label for="auth-email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="auth-email" placeholder="votre@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="auth-password"><i class="fas fa-lock"></i> Mot de passe</label>
-                    <input type="password" id="auth-password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-primary btn-full">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
-                </button>
-                <div class="auth-toggle">
-                    <span>Pas de compte ?</span>
-                    <button type="button" id="toggle-auth" class="link-btn">S'inscrire</button>
-                </div>
-            </form>
+    <!-- Zone de dépôt -->
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.txt,.html" multiple>
+      <div id="dropContent">
+        <div class="animate-float" style="margin-bottom:16px;">
+          <i class="fas fa-cloud-upload-alt" style="font-size:48px;color:var(--accent);opacity:0.7;"></i>
         </div>
+        <p style="font-size:16px;font-weight:500;margin-bottom:8px;">Glissez-deposez vos fichiers ici</p>
+        <p style="font-size:14px;color:var(--muted);">ou cliquez pour selectionner</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;" id="acceptedFormats">Formats acceptes : PDF</p>
+      </div>
+      <div id="filePreview" style="display:none;">
+        <i class="fas fa-file-pdf" style="font-size:40px;color:var(--accent);margin-bottom:12px;"></i>
+        <p id="fileName" style="font-size:15px;font-weight:500;margin-bottom:4px;"></p>
+        <p id="fileSize" style="font-size:13px;color:var(--muted);"></p>
+      </div>
     </div>
 
-    <!-- Account Modal -->
-    <div id="account-modal" class="modal">
-        <div class="modal-content account-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-user-circle"></i> Mon Compte</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="account-info">
-                <div class="account-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <p><strong>Email :</strong> <span id="account-email"></span></p>
-                <p><strong>Statut :</strong> <span id="account-status" class="status-badge"></span></p>
-                <p><strong>Conversions ce mois :</strong> <span id="account-conversions">0</span></p>
-            </div>
-            <div class="account-actions">
-                <button id="upgrade-btn" class="btn-primary btn-full">
-                    <i class="fas fa-crown"></i> Passer Premium
-                </button>
-                <button id="cancel-sub-btn" class="btn-secondary btn-full" style="display: none;">
-                    <i class="fas fa-times"></i> Annuler l'abonnement
-                </button>
-            </div>
-        </div>
+    <!-- Zone texte pour text-to-pdf et html-to-pdf -->
+    <div id="textInputArea" style="display:none;margin-top:16px;">
+      <textarea class="input-field" id="textInput" rows="10" placeholder="Collez votre texte ici..." style="resize:vertical;font-size:14px;line-height:1.7;"></textarea>
     </div>
 
-    <!-- Payment Modal -->
-    <div id="payment-modal" class="modal">
-        <div class="modal-content payment-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-credit-card"></i> Choisir votre paiement</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="payment-options">
-                <button class="payment-option" data-method="card">
-                    <i class="fas fa-credit-card"></i>
-                    <div class="payment-info">
-                        <h3>Carte bancaire</h3>
-                        <p>Visa, Mastercard, Amex</p>
-                    </div>
-                </button>
-                <button class="payment-option" data-method="mobile">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div class="payment-info">
-                        <h3>Mobile Money</h3>
-                        <p>Orange Money, MTN, Moov</p>
-                    </div>
-                </button>
-                <button class="payment-option" data-method="crypto">
-                    <i class="fab fa-bitcoin"></i>
-                    <div class="payment-info">
-                        <h3>Cryptomonnaie</h3>
-                        <p>BTC, ETH, USDT</p>
-                    </div>
-                </button>
-            </div>
-        </div>
+    <!-- Bouton convertir -->
+    <div style="margin-top:24px;display:flex;justify-content:center;">
+      <button class="btn-primary" id="convertBtn" onclick="startConversion()" disabled style="font-size:16px;padding:16px 48px;">
+        <i class="fas fa-sync-alt"></i> Convertir
+      </button>
     </div>
 
-    <!-- Card Payment Modal -->
-    <div id="card-modal" class="modal">
-        <div class="modal-content card-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-credit-card"></i> Paiement par carte</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <form id="card-form">
-                <div class="form-group">
-                    <label for="card-number">Numéro de carte</label>
-                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="card-expiry">Expiration</label>
-                        <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label for="card-cvv">CVV</label>
-                        <input type="text" id="card-cvv" placeholder="123" maxlength="4">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="card-name">Nom sur la carte</label>
-                    <input type="text" id="card-name" placeholder="JOHN DOE">
-                </div>
-                <button type="submit" class="btn-primary btn-full">
-                    <i class="fas fa-lock"></i> Payer 1$ / mois
-                </button>
-            </form>
+    <!-- Progression -->
+    <div id="progressArea" style="display:none;margin-top:32px;">
+      <div class="card" style="padding:24px;text-align:center;">
+        <div style="margin-bottom:16px;">
+          <i class="fas fa-cog" style="font-size:32px;color:var(--accent);animation:spin-slow 2s linear infinite;"></i>
         </div>
+        <p style="font-size:15px;font-weight:500;margin-bottom:12px;" id="progressText">Conversion en cours...</p>
+        <div class="progress-track" style="max-width:400px;margin:0 auto;">
+          <div class="progress-fill" id="conversionProgress" style="width:0%;transition:width 0.5s ease;"></div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-top:8px;" id="progressPercent">0%</p>
+      </div>
     </div>
 
-    <!-- Mobile Money Modal -->
-    <div id="mobile-modal" class="modal">
-        <div class="modal-content mobile-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-mobile-alt"></i> Mobile Money</h2>
-                <button class="close-btn">&times;</button>
-            </div>
-            <div class="mobile-options">
-                <button class="mobile-option" data-provider="orange">
-                    <div class="provider-logo orange">OM</div>
-                    <span>Orange Money</span>
-                </button>
-                <button class="mobile-option" data-provider="mtn">
-                    <div class="provider-logo mtn">MTN</div>
-                    <span>MTN Mobile Money</span>
-                </button>
-                <button class="mobile-option" data-provider="moov">
-                    <div class="provider-logo moov">MOOV</div>
-                    <span>Moov Money</span>
-                </button>
-            </div>
-            <form id="mobile-form">
-                <div class="form-group">
-                    <label for="mobile-number">Numéro de téléphone</label>
-                    <input type="tel" id="mobile-number" placeholder="+225 XX XX XX XX XX">
-                </div>
-                <button type="submit" class="btn-primary btn-full">
-                    <i class="fas fa-paper-plane"></i> Recevoir le code
-                </button>
-            </form>
+    <!-- Résultat -->
+    <div id="resultArea" style="display:none;margin-top:32px;">
+      <div class="card" style="padding:24px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="width:40px;height:40px;background:rgba(74,222,128,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-check" style="color:var(--success);font-size:18px;"></i>
+          </div>
+          <div>
+            <p style="font-size:16px;font-weight:600;">Conversion terminee</p>
+            <p style="font-size:13px;color:var(--muted);" id="resultInfo"></p>
+          </div>
         </div>
+        <!-- Aperçu texte -->
+        <div id="textResult" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;max-height:300px;overflow-y:auto;margin-bottom:16px;">
+          <pre style="font-size:13px;color:var(--fg-dim);white-space:pre-wrap;word-break:break-word;font-family:'DM Sans',monospace;" id="extractedText"></pre>
+        </div>
+        <button class="btn-primary" id="downloadBtn" onclick="downloadResult()">
+          <i class="fas fa-download"></i> Telecharger
+        </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== PAGE TARIFS ===== -->
+<main id="page-pricing" class="section-hidden" style="padding-top:64px;position:relative;z-index:1;">
+  <section style="padding:80px 24px;max-width:900px;margin:0 auto;">
+    <button class="btn-ghost" onclick="navigate('home')" style="margin-bottom:32px;">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+    <h1 style="font-size:40px;font-weight:700;text-align:center;margin-bottom:12px;">Choisissez votre plan</h1>
+    <p style="text-align:center;color:var(--muted);margin-bottom:56px;font-size:16px;">Simple, transparent, sans engagement</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;">
+      <!-- Gratuit -->
+      <div class="card" style="padding:36px;">
+        <div style="margin-bottom:24px;">
+          <span class="badge badge-free">Gratuit</span>
+          <div style="margin-top:16px;">
+            <span style="font-family:'Space Grotesk';font-size:42px;font-weight:700;">0</span>
+            <span style="font-size:18px;color:var(--muted);">$</span>
+          </div>
+          <p style="font-size:14px;color:var(--muted);margin-top:8px;">Pour toujours, sans carte bancaire</p>
+        </div>
+        <ul style="list-style:none;margin-bottom:32px;display:flex;flex-direction:column;gap:12px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--success);font-size:13px;"></i> 3 conversions par cycle
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--success);font-size:13px;"></i> Renouvellement toutes les 48h
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--success);font-size:13px;"></i> Tous les outils disponibles
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--success);font-size:13px;"></i> Traitement local
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);">
+            <i class="fas fa-times" style="color:var(--muted);font-size:13px;"></i> Fichiers jusqu'a 5 Mo
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);">
+            <i class="fas fa-times" style="color:var(--muted);font-size:13px;"></i> Pas de priorite
+          </li>
+        </ul>
+        <button class="btn-secondary" style="width:100%;justify-content:center;" onclick="handleFreePlan()">
+          Commencer gratuitement
+        </button>
+      </div>
+
+      <!-- Pro -->
+      <div class="card pricing-highlight" style="padding:36px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+          <span class="badge badge-pro"><i class="fas fa-crown"></i> Pro</span>
+          <span style="font-size:12px;color:var(--accent);background:var(--accent-dim);padding:4px 10px;border-radius:6px;font-weight:600;">POPULAIRE</span>
+        </div>
+        <div style="margin-bottom:24px;">
+          <div>
+            <span style="font-family:'Space Grotesk';font-size:42px;font-weight:700;">0,99</span>
+            <span style="font-size:18px;color:var(--muted);">$</span>
+            <span style="font-size:14px;color:var(--muted);">/mois</span>
+          </div>
+          <p style="font-size:14px;color:var(--muted);margin-top:8px;">Le meilleur rapport qualite-prix</p>
+        </div>
+        <ul style="list-style:none;margin-bottom:32px;display:flex;flex-direction:column;gap:12px;">
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Conversions illimitees
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Fichiers jusqu'a 50 Mo
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Tous les outils disponibles
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Traitement prioritaire
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Historique des conversions
+          </li>
+          <li style="display:flex;align-items:center;gap:10px;font-size:14px;">
+            <i class="fas fa-check" style="color:var(--accent);font-size:13px;"></i> Support prioritaire
+          </li>
+        </ul>
+        <button class="btn-primary" style="width:100%;justify-content:center;" onclick="handleProPlan()">
+          <i class="fas fa-crown"></i> S'abonner pour 0,99$         </button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== PAGE TABLEAU DE BORD ===== -->
+<main id="page-dashboard" class="section-hidden" style="padding-top:64px;position:relative;z-index:1;">
+  <section style="padding:60px 24px 80px;max-width:1000px;margin:0 auto;">
+    <button class="btn-ghost" onclick="navigate('home')" style="margin-bottom:32px;">
+      <i class="fas fa-arrow-left"></i> Retour
+    </button>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px;">
+      <div>
+        <h1 style="font-size:28px;font-weight:700;">Tableau de bord</h1>
+        <p style="font-size:14px;color:var(--muted);margin-top:4px;">Bienvenue, <span id="dashUsername"></span></p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <span id="dashBadge" class="badge badge-free">Gratuit</span>
+        <button class="btn-primary" id="dashUpgradeBtn" onclick="navigate('pricing')" style="padding:8px 16px;font-size:13px;">
+          <i class="fas fa-crown"></i> Passer Pro
+        </button>
+      </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Convertissez vos fichiers en quelques secondes</h2>
-                <p>Outil professionnel et rapide pour transformer vos documents</p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <span class="stat-number">10M+</span>
-                        <span class="stat-label">Fichiers convertis</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">50K+</span>
-                        <span class="stat-label">Utilisateurs actifs</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number">99.9%</span>
-                        <span class="stat-label">Taux de succès</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Tool Selector -->
-        <section class="tool-selector">
-            <div class="tools-container">
-                <button class="tool-btn active" data-tool="text-pdf">
-                    <i class="fas fa-file-alt"></i>
-                    <span class="tool-name">Texte → PDF</span>
-                </button>
-                <button class="tool-btn" data-tool="png-jpg">
-                    <i class="fas fa-image"></i>
-                    <span class="tool-name">PNG → JPG</span>
-                </button>
-                <button class="tool-btn" data-tool="jpg-png">
-                    <i class="fas fa-file-image"></i>
-                    <span class="tool-name">JPG → PNG</span>
-                </button>
-                <button class="tool-btn" data-tool="pdf-word">
-                    <i class="fas fa-file-word"></i>
-                    <span class="tool-name">PDF → Word</span>
-                </button>
-                <button class="tool-btn" data-tool="word-pdf">
-                    <i class="fas fa-file-pdf"></i>
-                    <span class="tool-name">Word → PDF</span>
-                </button>
-                <button class="tool-btn" data-tool="compress-pdf">
-                    <i class="fas fa-compress"></i>
-                    <span class="tool-name">Compresser PDF</span>
-                </button>
-                <button class="tool-btn" data-tool="merge-pdf">
-                    <i class="fas fa-layer-group"></i>
-                    <span class="tool-name">Fusionner PDF</span>
-                </button>
-                <button class="tool-btn" data-tool="split-pdf">
-                    <i class="fas fa-cut"></i>
-                    <span class="tool-name">Diviser PDF</span>
-                </button>
-                <button class="tool-btn" data-tool="zip">
-                    <i class="fas fa-archive"></i>
-                    <span class="tool-name">Compresser ZIP</span>
-                </button>
-                <button class="tool-btn" data-tool="unzip">
-                    <i class="fas fa-archive"></i>
-                    <span class="tool-name">Extraire ZIP</span>
-                </button>
-                <button class="tool-btn" data-tool="csv-excel">
-                    <i class="fas fa-file-excel"></i>
-                    <span class="tool-name">CSV → Excel</span>
-                </button>
-                <button class="tool-btn" data-tool="excel-csv">
-                    <i class="fas fa-file-csv"></i>
-                    <span class="tool-name">Excel → CSV</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Upload Section -->
-        <section class="upload-section">
-            <div id="dropzone" class="dropzone">
-                <div class="dropzone-content">
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <h3>Glissez vos fichiers ici</h3>
-                    <p>ou</p>
-                    <button id="file-input-btn" class="btn-primary btn-large">
-                        <i class="fas fa-folder-open"></i> Choisir les fichiers
-                    </button>
-                    <div class="file-types">
-                        <span class="file-type">PDF</span>
-                        <span class="file-type">DOCX</span>
-                        <span class="file-type">XLSX</span>
-                        <span class="file-type">TXT</span>
-                        <span class="file-type">PNG</span>
-                        <span class="file-type">JPG</span>
-                        <span class="file-type">ZIP</span>
-                    </div>
-                </div>
-                <input type="file" id="file-input" style="display: none;" multiple>
-            </div>
-
-            <!-- Preview Section -->
-            <div id="preview-section" class="preview-section" style="display: none;">
-                <div class="preview-header">
-                    <h3><i class="fas fa-eye"></i> Aperçu du fichier</h3>
-                    <button id="cancel-btn" class="btn-secondary btn-small">
-                        <i class="fas fa-times"></i> Annuler
-                    </button>
-                </div>
-                <div id="preview-content" class="preview-content"></div>
-                <div class="preview-actions">
-                    <button id="convert-btn" class="btn-primary btn-large">
-                        <i class="fas fa-magic"></i> Convertir maintenant
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Premium Card -->
-        <section class="premium-section">
-            <div class="premium-card">
-                <div class="premium-header">
-                    <div class="premium-badge">
-                        <i class="fas fa-crown"></i>
-                        <span>PREMIUM</span>
-                    </div>
-                    <h3>Boostez vos conversions</h3>
-                    <div class="price-tag">
-                        <span class="price">1$</span>
-                        <span class="period">/mois</span>
-                    </div>
-                </div>
-                <ul class="premium-features">
-                    <li><i class="fas fa-check"></i> Conversions illimitées</li>
-                    <li><i class="fas fa-check"></i> Fichiers jusqu'à 100MB</li>
-                    <li><i class="fas fa-check"></i> Support 24/7 prioritaire</li>
-                    <li><i class="fas fa-check"></i> Pas de publicités</li>
-                    <li><i class="fas fa-check"></i> API accès</li>
-                    <li><i class="fas fa-check"></i> Stockage cloud 10GB</li>
-                </ul>
-                <button id="premium-btn" class="btn-upgrade">
-                    <i class="fas fa-rocket"></i> Commencer l'essai gratuit
-                </button>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section class="features-section">
-            <h2>Pourquoi choisir FileFlow Pro ?</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>Ultra rapide</h3>
-                    <p>Conversion instantanée de vos fichiers en quelques secondes</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>Sécurisé</h3>
-                    <p>Vos fichiers sont traités localement, aucune donnée stockée</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Mobile friendly</h3>
-                    <p>Interface optimisée pour tous vos appareils</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <h3>12+ formats</h3>
-                    <p>Support de tous les formats populaires</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>50K+ utilisateurs</h3>
-                    <p>Rejoignez notre communauté grandissante</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>Support 24/7</h3>
-                    <p>Notre équipe est là pour vous aider</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>FileFlow Pro</h3>
-                <p>Le convertisseur de fichiers le plus avancé du marché.</p>
-            </div>
-            <div class="footer-section">
-                <h4>Outils</h4>
-                <ul>
-                    <li><a href="#">PDF Tools</a></li>
-                    <li><a href="#">Image Converter</a></li>
-                    <li><a href="#">Document Tools</a></li>
-                    <li><a href="#">Archive Tools</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Support</h4>
-                <ul>
-                    <li><a href="#">Centre d'aide</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">API</a></li>
-                    <li><a href="#">Statut</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Légal</h4>
-                <ul>
-                    <li><a href="#">Confidentialité</a></li>
-                    <li><a href="#">Conditions</a></li>
-                    <li><a href="#">Cookies</a></li>
-                    <li><a href="#">RGPD</a></li>
-                </ul>
-            </div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px;">
+      <div class="card" style="padding:24px;">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Conversions ce cycle</p>
+        <div style="font-family:'Space Grotesk';font-size:32px;font-weight:700;" id="dashUsed">0</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:4px;" id="dashLimit">sur 3</p>
+      </div>
+      <div class="card" style="padding:24px;">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Prochain renouvellement</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+          <div class="timer-ring" id="timerRing">
+            <svg width="80" height="80">
+              <circle cx="40" cy="40" r="34" fill="none" stroke="var(--border)" stroke-width="4"/>
+              <circle cx="40" cy="40" r="34" fill="none" stroke="var(--accent)" stroke-width="4"
+                stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/>
+            </svg>
+            <span style="font-family:'Space Grotesk';font-size:16px;font-weight:700;" id="timerText">48h</span>
+          </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 FileFlow Pro. Tous droits réservés.</p>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-                <a href="#"><i class="fab fa-github"></i></a>
-            </div>
-        </div>
-    </footer>
+      </div>
+      <div class="card" style="padding:24px;">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:8px;">Total conversions</p>
+        <div style="font-family:'Space Grotesk';font-size:32px;font-weight:700;" id="dashTotal">0</div>
+        <p style="font-size:13px;color:var(--success);margin-top:4px;"><i class="fas fa-arrow-up"></i> depuis l'inscription</p>
+      </div>
+    </div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="script.js"></script>
+    <!-- Historique -->
+    <div class="card" style="overflow:hidden;">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <h3 style="font-size:16px;font-weight:600;">Historique des conversions</h3>
+        <button class="btn-ghost" onclick="clearHistory()" style="font-size:13px;color:var(--error);">
+          <i class="fas fa-trash"></i> Effacer
+        </button>
+      </div>
+      <div class="table-row table-header">
+        <span>Fichier</span>
+        <span>Type</span>
+        <span>Date</span>
+        <span>Statut</span>
+      </div>
+      <div id="historyList">
+        <div style="padding:40px;text-align:center;color:var(--muted);font-size:14px;">
+          <i class="fas fa-inbox" style="font-size:32px;margin-bottom:12px;opacity:0.3;display:block;"></i>
+          Aucune conversion pour le moment
+        </div>
+      </div>
+    </div>
+
+    <!-- Déconnexion -->
+    <div style="margin-top:32px;text-align:right;">
+      <button class="btn-ghost" onclick="logout()" style="color:var(--error);">
+        <i class="fas fa-sign-out-alt"></i> Se deconnecter
+      </button>
+    </div>
+  </section>
+</main>
+
+<!-- ===== MODALS ===== -->
+<div id="modalOverlay" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeModal()">
+  <!-- Login -->
+  <div class="modal-content" id="modal-login" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <h2 style="font-size:22px;font-weight:700;">Connexion</h2>
+      <button class="btn-ghost" onclick="closeModal()" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="handleLogin(event)">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Adresse e-mail</label>
+        <input class="input-field" type="email" id="loginEmail" placeholder="vous@exemple.com" required>
+      </div>
+      <div style="margin-bottom:24px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Mot de passe</label>
+        <div style="position:relative;">
+          <input class="input-field" type="password" id="loginPassword" placeholder="Votre mot de passe" required style="padding-right:44px;">
+          <button type="button" onclick="togglePassword('loginPassword',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;" id="loginBtn">
+        Se connecter
+      </button>
+    </form>
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--muted);">
+      Pas encore de compte ?
+      <a href="#" onclick="switchModal('register');return false;" style="color:var(--accent);font-weight:500;text-decoration:none;">S'inscrire</a>
+    </p>
+  </div>
+
+  <!-- Register -->
+  <div class="modal-content" id="modal-register" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <h2 style="font-size:22px;font-weight:700;">Creer un compte</h2>
+      <button class="btn-ghost" onclick="closeModal()" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="handleRegister(event)">
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Nom d'utilisateur</label>
+        <input class="input-field" type="text" id="regName" placeholder="Votre nom" required minlength="2">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Adresse e-mail</label>
+        <input class="input-field" type="email" id="regEmail" placeholder="vous@exemple.com" required>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Mot de passe</label>
+        <div style="position:relative;">
+          <input class="input-field" type="password" id="regPassword" placeholder="Min. 6 caracteres" required minlength="6" style="padding-right:44px;" oninput="checkPasswordStrength(this.value)">
+          <button type="button" onclick="togglePassword('regPassword',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:8px;" id="strengthBars">
+          <div style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.2s;"></div>
+          <div style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.2s;"></div>
+          <div style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.2s;"></div>
+          <div style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.2s;"></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px;" id="strengthText"></p>
+      </div>
+      <div style="margin-bottom:24px;">
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Confirmer le mot de passe</label>
+        <input class="input-field" type="password" id="regPasswordConfirm" placeholder="Repetez le mot de passe" required>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;" id="regBtn">
+        Creer mon compte
+      </button>
+    </form>
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:var(--muted);">
+      Deja un compte ?
+      <a href="#" onclick="switchModal('login');return false;" style="color:var(--accent);font-weight:500;text-decoration:none;">Se connecter</a>
+    </p>
+  </div>
+
+  <!-- Abonnement Pro -->
+  <div class="modal-content" id="modal-subscribe" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <h2 style="font-size:22px;font-weight:700;">Confirmer l'abonnement</h2>
+      <button class="btn-ghost" onclick="closeModal()" style="padding:4px 8px;"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="background:var(--accent-dim);border:1px solid rgba(232,168,56,0.2);border-radius:12px;padding:20px;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <i class="fas fa-crown" style="color:var(--accent);font-size:24px;"></i>
+        <div>
+          <p style="font-weight:600;font-size:16px;">Plan Pro</p>
+          <p style="font-size:13px;color:var(--muted);">Conversions illimitees</p>
+        </div>
+        <div style="margin-left:auto;text-align:right;">
+          <span style="font-family:'Space Grotesk';font-size:24px;font-weight:700;color:var(--accent);">0,99$</span>
+          <span style="font-size:13px;color:var(--muted);">/mois</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Numero de carte</label>
+      <input class="input-field" type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+      <div>
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">Expiration</label>
+        <input class="input-field" type="text" placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)">
+      </div>
+      <div>
+        <label style="font-size:13px;color:var(--fg-dim);display:block;margin-bottom:6px;">CVC</label>
+        <input class="input-field" type="text" placeholder="123" maxlength="3">
+      </div>
+    </div>
+    <button class="btn-primary" style="width:100%;justify-content:center;" onclick="processSubscription()">
+      <i class="fas fa-lock"></i> Payer 0,99$     </button>
+    <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted);">
+      <i class="fas fa-shield-alt"></i> Paiement securise et chiffre. Annulable a tout moment.
+    </p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Configuration de pdf.js
+// ============================================================
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ============================================================
+// État de l'application
+// ============================================================
+const FREE_LIMIT = 3;
+const CYCLE_DURATION = 48 * 60 * 60 * 1000; // 48 heures en ms
+
+let currentUser = null;
+let currentTool = 'pdf-to-text';
+let uploadedFiles = [];
+let conversionResult = null;
+
+// Définition des outils
+const tools = {
+  'pdf-to-text': {
+    title: 'PDF vers Texte',
+    desc: 'Extrayez le texte de vos fichiers PDF',
+    icon: 'fa-file-alt',
+    color: 'var(--accent)',
+    bgColor: 'rgba(232,168,56,0.1)',
+    accept: '.pdf',
+    multiple: false,
+    hasTextInput: false
+  },
+  'pdf-to-image': {
+    title: 'PDF vers Image',
+    desc: 'Convertissez vos pages PDF en images PNG',
+    icon: 'fa-image',
+    color: 'var(--success)',
+    bgColor: 'rgba(74,222,128,0.1)',
+    accept: '.pdf',
+    multiple: false,
+    hasTextInput: false
+  },
+  'image-to-pdf': {
+    title: 'Image vers PDF',
+    desc: 'Transformez vos images en document PDF',
+    icon: 'fa-file-image',
+    color: '#60A5FA',
+    bgColor: 'rgba(96,165,250,0.1)',
+    accept: '.jpg,.jpeg,.png',
+    multiple: true,
+    hasTextInput: false
+  },
+  'text-to-pdf': {
+    title: 'Texte vers PDF',
+    desc: 'Convertissez votre texte en document PDF',
+    icon: 'fa-pen-nib',
+    color: 'var(--warning)',
+    bgColor: 'rgba(251,191,36,0.1)',
+    accept: null,
+    multiple: false,
+    hasTextInput: true
+  },
+  'merge-pdf': {
+    title: 'Fusionner des PDF',
+    desc: 'Combinez plusieurs PDF en un seul',
+    icon: 'fa-object-group',
+    color: 'var(--error)',
+    bgColor: 'rgba(248,113,113,0.1)',
+    accept: '.pdf',
+    multiple: true,
+    hasTextInput: false
+  },
+  'html-to-pdf': {
+    title: 'HTML vers PDF',
+    desc: 'Convertissez votre code HTML en PDF',
+    icon: 'fa-code',
+    color: '#A855F7',
+    bgColor: 'rgba(168,85,247,0.1)',
+    accept: null,
+    multiple: false,
+    hasTextInput: true
+  }
+};
+
+// ============================================================
+// Gestion des utilisateurs (localStorage)
+// ============================================================
+function getUsers() {
+  return JSON.parse(localStorage.getItem('pdfshift_users') || '{}');
+}
+function saveUsers(users) {
+  localStorage.setItem('pdfshift_users', JSON.stringify(users));
+}
+function getCurrentUser() {
+  const id = localStorage.getItem('pdfshift_current');
+  if (!id) return null;
+  const users = getUsers();
+  return users[id] || null;
+}
+function saveCurrentUser(user) {
+  const users = getUsers();
+  users[user.id] = user;
+  saveUsers(users);
+  currentUser = user;
+}
+function setLoggedIn(userId) {
+  localStorage.setItem('pdfshift_current', userId);
+}
+function setLoggedOut() {
+  localStorage.removeItem('pdfshift_current');
+  currentUser = null;
+}
+
+// ============================================================
+// Système de limites
+// ============================================================
+function getUsageCycle(user) {
+  const now = Date.now();
+  if (!user.cycleStart) {
+    user.cycleStart = now;
+    user.cycleUsed = 0;
+    saveCurrentUser(user);
+  }
+  const elapsed = now - user.cycleStart;
+  if (elapsed >= CYCLE_DURATION) {
+    // Renouvellement du cycle
+    user.cycleStart = now;
+    user.cycleUsed = 0;
+    saveCurrentUser(user);
+  }
+  return user;
+}
+
+function getRemainingConversions(user) {
+  if (user.isPro) return Infinity;
+  const u = getUsageCycle(user);
+  return Math.max(0, FREE_LIMIT - u.cycleUsed);
+}
+
+function useConversion(user) {
+  if (user.isPro) return true;
+  const remaining = getRemainingConversions(user);
+  if (remaining <= 0) return false;
+  user.cycleUsed = (user.cycleUsed || 0) + 1;
+  user.totalConversions = (user.totalConversions || 0) + 1;
+  saveCurrentUser(user);
+  return true;
+}
+
+function getTimeRemaining(user) {
+  const u = getUsageCycle(user);
+  const elapsed = Date.now() - u.cycleStart;
+  return Math.max(0, CYCLE_DURATION - elapsed);
+}
+
+function formatTime(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}h ${m.toString().padStart(2,'0')}min`;
+  return `${m}min ${s.toString().padStart(2,'0')}s`;
+}
+
+// ============================================================
+// Navigation
+// ============================================================
+function navigate(page) {
+  // Vérifier auth pour dashboard
+  if (page === 'dashboard' && !getCurrentUser()) {
+    openModal('login');
+    showToast('Connectez-vous pour acceder au tableau de bord', 'info');
+    return;
+  }
+
+  document.querySelectorAll('[id^="page-"]').forEach(p => {
+    p.className = 'section-hidden';
+  });
+  const target = document.getElementById('page-' + page);
+  if (target) {
+    target.className = 'section-visible';
+  }
+
+  // Mettre à jour nav
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`.nav-link[data-page="${page}"]`)?.classList.add('active');
+
+  // Scroll en haut
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Rafraîchir le dashboard si nécessaire
+  if (page === 'dashboard') refreshDashboard();
+}
+
+// ============================================================
+// Modals
+// ============================================================
+function openModal(type) {
+  document.getElementById('modalOverlay').style.display = 'flex';
+  document.querySelectorAll('#modalOverlay > .modal-content').forEach(m => m.style.display = 'none');
+  document.getElementById('modal-' + type).style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function switchModal(type) {
+  document.querySelectorAll('#modalOverlay > .modal-content').forEach(m => m.style.display = 'none');
+  document.getElementById('modal-' + type).style.display = 'block';
+}
+
+// ============================================================
+// Toast
+// ============================================================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas ${icons[type]}"></i> ${message}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-12px)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// ============================================================
+// Authentification
+// ============================================================
+function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const password = document.getElementById('regPassword').value;
+  const confirm = document.getElementById('regPasswordConfirm').value;
+
+  if (password !== confirm) {
+    showToast('Les mots de passe ne correspondent pas', 'error');
+    return;
+  }
+
+  const users = getUsers();
+  // Vérifier si l'email existe déjà
+  if (Object.values(users).find(u => u.email === email)) {
+    showToast('Un compte avec cet e-mail existe deja', 'error');
+    return;
+  }
+
+  const user = {
+    id: 'user_' + Date.now(),
+    name,
+    email,
+    password: btoa(password), // Encodage basique (pas sécurisé en production)
+    isPro: false,
+    cycleStart: Date.now(),
+    cycleUsed: 0,
+    totalConversions: 0,
+    history: [],
+    createdAt: Date.now()
+  };
+
+  users[user.id] = user;
+  saveUsers(users);
+  setLoggedIn(user.id);
+  currentUser = user;
+  closeModal();
+  updateNavAuth();
+  showToast(`Bienvenue ${name}, votre compte a ete cree !`, 'success');
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+
+  const users = getUsers();
+  const user = Object.values(users).find(u => u.email === email);
+
+  if (!user || atob(user.password) !== password) {
+    showToast('E-mail ou mot de passe incorrect', 'error');
+    return;
+  }
+
+  setLoggedIn(user.id);
+  currentUser = user;
+  closeModal();
+  updateNavAuth();
+  showToast(`Bon retour, ${user.name} !`, 'success');
+}
+
+function logout() {
+  setLoggedOut();
+  updateNavAuth();
+  navigate('home');
+  showToast('Vous etes deconnecte', 'info');
+}
+
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fas fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fas fa-eye';
+  }
+}
+
+function checkPasswordStrength(pwd) {
+  const bars = document.querySelectorAll('#strengthBars > div');
+  const text = document.getElementById('strengthText');
+  let strength = 0;
+  if (pwd.length >= 6) strength++;
+  if (pwd.length >= 10) strength++;
+  if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) strength++;
+  if (/[0-9]/.test(pwd) && /[^A-Za-z0-9]/.test(pwd)) strength++;
+
+  const colors = ['var(--border)', 'var(--error)', 'var(--warning)', 'var(--accent)', 'var(--success)'];
+  const labels = ['', 'Faible', 'Moyen', 'Bon', 'Excellent'];
+
+  bars.forEach((bar, i) => {
+    bar.style.background = i < strength ? colors[strength] : 'var(--border)';
+  });
+  text.textContent = pwd.length > 0 ? labels[strength] : '';
+  text.style.color = colors[strength];
+}
+
+function formatCardNumber(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 16);
+  input.value = v.replace(/(.{4})/g, '$1 ').trim();
+}
+
+function formatExpiry(input) {
+  let v = input.value.replace(/\D/g, '').substring(0, 4);
+  if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2);
+  input.value = v;
+}
+
+// ============================================================
+// Mise à jour UI selon état auth
+// ============================================================
+function updateNavAuth() {
+  const user = getCurrentUser();
+  const navAuth = document.getElementById('navAuth');
+  const navDash = document.getElementById('navDashboard');
+
+  if (user) {
+    navDash.style.display = 'inline-flex';
+    navAuth.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-user" style="color:var(--accent);font-size:13px;"></i>
+        </div>
+        <span style="font-size:14px;font-weight:500;color:var(--fg-dim);">${user.name}</span>
+        ${user.isPro ? '<span class="badge badge-pro" style="font-size:10px;padding:2px 6px;">PRO</span>' : ''}
+      </div>
+      <button class="btn-ghost" onclick="logout()" style="color:var(--error);font-size:13px;">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    `;
+  } else {
+    navDash.style.display = 'none';
+    navAuth.innerHTML = `
+      <button class="btn-ghost" onclick="openModal('login')">Connexion</button>
+      <button class="btn-primary" onclick="openModal('register')" style="padding:8px 18px;font-size:14px;">S'inscrire</button>
+    `;
+  }
+}
+
+// ============================================================
+// Outils - Sélection et upload
+// ============================================================
+function selectTool(toolId) {
+  currentTool = toolId;
+  const tool = tools[toolId];
+
+  document.getElementById('toolTitle').textContent = tool.title;
+  document.getElementById('toolDesc').textContent = tool.desc;
+  document.getElementById('toolIcon').innerHTML = `<i class="fas ${tool.icon}" style="color:${tool.color};font-size:20px;"></i>`;
+  document.getElementById('toolIcon').style.background = tool.bgColor;
+
+  const fileInput = document.getElementById('fileInput');
+  if (tool.accept) {
+    fileInput.accept = tool.accept;
+    fileInput.multiple = tool.multiple;
+    document.getElementById('acceptedFormats').textContent = `Formats acceptes : ${tool.accept.toUpperCase().replace(/\./g,'').replace(/,/g,', ')}`;
+    document.getElementById('dropZone').style.display = 'block';
+  } else {
+    document.getElementById('dropZone').style.display = 'none';
+  }
+
+  document.getElementById('textInputArea').style.display = tool.hasTextInput ? 'block' : 'none';
+  document.getElementById('textInput').value = '';
+  document.getElementById('textInput').placeholder = toolId === 'text-to-pdf' ? 'Collez votre texte ici...' : 'Collez votre code HTML ici...';
+
+  // Reset states
+  uploadedFiles = [];
+  conversionResult = null;
+  resetToolUI();
+
+  // Vérifier les limites
+  updateLimitUI();
+
+  navigate('tools');
+}
+
+function resetToolUI() {
+  document.getElementById('dropContent').style.display = 'block';
+  document.getElementById('filePreview').style.display = 'none';
+  document.getElementById('convertBtn').disabled = true;
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('textResult').style.display = 'none';
+}
+
+function updateLimitUI() {
+  const user = getCurrentUser();
+  const limitBanner = document.getElementById('limitBanner');
+
+  if (user && user.isPro) {
+    limitBanner.style.display = 'none';
+    return;
+  }
+
+  limitBanner.style.display = 'flex';
+  const remaining = user ? getRemainingConversions(user) : FREE_LIMIT;
+  const pct = (remaining / FREE_LIMIT) * 100;
+
+  document.getElementById('limitText').textContent = `${remaining} conversion${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''} ce cycle`;
+  document.getElementById('limitProgress').style.width = pct + '%';
+
+  if (remaining === 0) {
+    document.getElementById('limitProgress').style.background = 'var(--error)';
+  } else if (remaining === 1) {
+    document.getElementById('limitProgress').style.background = 'var(--warning)';
+  } else {
+    document.getElementById('limitProgress').style.background = '';
+  }
+}
+
+// Gestion du drop zone
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('drag-over');
+});
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', (e) => {
+  handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+  if (!files || files.length === 0) return;
+
+  const user = getCurrentUser();
+  if (!user) {
+    showToast('Connectez-vous pour utiliser les outils', 'warning');
+    openModal('login');
+    return;
+  }
+
+  const tool = tools[currentTool];
+  uploadedFiles = Array.from(files);
+
+  // Vérifier le type
+  for (const f of uploadedFiles) {
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    if (tool.accept && !tool.accept.includes(ext)) {
+      showToast(`Format non supporte. Utilisez : ${tool.accept}`, 'error');
+      uploadedFiles = [];
+      return;
+    }
+    // Vérifier taille (5 Mo gratuit, 50 Mo pro)
+    const maxSize = user.isPro ? 50 * 1024 * 1024 : 5 * 1024 * 1024;
+    if (f.size > maxSize) {
+      showToast(`Fichier trop volumineux. Limite : ${user.isPro ? '50' : '5'} Mo`, 'error');
+      uploadedFiles = [];
+      return;
+    }
+  }
+
+  // Afficher l'aperçu
+  if (uploadedFiles.length === 1) {
+    document.getElementById('dropContent').style.display = 'none';
+    document.getElementById('filePreview').style.display = 'block';
+    document.getElementById('fileName').textContent = uploadedFiles[0].name;
+    document.getElementById('fileSize').textContent = formatFileSize(uploadedFiles[0].size);
+  } else {
+    document.getElementById('dropContent').style.display = 'none';
+    document.getElementById('filePreview').style.display = 'block';
+    document.getElementById('fileName').textContent = `${uploadedFiles.length} fichiers selectionnes`;
+    document.getElementById('fileSize').textContent = uploadedFiles.map(f => formatFileSize(f.size)).join(', ');
+    document.getElementById('filePreview').querySelector('i').className = 'fas fa-copy';
+  }
+
+  document.getElementById('convertBtn').disabled = false;
+  updateLimitUI();
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' o';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' Mo';
+}
+
+// ============================================================
+// Conversion
+// ============================================================
+async function startConversion() {
+  const user = getCurrentUser();
+  if (!user) {
+    openModal('login');
+    return;
+  }
+
+  // Vérifier si on a besoin de fichier
+  const tool = tools[currentTool];
+  if (!tool.hasTextInput && uploadedFiles.length === 0) {
+    showToast('Veuillez selectionner un fichier', 'warning');
+    return;
+  }
+  if (tool.hasTextInput && !document.getElementById('textInput').value.trim()) {
+    showToast('Veuillez saisir du texte', 'warning');
+    return;
+  }
+
+  // Vérifier les limites
+  if (!useConversion(user)) {
+    const remaining = getTimeRemaining(user);
+    showToast(`Limite atteinte ! Prochain renouvellement dans ${formatTime(remaining)}`, 'error');
+    updateLimitUI();
+    return;
+  }
+
+  // Afficher la progression
+  document.getElementById('convertBtn').disabled = true;
+  document.getElementById('progressArea').style.display = 'block';
+  document.getElementById('resultArea').style.display = 'none';
+
+  try {
+    let result;
+    switch (currentTool) {
+      case 'pdf-to-text': result = await convertPdfToText(); break;
+      case 'pdf-to-image': result = await convertPdfToImage(); break;
+      case 'image-to-pdf': result = await convertImageToPdf(); break;
+      case 'text-to-pdf': result = await convertTextToPdf(); break;
+      case 'merge-pdf': result = await mergePdfs(); break;
+      case 'html-to-pdf': result = await convertHtmlToPdf(); break;
+    }
+
+    conversionResult = result;
+
+    // Ajouter à l'historique
+    const historyEntry = {
+      id: Date.now(),
+      tool: currentTool,
+      fileName: result.fileName || 'conversion',
+      date: Date.now(),
+      status: 'success'
+    };
+    user.history.unshift(historyEntry);
+    if (user.history.length > 50) user.history = user.history.slice(0, 50);
+    saveCurrentUser(user);
+
+    // Afficher le résultat
+    showResult(result);
+
+  } catch (err) {
+    console.error(err);
+    showToast('Erreur lors de la conversion : ' + err.message, 'error');
+    document.getElementById('progressArea').style.display = 'none';
+    document.getElementById('convertBtn').disabled = false;
+  }
+
+  updateLimitUI();
+}
+
+function animateProgress(text, duration = 2000) {
+  return new Promise(resolve => {
+    const progress = document.getElementById('conversionProgress');
+    const percent = document.getElementById('progressPercent');
+    document.getElementById('progressText').textContent = text;
+
+    let start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      // Easing
+      const eased = 1 - Math.pow(1 - p, 3);
+      progress.style.width = (eased * 100) + '%';
+      percent.textContent = Math.round(eased * 100) + '%';
+      if (p < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// --- PDF vers Texte ---
+async function convertPdfToText() {
+  await animateProgress('Lecture du fichier PDF...', 1500);
+  const arrayBuffer = await uploadedFiles[0].arrayBuffer();
+  await animateProgress('Extraction du texte...', 1500);
+
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map(item => item.str);
+    fullText += strings.join(' ') + '\n\n';
+  }
+
+  await animateProgress('Finalisation...', 500);
+
+  return {
+    type: 'text',
+    text: fullText,
+    fileName: uploadedFiles[0].name.replace('.pdf', '') + '.txt',
+    info: `${pdf.numPages} page(s) extraite(s)`
+  };
+}
+
+// --- PDF vers Image ---
+async function convertPdfToImage() {
+  await animateProgress('Chargement du PDF...', 1200);
+  const arrayBuffer = await uploadedFiles[0].arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  const images = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    await animateProgress(`Rendu de la page ${i}/${pdf.numPages}...`, 800);
+    const page = await pdf.getPage(i);
+    const scale = 2;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    images.push(canvas.toDataURL('image/png'));
+  }
+
+  await animateProgress('Finalisation...', 400);
+
+  return {
+    type: 'images',
+    images: images,
+    fileName: uploadedFiles[0].name.replace('.pdf', ''),
+    info: `${images.length} image(s) generee(s)`
+  };
+}
+
+// --- Image vers PDF ---
+async function convertImageToPdf() {
+  const { jsPDF } = window.jspdf;
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    await animateProgress(`Traitement de l'image ${i + 1}/${uploadedFiles.length}...`, 600);
+  }
+
+  const doc = new jsPDF();
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    if (i > 0) doc.addPage();
+    const dataUrl = await readFileAsDataUrl(uploadedFiles[i]);
+    const img = await loadImage(dataUrl);
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const ratio = Math.min(pageW / img.width, pageH / img.height, 1);
+    const w = img.width * ratio;
+    const h = img.height * ratio;
+    const x = (pageW - w) / 2;
+    const y = (pageH - h) / 2;
+    doc.addImage(dataUrl, 'JPEG', x, y, w, h);
+  }
+
+  await animateProgress('Generation du PDF...', 500);
+
+  const blob = doc.output('blob');
+  return {
+    type: 'blob',
+    blob: blob,
+    fileName: 'images-vers-pdf.pdf',
+    info: `${uploadedFiles.length} image(s) convertie(s)`
+  };
+}
+
+// --- Texte vers PDF ---
+async function convertTextToPdf() {
+  const { jsPDF } = window.jspdf;
+  const text = document.getElementById('textInput').value;
+
+  await animateProgress('Mise en forme du texte...', 1000);
+
+  const doc = new jsPDF();
+  doc.setFont('helvetica');
+  doc.setFontSize(12);
+
+  const lines = doc.splitTextToSize(text, 170);
+  const pageH = doc.internal.pageSize.getHeight() - 40;
+  let y = 20;
+  let lineIdx = 0;
+
+  while (lineIdx < lines.length) {
+    if (y + 7 > pageH + 20) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(lines[lineIdx], 20, y);
+    y += 7;
+    lineIdx++;
+  }
+
+  await animateProgress('Generation du PDF...', 500);
+
+  const blob = doc.output('blob');
+  return {
+    type: 'blob',
+    blob: blob,
+    fileName: 'texte-vers-pdf.pdf',
+    info: `${lines.length} ligne(s) traitee(s)`
+  };
+}
+
+// --- Fusionner des PDF ---
+async function mergePdfs() {
+  if (uploadedFiles.length < 2) {
+    showToast('Selectionnez au moins 2 fichiers PDF', 'warning');
+    throw new Error('Au moins 2 fichiers requis');
+  }
+
+  const { jsPDF } = window.jspdf;
+
+  for (let i = 0; i < uploadedFiles.length; i++) {
+    await animateProgress(`Lecture du PDF ${i + 1}/${uploadedFiles.length}...`, 600);
+  }
+
+  // Extraire les pages de chaque PDF
+  const allPages = [];
+  for (const file of uploadedFiles) {
+    const ab = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const viewport = page.getViewport({ scale: 2 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      allPages.push({
+        imgData: canvas.toDataURL('image/jpeg', 0.92),
+        w: viewport.width,
+        h: viewport.height
+      });
+    }
+  }
+
+  await animateProgress('Fusion en cours...', 800);
+
+  // Créer le PDF fusionné
+  const doc = new jsPDF();
+  allPages.forEach((pg, idx) => {
+    if (idx > 0) doc.addPage();
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const ratio = Math.min(pageW / pg.w, pageH / pg.h);
+    const w = pg.w * ratio;
+    const h = pg.h * ratio;
+    doc.addImage(pg.imgData, 'JPEG', (pageW - w) / 2, (pageH - h) / 2, w, h);
+  });
+
+  await animateProgress('Finalisation...', 400);
+
+  const blob = doc.output('blob');
+  return {
+    type: 'blob',
+    blob: blob,
+    fileName: 'pdf-fusionne.pdf',
+    info: `${allPages.length} page(s) fusionnee(s) depuis ${uploadedFiles.length} fichier(s)`
+  };
+}
+
+// --- HTML vers PDF ---
+async function convertHtmlToPdf() {
+  const { jsPDF } = window.jspdf;
+  const html = document.getElementById('textInput').value;
+
+  await animateProgress('Analyse du HTML...', 1000);
+
+  // Parser le HTML basiquement
+  const parser = new DOMParser();
+  const doc_html = parser.parseFromString(html, 'text/html');
+  const text = doc_html.body ? doc_html.body.textContent : html;
+
+  const doc = new jsPDF();
+  doc.setFont('helvetica');
+  doc.setFontSize(11);
+
+  const lines = doc.splitTextToSize(text, 170);
+  const pageH = doc.internal.pageSize.getHeight() - 40;
+  let y = 20;
+  let lineIdx = 0;
+
+  while (lineIdx < lines.length) {
+    if (y + 6 > pageH + 20) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(lines[lineIdx], 20, y);
+    y += 6;
+    lineIdx++;
+  }
+
+  await animateProgress('Generation du PDF...', 500);
+
+  const blob = doc.output('blob');
+  return {
+    type: 'blob',
+    blob: blob,
+    fileName: 'html-vers-pdf.pdf',
+    info: `${lines.length} ligne(s) convertie(s)`
+  };
+}
+
+// --- Utilitaires ---
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function showResult(result) {
+  document.getElementById('progressArea').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'block';
+  document.getElementById('resultInfo').textContent = result.info;
+
+  const textResult = document.getElementById('textResult');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  if (result.type === 'text') {
+    textResult.style.display = 'block';
+    document.getElementById('extractedText').textContent = result.text.substring(0, 5000) + (result.text.length > 5000 ? '\n\n... (texte tronque dans l\'aperçu)' : '');
+    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Telecharger le fichier texte';
+  } else if (result.type === 'images') {
+    textResult.style.display = 'block';
+    const container = document.getElementById('extractedText');
+    container.textContent = '';
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;flex-wrap:wrap;gap:12px;';
+    result.images.forEach((img, i) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'text-align:center;';
+      div.innerHTML = `<img src="${img}" style="max-width:200px;border-radius:8px;border:1px solid var(--border);"><p style="font-size:11px;color:var(--muted);margin-top:4px;">Page ${i + 1}</p>`;
+      wrapper.appendChild(div);
+    });
+    container.appendChild(wrapper);
+    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Telecharger les images';
+  } else {
+    textResult.style.display = 'none';
+    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Telecharger le PDF';
+  }
+
+  document.getElementById('convertBtn').disabled = false;
+  showToast('Conversion terminee avec succes !', 'success');
+}
+
+function downloadResult() {
+  if (!conversionResult) return;
+
+  if (conversionResult.type === 'text') {
+    const blob = new Blob([conversionResult.text], { type: 'text/plain;charset=utf-8' });
+    downloadBlob(blob, conversionResult.fileName);
+  } else if (conversionResult.type === 'images') {
+    conversionResult.images.forEach((imgData, i) => {
+      const link = document.createElement('a');
+      link.href = imgData;
+      link.download = `${conversionResult.fileName}_page_${i + 1}.png`;
+      link.click();
+    });
+  } else if (conversionResult.type === 'blob') {
+    downloadBlob(conversionResult.blob, conversionResult.fileName);
+  }
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// Tableau de bord
+// ============================================================
+function refreshDashboard() {
+  const user = getCurrentUser();
+  if (!user) return;
+
+  getUsageCycle(user);
+
+  document.getElementById('dashUsername').textContent = user.name;
+  document.getElementById('dashUsed').textContent = user.isPro ? 'Illimite' : (user.cycleUsed || 0);
+  document.getElementById('dashLimit').textContent = user.isPro ? '' : `sur ${FREE_LIMIT}`;
+  document.getElementById('dashTotal').textContent = user.totalConversions || 0;
+
+  const badge = document.getElementById('dashBadge');
+  const upgradeBtn = document.getElementById('dashUpgradeBtn');
+  if (user.isPro) {
+    badge.className = 'badge badge-pro';
+    badge.innerHTML = '<i class="fas fa-crown"></i> Pro';
+    upgradeBtn.style.display = 'none';
+  } else {
+    badge.className = 'badge badge-free';
+    badge.textContent = 'Gratuit';
+    upgradeBtn.style.display = 'inline-flex';
+  }
+
+  // Timer
+  if (!user.isPro) {
+    const remaining = getTimeRemaining(user);
+    const fraction = remaining / CYCLE_DURATION;
+    const circumference = 2 * Math.PI * 34;
+    document.getElementById('timerCircle').style.strokeDashoffset = circumference * (1 - fraction);
+    document.getElementById('timerText').textContent = formatTime(remaining);
+  } else {
+    document.getElementById('timerText').textContent = '--';
+    document.getElementById('timerCircle').style.strokeDashoffset = 0;
+    document.getElementById('timerCircle').style.stroke = 'var(--success)';
+  }
+
+  // Historique
+  const historyList = document.getElementById('historyList');
+  if (!user.history || user.history.length === 0) {
+    historyList.innerHTML = `
+      <div style="padding:40px;text-align:center;color:var(--muted);font-size:14px;">
+        <i class="fas fa-inbox" style="font-size:32px;margin-bottom:12px;opacity:0.3;display:block;"></i>
+        Aucune conversion pour le moment
+      </div>
+    `;
+  } else {
+    const toolNames = {
+      'pdf-to-text': 'PDF → Texte',
+      'pdf-to-image': 'PDF → Image',
+      'image-to-pdf': 'Image → PDF',
+      'text-to-pdf': 'Texte → PDF',
+      'merge-pdf': 'Fusion PDF',
+      'html-to-pdf': 'HTML → PDF'
+    };
+    historyList.innerHTML = user.history.slice(0, 20).map(h => `
+      <div class="table-row">
+        <span style="display:flex;align-items:center;gap:8px;">
+          <i class="fas fa-file" style="color:var(--muted);font-size:13px;"></i>
+          ${h.fileName}
+        </span>
+        <span style="color:var(--accent);font-size:13px;">${toolNames[h.tool] || h.tool}</span>
+        <span style="color:var(--muted);font-size:13px;">${new Date(h.date).toLocaleDateString('fr-FR')}</span>
+        <span style="color:var(--success);font-size:13px;"><i class="fas fa-check-circle"></i></span>
+      </div>
+    `).join('');
+  }
+}
+
+function clearHistory() {
+  const user = getCurrentUser();
+  if (!user) return;
+  user.history = [];
+  saveCurrentUser(user);
+  refreshDashboard();
+  showToast('Historique efface', 'info');
+}
+
+// ============================================================
+// Abonnement
+// ============================================================
+function handleFreePlan() {
+  const user = getCurrentUser();
+  if (!user) {
+    openModal('register');
+  } else {
+    navigate('tools');
+    showToast('Vous utilisez deja le plan gratuit', 'info');
+  }
+}
+
+function handleProPlan() {
+  const user = getCurrentUser();
+  if (!user) {
+    openModal('register');
+    showToast('Creez un compte pour vous abonner', 'info');
+    return;
+  }
+  if (user.isPro) {
+    showToast('Vous etes deja abonne au plan Pro', 'info');
+    return;
+  }
+  openModal('subscribe');
+}
+
+function processSubscription() {
+  const cardNum = document.getElementById('cardNumber').value.replace(/\s/g, '');
+  if (cardNum.length < 16) {
+    showToast('Veuillez entrer un numero de carte valide', 'error');
+    return;
+  }
+
+  // Simuler le paiement
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Traitement...';
+
+  setTimeout(() => {
+    const user = getCurrentUser();
+    user.isPro = true;
+    saveCurrentUser(user);
+    closeModal();
+    updateNavAuth();
+    showToast('Paiement accepte ! Bienvenue dans le plan Pro', 'success');
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-lock"></i> Payer 0,99$';
+    document.getElementById('cardNumber').value = '';
+  }, 2000);
+}
+
+// ============================================================
+// Timer de renouvellement (mise à jour chaque seconde)
+// ============================================================
+setInterval(() => {
+  const user = getCurrentUser();
+  if (user && !user.isPro) {
+    const remaining = getTimeRemaining(user);
+    const fraction = remaining / CYCLE_DURATION;
+    const circumference = 2 * Math.PI * 34;
+
+    const timerCircle = document.getElementById('timerCircle');
+    const timerText = document.getElementById('timerText');
+    if (timerCircle && timerText) {
+      timerCircle.style.strokeDasharray = circumference;
+      timerCircle.style.strokeDashoffset = circumference * (1 - fraction);
+      timerText.textContent = formatTime(remaining);
+    }
+
+    // Vérifier si le cycle vient de se renouveler
+    if (remaining === 0 && user.cycleUsed > 0) {
+      getUsageCycle(user);
+      updateLimitUI();
+      refreshDashboard();
+      showToast('Votre quota de conversions a ete renouvele !', 'success');
+    }
+  }
+}, 1000);
+
+// ============================================================
+// Animation du compteur de conversions (page d'accueil)
+// ============================================================
+function animateCounter(elementId, target, duration = 2000) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  let start = null;
+  function step(ts) {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    const value = Math.round(eased * target);
+    el.textContent = value.toLocaleString('fr-FR');
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ============================================================
+// Particules de fond
+// ============================================================
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.width = (Math.random() * 2 + 1) + 'px';
+    p.style.height = p.style.width;
+    p.style.opacity = Math.random() * 0.3 + 0.05;
+    p.style.animation = `float ${Math.random() * 6 + 4}s ease-in-out infinite`;
+    p.style.animationDelay = `${Math.random() * 4}s`;
+    container.appendChild(p);
+  }
+}
+
+// ============================================================
+// Initialisation
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  currentUser = getCurrentUser();
+  updateNavAuth();
+  createParticles();
+
+  // Compteur animé
+  const totalConversions = Object.values(getUsers()).reduce((sum, u) => sum + (u.totalConversions || 0), 0);
+  animateCounter('statConversions', Math.max(totalConversions, 1247));
+
+  // Observer l'input texte pour activer le bouton
+  document.getElementById('textInput').addEventListener('input', () => {
+    const tool = tools[currentTool];
+    if (tool.hasTextInput) {
+      document.getElementById('convertBtn').disabled = !document.getElementById('textInput').value.trim();
+    }
+  });
+});
+
+// Fermer modal avec Echap
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
 </body>
 </html>
