@@ -11,9 +11,12 @@
 </head>
 <body>
 
+  <!-- Particules fond -->
+  <canvas id="bgCanvas"></canvas>
+
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- ===== OVERLAY CONVERSION ===== -->
+  <!-- OVERLAY CONVERSION -->
   <div class="cv-overlay" id="cvOverlay">
     <div class="cv-bg-particles" id="cvParticles"></div>
     <div class="cv-content">
@@ -23,7 +26,7 @@
         <div class="cv-fmt cv-fmt-out" id="cvFmtOut"><i class="fas fa-file-alt"></i><span>TXT</span></div>
       </div>
       <div class="cv-ring-wrap">
-        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="#E2E8F0" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
+        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
         <div class="cv-ring-inner" id="cvRingInner"><i class="fas fa-cog fa-spin" id="cvSpinIcon"></i><i class="fas fa-check" id="cvCheckIcon" style="display:none"></i></div>
       </div>
       <p class="cv-step" id="cvStepText">Preparation...</p>
@@ -31,21 +34,17 @@
     </div>
   </div>
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header class="header" id="header">
     <div class="header-inner">
-      <a class="logo" onclick="navigate('home');return false;" href="#">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2B7BF5"/><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+      <a class="logo" onclick="navigate('home');return false" href="#">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#2B7BF5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
         <span class="logo-text">PDF<span class="logo-dot">Shift</span></span>
       </a>
       <nav class="nav-center" id="navLinks">
         <div class="nav-dropdown" id="navDropdown">
-          <a class="nav-link" onclick="toggleDropdown()">Outils <i class="fas fa-chevron-down" style="font-size:10px;margin-left:3px"></i></a>
-          <div class="dropdown-menu" id="dropdownMenu">
-            <div class="dm-col"><p class="dm-title">Convertir</p><a onclick="selectTool('pdf-to-text')">PDF vers Texte</a><a onclick="selectTool('pdf-to-image')">PDF vers Image</a><a onclick="selectTool('pdf-to-word')">PDF vers Word</a><a onclick="selectTool('pdf-to-excel')">PDF vers Excel</a><a onclick="selectTool('image-to-pdf')">Image vers PDF</a><a onclick="selectTool('html-to-pdf')">HTML vers PDF</a></div>
-            <div class="dm-col"><p class="dm-title">Organiser</p><a onclick="selectTool('merge-pdf')">Fusionner PDF</a><a onclick="selectTool('split-pdf')">Diviser PDF</a><a onclick="selectTool('rotate-pdf')">Pivoter PDF</a></div>
-            <div class="dm-col"><p class="dm-title">Optimiser</p><a onclick="selectTool('compress-pdf')">Compresser PDF</a><a onclick="selectTool('watermark-pdf')">Filigrane PDF</a><a onclick="selectTool('text-to-pdf')">Texte vers PDF</a></div>
-          </div>
+          <a class="nav-link" onclick="toggleDropdown()">Outils <i class="fas fa-chevron-down" style="font-size:9px;margin-left:3px"></i></a>
+          <div class="dropdown-menu" id="dropdownMenu"></div>
         </div>
         <a class="nav-link" data-page="pricing" onclick="navigate('pricing')">Tarifs</a>
         <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none">Dashboard</a>
@@ -57,108 +56,89 @@
     </div>
   </header>
 
-  <!-- ===== ACCUEIL ===== -->
+  <!-- ACCUEIL -->
   <main id="page-home" class="page page-visible">
     <section class="hero">
+      <div class="hero-mesh"></div>
+      <div class="hero-floats">
+        <div class="hf hf-1"><i class="fas fa-file-pdf"></i></div>
+        <div class="hf hf-2"><i class="fas fa-image"></i></div>
+        <div class="hf hf-3"><i class="fas fa-file-word"></i></div>
+        <div class="hf hf-4"><i class="fas fa-compress-alt"></i></div>
+        <div class="hf hf-5"><i class="fas fa-layer-group"></i></div>
+      </div>
       <div class="hero-inner">
         <div class="hero-left">
-          <h1 class="hero-title">Nous simplifions la gestion de <span class="text-blue">vos PDF.</span></h1>
-          <p class="hero-sub">Chaque outil dont vous avez besoin pour travailler avec les PDF dans un seul endroit. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
-          <div class="hero-actions">
-            <button class="btn-hero-primary" onclick="navigate('tools')"><i class="fas fa-rocket"></i> Commencer gratuitement</button>
+          <div class="hero-badge reveal"><i class="fas fa-bolt"></i> Traitement 100% local</div>
+          <h1 class="hero-title reveal"><span class="typewriter" id="heroTypewriter"></span></h1>
+          <p class="hero-sub reveal">Chaque outil dont vous avez besoin pour travailler avec les PDF dans un seul endroit. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
+          <div class="hero-actions reveal">
+            <button class="btn-hero-primary" onclick="navigate('tools')"><i class="fas fa-rocket"></i> Commencer</button>
             <button class="btn-hero-secondary" onclick="navigate('pricing')">Voir les tarifs <i class="fas fa-arrow-right"></i></button>
           </div>
-          <div class="hero-trust">
-            <div class="trust-avatars">
-              <img src="https://picsum.photos/seed/u1/32/32" alt="">
-              <img src="https://picsum.photos/seed/u2/32/32" alt="">
-              <img src="https://picsum.photos/seed/u3/32/32" alt="">
-              <img src="https://picsum.photos/seed/u4/32/32" alt="">
-            </div>
-            <div><p class="trust-text"><strong>12 000+</strong> utilisateurs satisfaits</p><div class="trust-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
+          <div class="hero-trust reveal">
+            <div class="trust-avatars"><img src="https://picsum.photos/seed/a1/32/32" alt=""><img src="https://picsum.photos/seed/a2/32/32" alt=""><img src="https://picsum.photos/seed/a3/32/32" alt=""><img src="https://picsum.photos/seed/a4/32/32" alt=""><img src="https://picsum.photos/seed/a5/32/32" alt=""></div>
+            <div><p class="trust-text"><strong class="counter" data-target="12847">0</strong> utilisateurs</p><div class="trust-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
           </div>
         </div>
-        <div class="hero-right">
-          <div class="hero-mockup">
-            <div class="mockup-bar"><span class="mockup-dot" style="background:#FF5F57"></span><span class="mockup-dot" style="background:#FEBC2E"></span><span class="mockup-dot" style="background:#28C840"></span><span class="mockup-title">Document.pdf</span></div>
+        <div class="hero-right reveal">
+          <div class="hero-mockup" id="heroMockup">
+            <div class="mockup-bar"><span class="md" style="background:#FF5F57"></span><span class="md" style="background:#FEBC2E"></span><span class="md" style="background:#28C840"></span><span class="mockup-title">Rapport.pdf</span></div>
             <div class="mockup-body">
-              <div class="mockup-sidebar">
-                <div class="mockup-thumb active"></div>
-                <div class="mockup-thumb"></div>
-                <div class="mockup-thumb"></div>
-                <div class="mockup-thumb"></div>
-              </div>
+              <div class="mockup-sidebar"><div class="mt active"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div></div>
               <div class="mockup-page">
-                <div class="mp-line" style="width:85%"></div>
-                <div class="mp-line" style="width:72%"></div>
-                <div class="mp-line" style="width:90%"></div>
-                <div class="mp-spacer"></div>
-                <div class="mp-line" style="width:60%"></div>
-                <div class="mp-line" style="width:80%"></div>
-                <div class="mp-line" style="width:45%"></div>
-                <div class="mp-spacer"></div>
-                <div class="mp-img"><img src="https://picsum.photos/seed/chart/200/100" alt=""></div>
-                <div class="mp-line" style="width:70%"></div>
-                <div class="mp-line" style="width:55%"></div>
+                <div class="ml" style="width:70%"></div><div class="ml" style="width:55%"></div><div class="ml" style="width:80%"></div><div class="ms"></div>
+                <div class="ml" style="width:50%"></div><div class="ml" style="width:65%"></div><div class="ml" style="width:40%"></div><div class="ms"></div>
+                <div class="mp-img"><img src="https://picsum.photos/seed/chart7/220/100" alt=""></div>
+                <div class="ml" style="width:60%"></div><div class="ml" style="width:45%"></div>
               </div>
             </div>
-            <div class="mockup-float-badge"><i class="fas fa-check-circle" style="color:#28C840"></i> Conversion reussie</div>
+            <div class="mockup-badge"><i class="fas fa-check-circle" style="color:#28C840"></i> Converti avec succes</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Illustration bandeau -->
-    <section class="hero-visual-band">
-      <div class="hvb-inner">
-        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf1/280/180" alt="Convertir PDF"><p>Convertir</p></div>
-        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf2/280/180" alt="Compresser PDF"><p>Compresser</p></div>
-        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf3/280/180" alt="Fusionner PDF"><p>Fusionner</p></div>
-        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf4/280/180" alt="Modifier PDF"><p>Modifier</p></div>
-        <div class="hvb-item"><img src="https://picsum.photos/seed/pdf5/280/180" alt="Signer PDF"><p>Signer</p></div>
-      </div>
-    </section>
+    <section class="vis-band"><div class="vb-track" id="vbTrack"></div></section>
 
-    <!-- Grille d'outils -->
     <section class="tools-section">
       <div class="container">
-        <div class="tools-section-header">
-          <h2>Tous les outils PDF dont vous avez besoin</h2>
-          <p>Traitement local rapide. Vos fichiers ne quittent jamais votre navigateur.</p>
+        <div class="tools-header reveal">
+          <h2>Tous les outils PDF</h2>
+          <p>18 outils pour maitriser vos documents</p>
         </div>
         <div class="tools-grid" id="toolsGrid"></div>
       </div>
     </section>
 
-    <!-- Comment ça marche -->
     <section class="how-section">
       <div class="container">
-        <h2 class="section-title">Comment ca marche ?</h2>
+        <h2 class="section-title reveal">Comment ca marche ?</h2>
         <div class="steps-row">
-          <div class="step-card"><div class="step-ico"><i class="fas fa-upload"></i></div><h3>Deposez</h3><p>Glissez votre fichier PDF ou image dans la zone de depot.</p></div>
-          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
-          <div class="step-card"><div class="step-ico"><i class="fas fa-magic"></i></div><h3>Choisissez</h3><p>Selectionnez l'outil et les options de conversion souhaitees.</p></div>
-          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
-          <div class="step-card"><div class="step-ico"><i class="fas fa-download"></i></div><h3>Telechargez</h3><p>Recevez votre fichier converti en quelques secondes.</p></div>
+          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-cloud-upload-alt"></i></div><h3>Deposez</h3><p>Glissez votre fichier dans la zone de depot.</p></div>
+          <div class="step-arrow reveal"><i class="fas fa-long-arrow-alt-right"></i></div>
+          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-sliders-h"></i></div><h3>Choisissez</h3><p>Selectionnez l'outil et les options.</p></div>
+          <div class="step-arrow reveal"><i class="fas fa-long-arrow-alt-right"></i></div>
+          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-download"></i></div><h3>Telechargez</h3><p>Recevez votre fichier converti.</p></div>
         </div>
       </div>
     </section>
 
-    <!-- Social proof -->
     <section class="proof-section">
       <div class="container">
+        <h2 class="section-title reveal">Ils nous font confiance</h2>
         <div class="proof-grid">
-          <div class="proof-card"><img src="https://picsum.photos/seed/team1/80/80" alt=""><div><p class="proof-quote">"J'ai converti plus de 500 fichiers sans aucun probleme."</p><p class="proof-author">Marie L. — Graphiste</p></div></div>
-          <div class="proof-card"><img src="https://picsum.photos/seed/team2/80/80" alt=""><div><p class="proof-quote">"La fusion PDF m'a fait gagner des heures chaque semaine."</p><p class="proof-author">Thomas R. — Chef de projet</p></div></div>
-          <div class="proof-card"><img src="https://picsum.photos/seed/team3/80/80" alt=""><div><p class="proof-quote">"Interface intuitive, resultat impeccable a chaque fois."</p><p class="proof-author">Sophie M. — Avocate</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t1/72/72" alt=""><div><p class="pq">"500 fichiers convertis sans aucun souci. Interface incroyable."</p><p class="pa">Marie L. — Graphiste</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t2/72/72" alt=""><div><p class="pq">"La fusion PDF me fait gagner des heures chaque semaine."</p><p class="pa">Thomas R. — Chef de projet</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t3/72/72" alt=""><div><p class="pq">"Resultat impeccable a chaque fois. Je recommande a 100%."</p><p class="pa">Sophie M. — Avocate</p></div></div>
         </div>
       </div>
     </section>
 
-    <footer class="footer"><div class="container"><div class="footer-inner"><div class="footer-brand"><svg width="24" height="24" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="#2B7BF5"/><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>PDFShift</span></div><p>&copy; 2025 PDFShift. Tous les fichiers traites localement.</p></div></div></footer>
+    <footer class="footer"><div class="container"><div class="footer-inner"><div class="footer-brand"><svg width="22" height="22" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="url(#lg2)"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#2B7BF5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>PDFShift</span></div><p>&copy; 2025 PDFShift. Fichiers traites localement.</p></div></div></footer>
   </main>
 
-  <!-- ===== OUTILS ===== -->
+  <!-- OUTILS -->
   <main id="page-tools" class="page page-hidden">
     <section class="tool-page"><div class="container">
       <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
@@ -167,11 +147,11 @@
         <div><h1 id="toolTitle">PDF vers Texte</h1><p id="toolDesc">Extrayez le texte</p></div>
         <span id="toolProBadge" class="tool-pro-badge" style="display:none"><i class="fas fa-crown"></i> Pro</span>
       </div>
-      <div class="limit-bar" id="limitBanner"><div class="limit-bar-left"><i class="fas fa-info-circle" style="color:#D97706"></i><div><span class="limit-text" id="limitText">3 restantes</span><div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div></div></div><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div>
+      <div class="limit-bar" id="limitBanner"><div class="limit-bar-left"><i class="fas fa-info-circle" style="color:#F59E0B"></i><div><span class="limit-text" id="limitText">3 restantes</span><div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div></div></div><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div>
       <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" accept=".pdf" multiple>
         <div id="dropContent"><div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div><p class="drop-title">Glissez votre fichier ici</p><p class="drop-sub">ou cliquez pour parcourir</p><p class="drop-formats" id="acceptedFormats">PDF</p></div>
-        <div id="filePreview" style="display:none" class="file-preview"><i class="fas fa-file-pdf" style="font-size:36px;color:#2B7BF5"></i><p id="fileName" class="file-name"></p><p id="fileSize" class="file-size"></p><button class="btn-ghost" onclick="event.stopPropagation();clearFile()" style="color:#DC2626;margin-top:8px"><i class="fas fa-times"></i> Supprimer</button></div>
+        <div id="filePreview" style="display:none" class="file-preview"><i class="fas fa-file-pdf" style="font-size:36px;color:#2B7BF5"></i><p id="fileName" class="file-name"></p><p id="fileSize" class="file-size"></p><button class="btn-ghost" onclick="event.stopPropagation();clearFile()" style="color:#EF4444;margin-top:8px"><i class="fas fa-times"></i> Supprimer</button></div>
       </div>
       <div id="textInputArea" style="display:none" class="text-input-wrap"><textarea class="text-input" id="textInput" rows="12" placeholder="Collez votre contenu ici..."></textarea></div>
       <div id="pageRangeArea" style="display:none" class="extra-field"><label class="form-label" style="margin:0 0 6px">Pages (ex: 1-3, 5)</label><input class="form-input" type="text" id="pageRangeInput" placeholder="1-3" value="1"></div>
@@ -181,31 +161,30 @@
     </div></section>
   </main>
 
-  <!-- ===== TARIFS ===== -->
+  <!-- TARIFS -->
   <main id="page-pricing" class="page page-hidden">
     <section class="pricing-page"><div class="container">
       <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-      <h1 class="pricing-title">Choisissez votre plan</h1>
-      <p class="pricing-sub">Annulez a tout moment. Sans engagement.</p>
-      <div class="pricing-toggle"><button class="pt-btn active" id="ptMonthly" onclick="setPricing('monthly')">Mensuel</button><button class="pt-btn" id="ptYearly" onclick="setPricing('yearly')">Annuel <span class="pt-save">-40%</span></button></div>
+      <h1 class="pricing-title reveal">Choisissez votre plan</h1>
+      <p class="pricing-sub reveal">Sans engagement. Annulez a tout moment.</p>
+      <div class="pricing-toggle reveal"><button class="pt-btn active" id="ptMonthly" onclick="setPricing('monthly')">Mensuel</button><button class="pt-btn" id="ptYearly" onclick="setPricing('yearly')">Annuel <span class="pt-save">-40%</span></button></div>
       <div class="pricing-grid" id="pricingGrid"></div>
     </div></section>
   </main>
 
-  <!-- ===== DASHBOARD ===== -->
+  <!-- DASHBOARD -->
   <main id="page-dashboard" class="page page-hidden">
     <section class="dashboard-page"><div class="container">
       <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
       <div class="dash-top"><div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div><div class="dash-top-right"><span id="dashBadge" class="badge-free">Gratuit</span><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div></div>
-      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#E2E8F0" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#059669"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
-      <div class="dash-history-card"><div class="dash-history-header"><h3>Historique</h3><button class="btn-ghost" onclick="clearHistory()" style="color:#DC2626;font-size:13px"><i class="fas fa-trash"></i> Effacer</button></div><div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span></span></div><div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div></div>
-      <div class="dash-logout"><button class="btn-ghost" onclick="logout()" style="color:#DC2626"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
+      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#10B981"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
+      <div class="dash-history-card"><div class="dash-history-header"><h3>Historique</h3><button class="btn-ghost" onclick="clearHistory()" style="color:#EF4444;font-size:13px"><i class="fas fa-trash"></i> Effacer</button></div><div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span></span></div><div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div></div>
+      <div class="dash-logout"><button class="btn-ghost" onclick="logout()" style="color:#EF4444"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
     </div></section>
   </main>
 
-  <!-- ===== MODALS ===== -->
+  <!-- MODALS -->
   <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-    <!-- Login -->
     <div class="modal" id="modal-login" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Se connecter</h2>
@@ -220,14 +199,13 @@
       </form>
       <p class="modal-switch">Pas de compte ? <a href="#" onclick="switchModal('register');return false">S'inscrire</a></p>
     </div>
-    <!-- Register -->
     <div class="modal" id="modal-register" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Creer votre compte</h2>
       <button class="btn-social" onclick="socialLogin('google')"><i class="fab fa-google"></i> Continuer avec Google</button>
       <button class="btn-social" onclick="socialLogin('microsoft')"><i class="fab fa-microsoft"></i> Continuer avec Microsoft</button>
       <div class="modal-divider"><span>ou</span></div>
-      <form onsubmit="handleRegister(event)" id="registerForm">
+      <form onsubmit="handleRegister(event)">
         <label class="form-label">Nom</label><input class="form-input" type="text" id="regName" placeholder="Votre nom" required minlength="2">
         <label class="form-label">E-mail</label><input class="form-input" type="email" id="regEmail" placeholder="vous@exemple.com" required>
         <label class="form-label">Mot de passe</label>
@@ -235,55 +213,28 @@
         <div class="strength-bars" id="strengthBars"><div></div><div></div><div></div><div></div></div>
         <p class="strength-text" id="strengthText"></p>
         <label class="form-label">Confirmer</label><input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez" required>
-        <div class="captcha-row">
-          <div class="captcha-box" id="captchaBox" onclick="verifyCaptcha()"><i class="fas fa-robot"></i> Je ne suis pas un robot</div>
-          <div class="captcha-check" id="captchaCheck" style="display:none"><i class="fas fa-check-circle" style="color:#059669"></i> Verifie</div>
-        </div>
-        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px" id="regSubmitBtn" disabled>Creer mon compte</button>
+        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px">Creer mon compte</button>
       </form>
       <p class="modal-switch">Deja un compte ? <a href="#" onclick="switchModal('login');return false">Se connecter</a></p>
-      <p class="modal-legal">En creant un compte, vous acceptez nos <a href="#">CGU</a> et notre <a href="#">politique de confidentialite</a>.</p>
+      <p class="modal-legal">En creant un compte, vous acceptez nos <a href="#">CGU</a>.</p>
     </div>
-    <!-- Email Verification -->
-    <div class="modal" id="modal-verify" style="display:none">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <div style="text-align:center;padding:8px 0">
-        <div style="width:72px;height:72px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-envelope-open-text" style="font-size:28px;color:#2B7BF5"></i></div>
-        <h2 class="modal-title" style="text-align:center">Verifiez votre e-mail</h2>
-        <p style="color:#64748B;font-size:14px;margin-bottom:8px;line-height:1.6">Un code de verification a ete envoye a :</p>
-        <p style="font-weight:700;color:#0F172A;font-size:15px;margin-bottom:24px" id="verifyEmail"></p>
-        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px">
-          <input class="form-input" type="text" id="verifyCode1" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode2')">
-          <input class="form-input" type="text" id="verifyCode2" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode3')">
-          <input class="form-input" type="text" id="verifyCode3" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode4')">
-          <input class="form-input" type="text" id="verifyCode4" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode5')">
-          <input class="form-input" type="text" id="verifyCode5" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" oninput="verifyCodeInput(this,'verifyCode6')">
-          <input class="form-input" type="text" id="verifyCode6" maxlength="1" style="width:48px;text-align:center;font-size:22px;font-weight:700;padding:14px" onkeydown="if(event.key==='Enter')processVerification()">
-        </div>
-        <p style="font-size:13px;color:#64748B;margin-bottom:16px">Code demo : <strong>123456</strong></p>
-        <button class="btn-modal-primary" style="width:100%" onclick="processVerification()">Verifier</button>
-        <button class="btn-ghost" onclick="resendCode()" style="margin-top:12px" id="resendBtn"><i class="fas fa-redo"></i> Renvoyer le code</button>
-      </div>
-    </div>
-    <!-- Pro Lock -->
     <div class="modal" id="modal-pro-lock" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <div style="text-align:center;padding:12px 0">
-        <div style="width:64px;height:64px;background:#EEF4FF;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-lock" style="font-size:24px;color:#2B7BF5"></i></div>
-        <h2 class="modal-title" style="text-align:center">Outil reserve au plan Pro</h2>
-        <p style="color:#64748B;font-size:14px;margin-bottom:24px;line-height:1.6">Debloquez cet outil et 8 autres avec le plan Pro.</p>
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#EEF4FF,#F3E8FF);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-lock" style="font-size:24px;color:#2B7BF5"></i></div>
+        <h2 class="modal-title" style="text-align:center">Outil Pro</h2>
+        <p style="color:#64748B;font-size:14px;margin-bottom:24px;line-height:1.6">Debloquez cet outil et 14 autres avec le plan Pro.</p>
         <button class="btn-modal-primary" style="width:100%" onclick="closeModal();navigate('pricing')"><i class="fas fa-crown"></i> Passer Pro — 0,99€/mois</button>
-        <button class="btn-ghost" onclick="closeModal()" style="margin-top:12px">Peut-etre plus tard</button>
+        <button class="btn-ghost" onclick="closeModal()" style="margin-top:12px">Plus tard</button>
       </div>
     </div>
-    <!-- Subscribe -->
     <div class="modal" id="modal-subscribe" style="display:none">
       <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
       <h2 class="modal-title">Confirmer l'abonnement</h2>
       <div class="sub-summary"><div class="sub-summary-left"><i class="fas fa-crown" style="color:#2B7BF5;font-size:24px"></i><div><p style="font-weight:700" id="subPlanName">Plan Pro</p><p style="font-size:13px;color:#64748B" id="subPlanDesc">Illimite</p></div></div><div class="sub-summary-price" id="subPlanPrice">0,99€<span>/mois</span></div></div>
       <div class="sub-secure"><i class="fas fa-lock"></i> Paiement securise par Stripe</div>
       <button class="btn-modal-primary" style="width:100%" id="stripeCheckoutBtn" onclick="processStripeCheckout()"><i class="fas fa-credit-card"></i> Payer avec Stripe</button>
-      <p class="sub-note">Annulable a tout moment. Versement direct sur votre compte.</p>
+      <p class="sub-note">Annulable a tout moment.</p>
       <div class="stripe-help" id="stripeHelp" style="display:none"></div>
     </div>
   </div>
