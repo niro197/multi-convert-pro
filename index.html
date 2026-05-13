@@ -11,9 +11,6 @@
 </head>
 <body>
 
-  <!-- Particules fond -->
-  <canvas id="bgCanvas"></canvas>
-
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- OVERLAY CONVERSION -->
@@ -26,7 +23,7 @@
         <div class="cv-fmt cv-fmt-out" id="cvFmtOut"><i class="fas fa-file-alt"></i><span>TXT</span></div>
       </div>
       <div class="cv-ring-wrap">
-        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
+        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
         <div class="cv-ring-inner" id="cvRingInner"><i class="fas fa-cog fa-spin" id="cvSpinIcon"></i><i class="fas fa-check" id="cvCheckIcon" style="display:none"></i></div>
       </div>
       <p class="cv-step" id="cvStepText">Preparation...</p>
@@ -60,18 +57,11 @@
   <main id="page-home" class="page page-visible">
     <section class="hero">
       <div class="hero-mesh"></div>
-      <div class="hero-floats">
-        <div class="hf hf-1"><i class="fas fa-file-pdf"></i></div>
-        <div class="hf hf-2"><i class="fas fa-image"></i></div>
-        <div class="hf hf-3"><i class="fas fa-file-word"></i></div>
-        <div class="hf hf-4"><i class="fas fa-compress-alt"></i></div>
-        <div class="hf hf-5"><i class="fas fa-layer-group"></i></div>
-      </div>
       <div class="hero-inner">
         <div class="hero-left">
           <div class="hero-badge reveal"><i class="fas fa-bolt"></i> Traitement 100% local</div>
           <h1 class="hero-title reveal"><span class="typewriter" id="heroTypewriter"></span></h1>
-          <p class="hero-sub reveal">Chaque outil dont vous avez besoin pour travailler avec les PDF dans un seul endroit. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
+          <p class="hero-sub reveal">Chaque outil dont vous avez besoin pour travailler avec les PDF. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
           <div class="hero-actions reveal">
             <button class="btn-hero-primary" onclick="navigate('tools')"><i class="fas fa-rocket"></i> Commencer</button>
             <button class="btn-hero-secondary" onclick="navigate('pricing')">Voir les tarifs <i class="fas fa-arrow-right"></i></button>
@@ -82,7 +72,7 @@
           </div>
         </div>
         <div class="hero-right reveal">
-          <div class="hero-mockup" id="heroMockup">
+          <div class="hero-mockup">
             <div class="mockup-bar"><span class="md" style="background:#FF5F57"></span><span class="md" style="background:#FEBC2E"></span><span class="md" style="background:#28C840"></span><span class="mockup-title">Rapport.pdf</span></div>
             <div class="mockup-body">
               <div class="mockup-sidebar"><div class="mt active"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div></div>
@@ -103,10 +93,7 @@
 
     <section class="tools-section">
       <div class="container">
-        <div class="tools-header reveal">
-          <h2>Tous les outils PDF</h2>
-          <p>18 outils pour maitriser vos documents</p>
-        </div>
+        <div class="tools-header reveal"><h2>Tous les outils PDF</h2><p>18 outils pour maitriser vos documents</p></div>
         <div class="tools-grid" id="toolsGrid"></div>
       </div>
     </section>
@@ -128,9 +115,9 @@
       <div class="container">
         <h2 class="section-title reveal">Ils nous font confiance</h2>
         <div class="proof-grid">
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t1/72/72" alt=""><div><p class="pq">"500 fichiers convertis sans aucun souci. Interface incroyable."</p><p class="pa">Marie L. — Graphiste</p></div></div>
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t2/72/72" alt=""><div><p class="pq">"La fusion PDF me fait gagner des heures chaque semaine."</p><p class="pa">Thomas R. — Chef de projet</p></div></div>
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t3/72/72" alt=""><div><p class="pq">"Resultat impeccable a chaque fois. Je recommande a 100%."</p><p class="pa">Sophie M. — Avocate</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t1/72/72" alt=""><div><p class="pq">"500 fichiers convertis sans aucun souci."</p><p class="pa">Marie L. — Graphiste</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t2/72/72" alt=""><div><p class="pq">"La fusion PDF me fait gagner des heures."</p><p class="pa">Thomas R. — Chef de projet</p></div></div>
+          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t3/72/72" alt=""><div><p class="pq">"Resultat impeccable a chaque fois."</p><p class="pa">Sophie M. — Avocate</p></div></div>
         </div>
       </div>
     </section>
@@ -177,7 +164,7 @@
     <section class="dashboard-page"><div class="container">
       <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
       <div class="dash-top"><div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div><div class="dash-top-right"><span id="dashBadge" class="badge-free">Gratuit</span><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div></div>
-      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#10B981"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
+      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#10B981"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
       <div class="dash-history-card"><div class="dash-history-header"><h3>Historique</h3><button class="btn-ghost" onclick="clearHistory()" style="color:#EF4444;font-size:13px"><i class="fas fa-trash"></i> Effacer</button></div><div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span></span></div><div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div></div>
       <div class="dash-logout"><button class="btn-ghost" onclick="logout()" style="color:#EF4444"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
     </div></section>
