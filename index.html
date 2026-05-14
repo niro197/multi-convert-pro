@@ -1,234 +1,1343 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDFShift — Simplifiez la gestion de vos PDF</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocFlow — Convertisseur PDF Intelligent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f14;
+            --bg-elevated: #17171f;
+            --card: #1e1e28;
+            --card-hover: #252532;
+            --border: #2a2a38;
+            --fg: #f0ede6;
+            --fg-muted: #8a8a9a;
+            --accent: #ff6b35;
+            --accent-glow: rgba(255, 107, 53, 0.25);
+            --accent-secondary: #ff9f1c;
+            --success: #2ec4b6;
+            --danger: #e63946;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Fond animé */
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .hero-bg .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            animation: blobFloat 12s ease-in-out infinite alternate;
+        }
+
+        .blob-1 {
+            width: 500px; height: 500px;
+            background: var(--accent);
+            top: -150px; right: -100px;
+            animation-delay: 0s !important;
+        }
+
+        .blob-2 {
+            width: 400px; height: 400px;
+            background: var(--accent-secondary);
+            bottom: -100px; left: -80px;
+            animation-delay: -4s !important;
+            animation-duration: 15s !important;
+        }
+
+        .blob-3 {
+            width: 300px; height: 300px;
+            background: #e63946;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -8s !important;
+            animation-duration: 18s !important;
+            opacity: 0.15;
+        }
+
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -40px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+            100% { transform: translate(15px, -15px) scale(1.05); }
+        }
+
+        /* Grille de points en fond */
+        .dot-grid {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Zone de drop */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, var(--accent-glow), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--accent);
+            transform: scale(1.02);
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .drop-zone.drag-over::before {
+            opacity: 1;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--fg-muted);
+        }
+
+        /* Cartes outils */
+        .tool-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tool-card:hover {
+            background: var(--card-hover);
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px var(--accent-glow);
+        }
+
+        .tool-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .tool-card .icon-wrap {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+            transition: all 0.35s;
+        }
+
+        .tool-card:hover .icon-wrap {
+            transform: scale(1.1);
+        }
+
+        /* Barre de progression */
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #1a3a35, #1e2e2a);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #3a1a1a, #2e1e1e);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #2a2215, #2e2518);
+            border: 1px solid var(--accent-secondary);
+            color: var(--accent-secondary);
+        }
+
+        /* Boutons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-primary:hover::before { opacity: 1; }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--card);
+            color: var(--fg);
+            font-weight: 500;
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-hover);
+            border-color: var(--fg-muted);
+        }
+
+        /* Fichier listé */
+        .file-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 520px;
+            width: 90%;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--fg-muted); }
+
+        /* Statistiques animées */
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            color: var(--fg-muted);
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover { color: var(--fg); }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0; right: 0;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .nav-link:hover::after { transform: scaleX(1); }
+
+        /* Particules flottantes */
+        .particle {
+            position: absolute;
+            width: 4px; height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            20% { opacity: 0.6; transform: translateY(-30px) scale(1); }
+            80% { opacity: 0.3; transform: translateY(-100px) scale(0.5); }
+            100% { opacity: 0; transform: translateY(-130px) scale(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stat-number { font-size: 1.8rem; }
+            .tools-grid { grid-template-columns: 1fr !important; }
+            .hero-title { font-size: 2.2rem !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Spin animation pour conversion */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin-slow { animation: spin-slow 2s linear infinite; }
+
+        /* Pulse ring */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .pulse-ring {
+            position: absolute;
+            inset: -8px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        /* Séparateur */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+        }
+    </style>
 </head>
 <body>
 
-  <div class="toast-container" id="toastContainer"></div>
+    <!-- Toast -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
 
-  <!-- OVERLAY CONVERSION -->
-  <div class="cv-overlay" id="cvOverlay">
-    <div class="cv-bg-particles" id="cvParticles"></div>
-    <div class="cv-content">
-      <div class="cv-formats">
-        <div class="cv-fmt cv-fmt-in" id="cvFmtIn"><i class="fas fa-file-pdf"></i><span>PDF</span></div>
-        <div class="cv-arrow-wrap"><div class="cv-arrow-line"></div><div class="cv-arrow-dot"></div><div class="cv-arrow-dot" style="animation-delay:.3s"></div><div class="cv-arrow-dot" style="animation-delay:.6s"></div></div>
-        <div class="cv-fmt cv-fmt-out" id="cvFmtOut"><i class="fas fa-file-alt"></i><span>TXT</span></div>
-      </div>
-      <div class="cv-ring-wrap">
-        <svg class="cv-ring-svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="4"/><circle cx="100" cy="100" r="88" fill="none" stroke="#2B7BF5" stroke-width="4" stroke-dasharray="553" stroke-dashoffset="553" stroke-linecap="round" id="cvRingCircle"/></svg>
-        <div class="cv-ring-inner" id="cvRingInner"><i class="fas fa-cog fa-spin" id="cvSpinIcon"></i><i class="fas fa-check" id="cvCheckIcon" style="display:none"></i></div>
-      </div>
-      <p class="cv-step" id="cvStepText">Preparation...</p>
-      <p class="cv-percent" id="cvPercentText">0%</p>
-    </div>
-  </div>
-
-  <!-- HEADER -->
-  <header class="header" id="header">
-    <div class="header-inner">
-      <a class="logo" onclick="navigate('home');return false" href="#">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#2B7BF5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-        <span class="logo-text">PDF<span class="logo-dot">Shift</span></span>
-      </a>
-      <nav class="nav-center" id="navLinks">
-        <div class="nav-dropdown" id="navDropdown">
-          <a class="nav-link" onclick="toggleDropdown()">Outils <i class="fas fa-chevron-down" style="font-size:9px;margin-left:3px"></i></a>
-          <div class="dropdown-menu" id="dropdownMenu"></div>
-        </div>
-        <a class="nav-link" data-page="pricing" onclick="navigate('pricing')">Tarifs</a>
-        <a class="nav-link" data-page="dashboard" onclick="navigate('dashboard')" id="navDashboard" style="display:none">Dashboard</a>
-      </nav>
-      <div class="nav-right" id="navAuth">
-        <button class="btn-ghost" onclick="openModal('login')">Se connecter</button>
-        <button class="btn-nav-cta" onclick="openModal('register')">Essai gratuit</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ACCUEIL -->
-  <main id="page-home" class="page page-visible">
-    <section class="hero">
-      <div class="hero-mesh"></div>
-      <div class="hero-inner">
-        <div class="hero-left">
-          <div class="hero-badge reveal"><i class="fas fa-bolt"></i> Traitement 100% local</div>
-          <h1 class="hero-title reveal"><span class="typewriter" id="heroTypewriter"></span></h1>
-          <p class="hero-sub reveal">Chaque outil dont vous avez besoin pour travailler avec les PDF. Convertissez, compressez, fusionnez et modifiez vos fichiers en quelques secondes.</p>
-          <div class="hero-actions reveal">
-            <button class="btn-hero-primary" onclick="navigate('tools')"><i class="fas fa-rocket"></i> Commencer</button>
-            <button class="btn-hero-secondary" onclick="navigate('pricing')">Voir les tarifs <i class="fas fa-arrow-right"></i></button>
-          </div>
-          <div class="hero-trust reveal">
-            <div class="trust-avatars"><img src="https://picsum.photos/seed/a1/32/32" alt=""><img src="https://picsum.photos/seed/a2/32/32" alt=""><img src="https://picsum.photos/seed/a3/32/32" alt=""><img src="https://picsum.photos/seed/a4/32/32" alt=""><img src="https://picsum.photos/seed/a5/32/32" alt=""></div>
-            <div><p class="trust-text"><strong class="counter" data-target="12847">0</strong> utilisateurs</p><div class="trust-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
-          </div>
-        </div>
-        <div class="hero-right reveal">
-          <div class="hero-mockup">
-            <div class="mockup-bar"><span class="md" style="background:#FF5F57"></span><span class="md" style="background:#FEBC2E"></span><span class="md" style="background:#28C840"></span><span class="mockup-title">Rapport.pdf</span></div>
-            <div class="mockup-body">
-              <div class="mockup-sidebar"><div class="mt active"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div><div class="mt"></div></div>
-              <div class="mockup-page">
-                <div class="ml" style="width:70%"></div><div class="ml" style="width:55%"></div><div class="ml" style="width:80%"></div><div class="ms"></div>
-                <div class="ml" style="width:50%"></div><div class="ml" style="width:65%"></div><div class="ml" style="width:40%"></div><div class="ms"></div>
-                <div class="mp-img"><img src="https://picsum.photos/seed/chart7/220/100" alt=""></div>
-                <div class="ml" style="width:60%"></div><div class="ml" style="width:45%"></div>
-              </div>
+    <!-- Modal de conversion -->
+    <div id="conversionModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content text-center">
+            <div id="modalIcon" class="mx-auto mb-6" style="width:80px;height:80px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:32px;position:relative;">
+                <i class="fas fa-cog spin-slow" style="color:var(--accent)"></i>
+                <div class="pulse-ring"></div>
             </div>
-            <div class="mockup-badge"><i class="fas fa-check-circle" style="color:#28C840"></i> Converti avec succes</div>
-          </div>
+            <h3 id="modalTitle" class="text-xl font-bold mb-3" style="font-family:'Space Grotesk',sans-serif;">Conversion en cours...</h3>
+            <p id="modalSubtitle" class="mb-6" style="color:var(--fg-muted);">Veuillez patienter pendant le traitement</p>
+            <div class="progress-bar mb-4">
+                <div id="modalProgress" class="progress-fill" style="width:0%"></div>
+            </div>
+            <p id="modalPercent" class="text-sm" style="color:var(--fg-muted);">0%</p>
         </div>
-      </div>
-    </section>
+    </div>
 
-    <section class="vis-band"><div class="vb-track" id="vbTrack"></div></section>
-
-    <section class="tools-section">
-      <div class="container">
-        <div class="tools-header reveal"><h2>Tous les outils PDF</h2><p>18 outils pour maitriser vos documents</p></div>
-        <div class="tools-grid" id="toolsGrid"></div>
-      </div>
-    </section>
-
-    <section class="how-section">
-      <div class="container">
-        <h2 class="section-title reveal">Comment ca marche ?</h2>
-        <div class="steps-row">
-          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-cloud-upload-alt"></i></div><h3>Deposez</h3><p>Glissez votre fichier dans la zone de depot.</p></div>
-          <div class="step-arrow reveal"><i class="fas fa-long-arrow-alt-right"></i></div>
-          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-sliders-h"></i></div><h3>Choisissez</h3><p>Selectionnez l'outil et les options.</p></div>
-          <div class="step-arrow reveal"><i class="fas fa-long-arrow-alt-right"></i></div>
-          <div class="step-card reveal"><div class="step-ico"><i class="fas fa-download"></i></div><h3>Telechargez</h3><p>Recevez votre fichier converti.</p></div>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50" style="background:rgba(15,15,20,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3" aria-label="DocFlow Accueil">
+                <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-secondary));display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-file-pdf text-white text-lg"></i>
+                </div>
+                <span class="text-xl font-bold" style="font-family:'Space Grotesk',sans-serif;">DocFlow</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#tools" class="nav-link text-sm">Outils</a>
+                <a href="#features" class="nav-link text-sm">Fonctionnalites</a>
+                <a href="#stats" class="nav-link text-sm">Statistiques</a>
+                <button class="btn-primary text-sm" style="padding:10px 22px;" onclick="scrollToUpload()">
+                    <i class="fas fa-upload mr-2"></i>Convertir
+                </button>
+            </div>
+            <button id="mobileMenuBtn" class="md:hidden text-xl" style="color:var(--fg-muted);" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-      </div>
-    </section>
-
-    <section class="proof-section">
-      <div class="container">
-        <h2 class="section-title reveal">Ils nous font confiance</h2>
-        <div class="proof-grid">
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t1/72/72" alt=""><div><p class="pq">"500 fichiers convertis sans aucun souci."</p><p class="pa">Marie L. — Graphiste</p></div></div>
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t2/72/72" alt=""><div><p class="pq">"La fusion PDF me fait gagner des heures."</p><p class="pa">Thomas R. — Chef de projet</p></div></div>
-          <div class="proof-card reveal"><img src="https://picsum.photos/seed/t3/72/72" alt=""><div><p class="pq">"Resultat impeccable a chaque fois."</p><p class="pa">Sophie M. — Avocate</p></div></div>
+        <!-- Menu mobile -->
+        <div id="mobileMenu" class="md:hidden overflow-hidden" style="max-height:0;transition:max-height 0.3s;">
+            <div class="px-6 pb-4 flex flex-col gap-3">
+                <a href="#tools" class="nav-link text-sm py-2">Outils</a>
+                <a href="#features" class="nav-link text-sm py-2">Fonctionnalites</a>
+                <a href="#stats" class="nav-link text-sm py-2">Statistiques</a>
+                <button class="btn-primary text-sm" style="padding:10px 22px;" onclick="scrollToUpload()">
+                    <i class="fas fa-upload mr-2"></i>Convertir
+                </button>
+            </div>
         </div>
-      </div>
-    </section>
+    </nav>
 
-    <footer class="footer"><div class="container"><div class="footer-inner"><div class="footer-brand"><svg width="22" height="22" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="url(#lg2)"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#2B7BF5"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg><span>PDFShift</span></div><p>&copy; 2025 PDFShift. Fichiers traites localement.</p></div></div></footer>
-  </main>
+    <main>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 px-6">
+            <div class="hero-bg">
+                <div class="blob blob-1"></div>
+                <div class="blob blob-2"></div>
+                <div class="blob blob-3"></div>
+            </div>
+            <div class="dot-grid"></div>
 
-  <!-- OUTILS -->
-  <main id="page-tools" class="page page-hidden">
-    <section class="tool-page"><div class="container">
-      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-      <div class="tool-header" id="toolHeader">
-        <div class="tool-header-icon" id="toolIcon"><i class="fas fa-file-alt"></i></div>
-        <div><h1 id="toolTitle">PDF vers Texte</h1><p id="toolDesc">Extrayez le texte</p></div>
-        <span id="toolProBadge" class="tool-pro-badge" style="display:none"><i class="fas fa-crown"></i> Pro</span>
-      </div>
-      <div class="limit-bar" id="limitBanner"><div class="limit-bar-left"><i class="fas fa-info-circle" style="color:#F59E0B"></i><div><span class="limit-text" id="limitText">3 restantes</span><div class="limit-track"><div class="limit-fill" id="limitProgress"></div></div></div></div><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div>
-      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-        <input type="file" id="fileInput" accept=".pdf" multiple>
-        <div id="dropContent"><div class="drop-icon"><i class="fas fa-cloud-upload-alt"></i></div><p class="drop-title">Glissez votre fichier ici</p><p class="drop-sub">ou cliquez pour parcourir</p><p class="drop-formats" id="acceptedFormats">PDF</p></div>
-        <div id="filePreview" style="display:none" class="file-preview"><i class="fas fa-file-pdf" style="font-size:36px;color:#2B7BF5"></i><p id="fileName" class="file-name"></p><p id="fileSize" class="file-size"></p><button class="btn-ghost" onclick="event.stopPropagation();clearFile()" style="color:#EF4444;margin-top:8px"><i class="fas fa-times"></i> Supprimer</button></div>
-      </div>
-      <div id="textInputArea" style="display:none" class="text-input-wrap"><textarea class="text-input" id="textInput" rows="12" placeholder="Collez votre contenu ici..."></textarea></div>
-      <div id="pageRangeArea" style="display:none" class="extra-field"><label class="form-label" style="margin:0 0 6px">Pages (ex: 1-3, 5)</label><input class="form-input" type="text" id="pageRangeInput" placeholder="1-3" value="1"></div>
-      <div id="watermarkArea" style="display:none" class="extra-field"><label class="form-label" style="margin:0 0 6px">Texte du filigrane</label><input class="form-input" type="text" id="watermarkInput" placeholder="CONFIDENTIEL" value="CONFIDENTIEL"></div>
-      <div class="convert-btn-wrap"><button class="btn-convert" id="convertBtn" onclick="startConversion()" disabled><i class="fas fa-sync-alt"></i> Convertir maintenant</button></div>
-      <div id="resultArea" class="result-card" style="display:none"><div class="result-header"><div class="result-check"><i class="fas fa-check-circle"></i></div><div><p class="result-title">Conversion terminee</p><p class="result-info" id="resultInfo"></p></div></div><div id="textResult" style="display:none" class="result-preview"><pre id="extractedText"></pre></div><button class="btn-download" id="downloadBtn" onclick="downloadResult()"><i class="fas fa-download"></i> Telecharger</button></div>
-    </div></section>
-  </main>
+            <!-- Particules -->
+            <div id="particles" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
 
-  <!-- TARIFS -->
-  <main id="page-pricing" class="page page-hidden">
-    <section class="pricing-page"><div class="container">
-      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-      <h1 class="pricing-title reveal">Choisissez votre plan</h1>
-      <p class="pricing-sub reveal">Sans engagement. Annulez a tout moment.</p>
-      <div class="pricing-toggle reveal"><button class="pt-btn active" id="ptMonthly" onclick="setPricing('monthly')">Mensuel</button><button class="pt-btn" id="ptYearly" onclick="setPricing('yearly')">Annuel <span class="pt-save">-40%</span></button></div>
-      <div class="pricing-grid" id="pricingGrid"></div>
-    </div></section>
-  </main>
+            <div class="relative z-10 text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8" style="background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--fg-muted);">
+                    <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span>
+                    Traitement 100% local — vos fichiers ne quittent jamais votre appareil
+                </div>
 
-  <!-- DASHBOARD -->
-  <main id="page-dashboard" class="page page-hidden">
-    <section class="dashboard-page"><div class="container">
-      <button class="btn-back" onclick="navigate('home')"><i class="fas fa-arrow-left"></i> Retour</button>
-      <div class="dash-top"><div><h1 class="dash-title">Tableau de bord</h1><p class="dash-sub">Bienvenue, <span id="dashUsername"></span></p></div><div class="dash-top-right"><span id="dashBadge" class="badge-free">Gratuit</span><button class="btn-nav-cta" style="font-size:12px;padding:6px 14px" id="dashUpgradeBtn" onclick="navigate('pricing')"><i class="fas fa-crown"></i> Pro</button></div></div>
-      <div class="dash-stats"><div class="dash-stat-card"><p class="dash-stat-label">Ce cycle</p><p class="dash-stat-value" id="dashUsed">0</p><p class="dash-stat-sub" id="dashLimit">sur 3</p></div><div class="dash-stat-card"><p class="dash-stat-label">Renouvellement</p><div class="timer-wrap"><svg class="timer-svg" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="5"/><circle cx="40" cy="40" r="34" fill="none" stroke="#2B7BF5" stroke-width="5" stroke-dasharray="213.6" stroke-dashoffset="0" stroke-linecap="round" id="timerCircle"/></svg><span class="timer-text" id="timerText">48h</span></div></div><div class="dash-stat-card"><p class="dash-stat-label">Total</p><p class="dash-stat-value" id="dashTotal">0</p><p class="dash-stat-sub" style="color:#10B981"><i class="fas fa-arrow-up"></i> conversions</p></div></div>
-      <div class="dash-history-card"><div class="dash-history-header"><h3>Historique</h3><button class="btn-ghost" onclick="clearHistory()" style="color:#EF4444;font-size:13px"><i class="fas fa-trash"></i> Effacer</button></div><div class="table-head"><span>Fichier</span><span>Type</span><span>Date</span><span></span></div><div id="historyList" class="table-body"><div class="table-empty"><i class="fas fa-inbox"></i><p>Aucune conversion</p></div></div></div>
-      <div class="dash-logout"><button class="btn-ghost" onclick="logout()" style="color:#EF4444"><i class="fas fa-sign-out-alt"></i> Se deconnecter</button></div>
-    </div></section>
-  </main>
+                <h1 class="hero-title font-bold mb-6" style="font-size:3.8rem;line-height:1.05;letter-spacing:-0.02em;">
+                    Convertissez vos PDF<br>
+                    <span style="background:linear-gradient(135deg,var(--accent),var(--accent-secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">en un clic</span>
+                </h1>
 
-  <!-- MODALS -->
-  <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-    <div class="modal" id="modal-login" style="display:none">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Se connecter</h2>
-      <button class="btn-social" onclick="socialLogin('google')"><i class="fab fa-google"></i> Continuer avec Google</button>
-      <button class="btn-social" onclick="socialLogin('microsoft')"><i class="fab fa-microsoft"></i> Continuer avec Microsoft</button>
-      <div class="modal-divider"><span>ou</span></div>
-      <form onsubmit="handleLogin(event)">
-        <label class="form-label">E-mail</label><input class="form-input" type="email" id="loginEmail" placeholder="vous@exemple.com" required>
-        <label class="form-label">Mot de passe</label>
-        <div class="password-wrap"><input class="form-input" type="password" id="loginPassword" placeholder="Votre mot de passe" required><button type="button" class="password-toggle" onclick="togglePassword('loginPassword',this)"><i class="fas fa-eye"></i></button></div>
-        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px">Se connecter</button>
-      </form>
-      <p class="modal-switch">Pas de compte ? <a href="#" onclick="switchModal('register');return false">S'inscrire</a></p>
-    </div>
-    <div class="modal" id="modal-register" style="display:none">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Creer votre compte</h2>
-      <button class="btn-social" onclick="socialLogin('google')"><i class="fab fa-google"></i> Continuer avec Google</button>
-      <button class="btn-social" onclick="socialLogin('microsoft')"><i class="fab fa-microsoft"></i> Continuer avec Microsoft</button>
-      <div class="modal-divider"><span>ou</span></div>
-      <form onsubmit="handleRegister(event)">
-        <label class="form-label">Nom</label><input class="form-input" type="text" id="regName" placeholder="Votre nom" required minlength="2">
-        <label class="form-label">E-mail</label><input class="form-input" type="email" id="regEmail" placeholder="vous@exemple.com" required>
-        <label class="form-label">Mot de passe</label>
-        <div class="password-wrap"><input class="form-input" type="password" id="regPassword" placeholder="Min. 6 caracteres" required minlength="6" oninput="checkPasswordStrength(this.value)"><button type="button" class="password-toggle" onclick="togglePassword('regPassword',this)"><i class="fas fa-eye"></i></button></div>
-        <div class="strength-bars" id="strengthBars"><div></div><div></div><div></div><div></div></div>
-        <p class="strength-text" id="strengthText"></p>
-        <label class="form-label">Confirmer</label><input class="form-input" type="password" id="regPasswordConfirm" placeholder="Repetez" required>
-        <button type="submit" class="btn-modal-primary" style="width:100%;margin-top:8px">Creer mon compte</button>
-      </form>
-      <p class="modal-switch">Deja un compte ? <a href="#" onclick="switchModal('login');return false">Se connecter</a></p>
-      <p class="modal-legal">En creant un compte, vous acceptez nos <a href="#">CGU</a>.</p>
-    </div>
-    <div class="modal" id="modal-pro-lock" style="display:none">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <div style="text-align:center;padding:12px 0">
-        <div style="width:64px;height:64px;background:linear-gradient(135deg,#EEF4FF,#F3E8FF);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i class="fas fa-lock" style="font-size:24px;color:#2B7BF5"></i></div>
-        <h2 class="modal-title" style="text-align:center">Outil Pro</h2>
-        <p style="color:#64748B;font-size:14px;margin-bottom:24px;line-height:1.6">Debloquez cet outil et 14 autres avec le plan Pro.</p>
-        <button class="btn-modal-primary" style="width:100%" onclick="closeModal();navigate('pricing')"><i class="fas fa-crown"></i> Passer Pro — 0,99€/mois</button>
-        <button class="btn-ghost" onclick="closeModal()" style="margin-top:12px">Plus tard</button>
-      </div>
-    </div>
-    <div class="modal" id="modal-subscribe" style="display:none">
-      <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-      <h2 class="modal-title">Confirmer l'abonnement</h2>
-      <div class="sub-summary"><div class="sub-summary-left"><i class="fas fa-crown" style="color:#2B7BF5;font-size:24px"></i><div><p style="font-weight:700" id="subPlanName">Plan Pro</p><p style="font-size:13px;color:#64748B" id="subPlanDesc">Illimite</p></div></div><div class="sub-summary-price" id="subPlanPrice">0,99€<span>/mois</span></div></div>
-      <div class="sub-secure"><i class="fas fa-lock"></i> Paiement securise par Stripe</div>
-      <button class="btn-modal-primary" style="width:100%" id="stripeCheckoutBtn" onclick="processStripeCheckout()"><i class="fas fa-credit-card"></i> Payer avec Stripe</button>
-      <p class="sub-note">Annulable a tout moment.</p>
-      <div class="stripe-help" id="stripeHelp" style="display:none"></div>
-    </div>
-  </div>
+                <p class="text-lg mb-10 max-w-2xl mx-auto" style="color:var(--fg-muted);line-height:1.7;">
+                    PDF vers Word, Excel, PowerPoint, images et plus encore. Conversion rapide, gratuite et sans inscription.
+                </p>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
-  <script src="script.js"></script>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <button class="btn-primary text-base" onclick="scrollToUpload()" style="padding:16px 40px;">
+                        <i class="fas fa-bolt mr-2"></i>Commencer la conversion
+                    </button>
+                    <button class="btn-secondary" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">
+                        <i class="fas fa-th-large mr-2"></i>Voir tous les outils
+                    </button>
+                </div>
+
+                <!-- Mini aperçu des formats -->
+                <div class="flex items-center justify-center gap-6 flex-wrap" style="opacity:0.5;">
+                    <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-pdf" style="color:#e63946;"></i> PDF</div>
+                    <i class="fas fa-arrow-right text-xs" style="color:var(--fg-muted);"></i>
+                    <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-word" style="color:#2b579a;"></i> Word</div>
+                    <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-excel" style="color:#217346;"></i> Excel</div>
+                    <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-powerpoint" style="color:#d24726;"></i> PPT</div>
+                    <div class="flex items-center gap-2 text-sm"><i class="fas fa-file-image" style="color:var(--accent);"></i> JPG</div>
+                </div>
+            </div>
+
+            <!-- Flèche défilante -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2" style="animation: bounce 2s infinite;">
+                <i class="fas fa-chevron-down text-lg" style="color:var(--fg-muted);"></i>
+            </div>
+            <style>
+                @keyframes bounce {
+                    0%, 100% { transform: translateX(-50%) translateY(0); }
+                    50% { transform: translateX(-50%) translateY(10px); }
+                }
+            </style>
+        </section>
+
+        <!-- Section Upload -->
+        <section id="upload-section" class="relative py-24 px-6">
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10 fade-in">
+                    <h2 class="text-3xl font-bold mb-3">Deposez votre fichier</h2>
+                    <p style="color:var(--fg-muted);">Glissez-deposez ou selectionnez un fichier a convertir</p>
+                </div>
+
+                <!-- Sélecteur de format cible -->
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-8 fade-in" style="animation-delay:0.1s;">
+                    <span class="text-sm mr-2" style="color:var(--fg-muted);">Convertir vers :</span>
+                    <button class="format-btn active" data-format="word" onclick="selectFormat(this)">
+                        <i class="fas fa-file-word mr-1"></i> Word
+                    </button>
+                    <button class="format-btn" data-format="excel" onclick="selectFormat(this)">
+                        <i class="fas fa-file-excel mr-1"></i> Excel
+                    </button>
+                    <button class="format-btn" data-format="ppt" onclick="selectFormat(this)">
+                        <i class="fas fa-file-powerpoint mr-1"></i> PPT
+                    </button>
+                    <button class="format-btn" data-format="jpg" onclick="selectFormat(this)">
+                        <i class="fas fa-file-image mr-1"></i> JPG
+                    </button>
+                    <button class="format-btn" data-format="png" onclick="selectFormat(this)">
+                        <i class="fas fa-image mr-1"></i> PNG
+                    </button>
+                    <button class="format-btn" data-format="txt" onclick="selectFormat(this)">
+                        <i class="fas fa-file-alt mr-1"></i> TXT
+                    </button>
+                </div>
+                <style>
+                    .format-btn {
+                        padding: 8px 18px;
+                        border-radius: 10px;
+                        font-size: 13px;
+                        font-weight: 500;
+                        background: var(--card);
+                        border: 1px solid var(--border);
+                        color: var(--fg-muted);
+                        cursor: pointer;
+                        transition: all 0.3s;
+                        font-family: 'DM Sans', sans-serif;
+                    }
+                    .format-btn:hover {
+                        border-color: var(--fg-muted);
+                        color: var(--fg);
+                    }
+                    .format-btn.active {
+                        background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+                        border-color: transparent;
+                        color: #fff;
+                        box-shadow: 0 4px 20px var(--accent-glow);
+                    }
+                </style>
+
+                <!-- Zone de drop -->
+                <div id="dropZone" class="drop-zone p-16 text-center fade-in" style="animation-delay:0.2s;"
+                     role="button" tabindex="0" aria-label="Zone de depot de fichier">
+                    <div class="relative z-10">
+                        <div class="mx-auto mb-6" style="width:80px;height:80px;border-radius:20px;background:var(--card-hover);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-cloud-upload-alt text-3xl" style="color:var(--accent);"></i>
+                        </div>
+                        <p class="text-lg font-semibold mb-2">Glissez et deposez votre PDF ici</p>
+                        <p class="text-sm mb-6" style="color:var(--fg-muted);">ou cliquez pour parcourir vos fichiers</p>
+                        <span class="inline-block text-xs px-3 py-1 rounded-full" style="background:var(--card);color:var(--fg-muted);border:1px solid var(--border);">
+                            Taille max : 50 MB — PDF uniquement
+                        </span>
+                    </div>
+                    <input type="file" id="fileInput" accept=".pdf" class="hidden" aria-label="Selectionner un fichier PDF">
+                </div>
+
+                <!-- Liste des fichiers -->
+                <div id="fileList" class="mt-6 flex flex-col gap-3"></div>
+
+                <!-- Bouton convertir -->
+                <div id="convertSection" class="mt-8 text-center" style="display:none;">
+                    <button id="convertBtn" class="btn-primary text-base" onclick="startConversion()" style="padding:16px 48px;">
+                        <i class="fas fa-magic mr-2"></i>Lancer la conversion
+                    </button>
+                    <button class="btn-secondary ml-3" onclick="clearFiles()">
+                        <i class="fas fa-trash-alt mr-1"></i>Effacer
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-5xl mx-auto"></div>
+
+        <!-- Outils -->
+        <section id="tools" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="inline-block text-xs font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full" style="background:var(--card);color:var(--accent);border:1px solid var(--border);">
+                        Outils de conversion
+                    </span>
+                    <h2 class="text-4xl font-bold mb-4">Tout ce dont vous avez besoin</h2>
+                    <p class="max-w-lg mx-auto" style="color:var(--fg-muted);">Une suite complete d'outils pour manipuler vos documents au quotidien</p>
+                </div>
+
+                <div class="tools-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+                    <!-- Cartes outils générées par JS -->
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-5xl mx-auto"></div>
+
+        <!-- Fonctionnalités -->
+        <section id="features" class="py-24 px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="inline-block text-xs font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full" style="background:var(--card);color:var(--accent);border:1px solid var(--border);">
+                        Pourquoi DocFlow
+                    </span>
+                    <h2 class="text-4xl font-bold mb-4">La conversion reinventee</h2>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(46,196,182,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-shield-alt text-xl" style="color:var(--success);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">100% Securise</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Vos fichiers sont traites localement dans votre navigateur. Aucune donnee n'est envoyee sur un serveur.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(255,107,53,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-bolt text-xl" style="color:var(--accent);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Ultra rapide</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Conversion instantanee grace au traitement natif du navigateur. Pas d'attente de serveur distant.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(255,159,28,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-infinity text-xl" style="color:var(--accent-secondary);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Illimite</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Convertissez autant de fichiers que vous le souhaitez. Aucune limite quotidienne ni inscription requise.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(230,57,70,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-magic text-xl" style="color:var(--danger);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Qualite premium</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">La mise en page, les polices et les images sont preservees avec une precision remarquable.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(46,196,182,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-mobile-alt text-xl" style="color:var(--success);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Multi-appareils</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Fonctionne parfaitement sur ordinateur, tablette et mobile. Aucune installation necessaire.</p>
+                    </div>
+                    <div class="p-8 rounded-2xl" style="background:var(--card);border:1px solid var(--border);">
+                        <div class="mb-5" style="width:56px;height:56px;border-radius:16px;background:rgba(255,107,53,0.12);display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-language text-xl" style="color:var(--accent);"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Multilingue</h3>
+                        <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Interface disponible en francais, anglais et bien d'autres langues. Adapte a votre usage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="section-divider max-w-5xl mx-auto"></div>
+
+        <!-- Statistiques -->
+        <section id="stats" class="py-24 px-6">
+            <div class="max-w-5xl mx-auto">
+                <div class="rounded-3xl p-12 relative overflow-hidden" style="background:var(--card);border:1px solid var(--border);">
+                    <div class="absolute top-0 right-0 w-96 h-96 rounded-full" style="background:var(--accent);filter:blur(150px);opacity:0.08;"></div>
+                    <div class="relative z-10">
+                        <div class="text-center mb-12">
+                            <h2 class="text-3xl font-bold mb-2">Approuve par des milliers d'utilisateurs</h2>
+                            <p style="color:var(--fg-muted);">Des chiffres qui parlent d'eux-memes</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;text-align:center;">
+                            <div>
+                                <div class="stat-number" data-target="284000">0</div>
+                                <p class="text-sm mt-2" style="color:var(--fg-muted);">Fichiers convertis</p>
+                            </div>
+                            <div>
+                                <div class="stat-number" data-target="47000">0</div>
+                                <p class="text-sm mt-2" style="color:var(--fg-muted);">Utilisateurs actifs</p>
+                            </div>
+                            <div>
+                                <div class="stat-number" data-target="99">0</div>
+                                <p class="text-sm mt-2" style="color:var(--fg-muted);">% de satisfaction</p>
+                            </div>
+                            <div>
+                                <div class="stat-number" data-target="12">0</div>
+                                <p class="text-sm mt-2" style="color:var(--fg-muted);">Outils disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Comment ça marche -->
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Simple comme 1-2-3</h2>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;">
+                    <div class="text-center">
+                        <div class="mx-auto mb-5" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;color:#fff;">1</div>
+                        <h3 class="font-bold mb-2">Deposez votre fichier</h3>
+                        <p class="text-sm" style="color:var(--fg-muted);">Glissez votre PDF ou cliquez pour parcourir</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="mx-auto mb-5" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;color:#fff;">2</div>
+                        <h3 class="font-bold mb-2">Choisissez le format</h3>
+                        <p class="text-sm" style="color:var(--fg-muted);">Selectionnez le format de sortie souhaite</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="mx-auto mb-5" style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-secondary));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;color:#fff;">3</div>
+                        <h3 class="font-bold mb-2">Telechargez</h3>
+                        <p class="text-sm" style="color:var(--fg-muted);">Recuperez votre fichier converti instantanement</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background:var(--bg-elevated);border-top:1px solid var(--border);" class="py-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;" class="mb-12">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-secondary));display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-file-pdf text-white text-sm"></i>
+                        </div>
+                        <span class="text-lg font-bold" style="font-family:'Space Grotesk',sans-serif;">DocFlow</span>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color:var(--fg-muted);">Convertisseur PDF gratuit, rapide et securise. Traite vos fichiers directement dans votre navigateur.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm">Produit</h4>
+                    <div class="flex flex-col gap-2">
+                        <a href="#tools" class="text-sm hover:underline" style="color:var(--fg-muted);">Outils</a>
+                        <a href="#features" class="text-sm hover:underline" style="color:var(--fg-muted);">Fonctionnalites</a>
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">Tarifs</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm">Support</h4>
+                    <div class="flex flex-col gap-2">
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">Centre d'aide</a>
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">Contact</a>
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">FAQ</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-sm">Legal</h4>
+                    <div class="flex flex-col gap-2">
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">Confidentialite</a>
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">Conditions</a>
+                        <a href="#" class="text-sm hover:underline" style="color:var(--fg-muted);">RGPD</a>
+                    </div>
+                </div>
+            </div>
+            <div class="section-divider mb-8"></div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-xs" style="color:var(--fg-muted);">2025 DocFlow. Tous droits reserves.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" style="color:var(--fg-muted);" class="hover:text-white transition-colors" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="color:var(--fg-muted);" class="hover:text-white transition-colors" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" style="color:var(--fg-muted);" class="hover:text-white transition-colors" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== DONNEES =====
+        const tools = [
+            { name: 'PDF vers Word', desc: 'Convertissez vos PDF en documents Word editables', icon: 'fa-file-word', color: '#2b579a', bg: 'rgba(43,87,154,0.12)', format: 'word' },
+            { name: 'PDF vers Excel', desc: 'Transformez vos tableaux PDF en feuilles de calcul', icon: 'fa-file-excel', color: '#217346', bg: 'rgba(33,115,70,0.12)', format: 'excel' },
+            { name: 'PDF vers PowerPoint', desc: ' Creez des presentations depuis vos PDF', icon: 'fa-file-powerpoint', color: '#d24726', bg: 'rgba(210,71,38,0.12)', format: 'ppt' },
+            { name: 'PDF vers JPG', desc: 'Exportez chaque page du PDF en image HD', icon: 'fa-file-image', color: '#ff6b35', bg: 'rgba(255,107,53,0.12)', format: 'jpg' },
+            { name: 'PDF vers PNG', desc: 'Conversion PNG haute resolution transparente', icon: 'fa-image', color: '#2ec4b6', bg: 'rgba(46,196,182,0.12)', format: 'png' },
+            { name: 'PDF vers TXT', desc: 'Extrayez le texte brut de vos documents', icon: 'fa-file-alt', color: '#ff9f1c', bg: 'rgba(255,159,28,0.12)', format: 'txt' },
+            { name: 'Fusionner des PDF', desc: 'Combinez plusieurs PDF en un seul document', icon: 'fa-object-group', color: '#e63946', bg: 'rgba(230,57,70,0.12)', format: 'merge' },
+            { name: 'Diviser un PDF', desc: 'Separez un PDF en plusieurs fichiers', icon: 'fa-cut', color: '#9b59b6', bg: 'rgba(155,89,182,0.12)', format: 'split' },
+            { name: 'Compresser PDF', desc: 'Reduisez la taille de vos fichiers PDF', icon: 'fa-compress-arrows-alt', color: '#1abc9c', bg: 'rgba(26,188,156,0.12)', format: 'compress' },
+            { name: 'Protéger un PDF', desc: 'Ajoutez un mot de passe a votre PDF', icon: 'fa-lock', color: '#f39c12', bg: 'rgba(243,156,18,0.12)', format: 'protect' },
+            { name: 'Rotation PDF', desc: 'Faites pivoter les pages de votre document', icon: 'fa-sync-alt', color: '#3498db', bg: 'rgba(52,152,219,0.12)', format: 'rotate' },
+            { name: 'Numériser vers PDF', desc: 'Transformez des photos en documents PDF', icon: 'fa-camera', color: '#e74c3c', bg: 'rgba(231,76,60,0.12)', format: 'scan' },
+        ];
+
+        const formatExtensions = {
+            word: '.docx', excel: '.xlsx', ppt: '.pptx',
+            jpg: '.jpg', png: '.png', txt: '.txt',
+            merge: '_fusionne.pdf', split: '_page.pdf',
+            compress: '_compressé.pdf', protect: '_protégé.pdf',
+            rotate: '_rotaté.pdf', scan: '.pdf'
+        };
+
+        const formatMimeTypes = {
+            word: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            excel: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ppt: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            jpg: 'image/jpeg', png: 'image/png', txt: 'text/plain',
+            merge: 'application/pdf', split: 'application/pdf',
+            compress: 'application/pdf', protect: 'application/pdf',
+            rotate: 'application/pdf', scan: 'application/pdf'
+        };
+
+        // ===== ETAT =====
+        let selectedFormat = 'word';
+        let uploadedFiles = [];
+        let isConverting = false;
+
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTools();
+            setupDropZone();
+            setupParticles();
+            setupMobileMenu();
+            setupScrollAnimations();
+            setupStatCounters();
+        });
+
+        // ===== RENDU DES CARTES OUTILS =====
+        function renderTools() {
+            const grid = document.querySelector('.tools-grid');
+            grid.innerHTML = tools.map((tool, i) => `
+                <div class="tool-card" onclick="selectToolAndScroll('${tool.format}')" style="animation-delay:${i * 0.05}s;" tabindex="0" role="button" aria-label="${tool.name}">
+                    <div class="icon-wrap" style="background:${tool.bg};">
+                        <i class="fas ${tool.icon}" style="color:${tool.color};"></i>
+                    </div>
+                    <h3 class="font-bold mb-1">${tool.name}</h3>
+                    <p class="text-sm" style="color:var(--fg-muted);line-height:1.5;">${tool.desc}</p>
+                    <div class="mt-4 flex items-center gap-1 text-xs font-medium" style="color:${tool.color};">
+                        Essayer <i class="fas fa-arrow-right text-[10px]"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== SELECTION FORMAT =====
+        function selectFormat(btn) {
+            document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedFormat = btn.dataset.format;
+        }
+
+        function selectToolAndScroll(format) {
+            selectedFormat = format;
+            document.querySelectorAll('.format-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.format === format);
+            });
+            scrollToUpload();
+        }
+
+        // ===== ZONE DE DROP =====
+        function setupDropZone() {
+            const zone = document.getElementById('dropZone');
+            const input = document.getElementById('fileInput');
+
+            zone.addEventListener('click', () => input.click());
+            zone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') input.click(); });
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            input.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+                input.value = '';
+            });
+        }
+
+        // ===== GESTION FICHIERS =====
+        function handleFiles(filesList) {
+            const validFiles = Array.from(filesList).filter(f => {
+                if (f.type !== 'application/pdf' && !f.name.toLowerCase().endsWith('.pdf')) {
+                    showToast('Seuls les fichiers PDF sont acceptes', 'error');
+                    return false;
+                }
+                if (f.size > 50 * 1024 * 1024) {
+                    showToast('Le fichier depasse la limite de 50 MB', 'error');
+                    return false;
+                }
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            // Limiter à 5 fichiers
+            if (uploadedFiles.length + validFiles.length > 5) {
+                showToast('Maximum 5 fichiers a la fois', 'info');
+                return;
+            }
+
+            uploadedFiles = [...uploadedFiles, ...validFiles];
+            renderFileList();
+            showToast(`${validFiles.length} fichier(s) ajoute(s)`, 'success');
+        }
+
+        function renderFileList() {
+            const container = document.getElementById('fileList');
+            const convertSection = document.getElementById('convertSection');
+
+            if (uploadedFiles.length === 0) {
+                container.innerHTML = '';
+                convertSection.style.display = 'none';
+                return;
+            }
+
+            convertSection.style.display = 'block';
+
+            container.innerHTML = uploadedFiles.map((file, i) => {
+                const sizeStr = formatFileSize(file.size);
+                const tool = tools.find(t => t.format === selectedFormat);
+                const ext = formatExtensions[selectedFormat] || '.pdf';
+                return `
+                    <div class="file-item" style="animation-delay:${i * 0.1}s;">
+                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(230,57,70,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="fas fa-file-pdf" style="color:#e63946;"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-sm truncate">${file.name}</p>
+                            <p class="text-xs mt-1" style="color:var(--fg-muted);">${sizeStr} → <span style="color:var(--accent);">${ext}</span></p>
+                        </div>
+                        <button onclick="removeFile(${i})" class="flex-shrink-0" style="width:36px;height:36px;border-radius:10px;background:var(--card-hover);border:1px solid var(--border);color:var(--fg-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.color='var(--danger)';this.style.borderColor='var(--danger)'" onmouseout="this.style.color='var(--fg-muted)';this.style.borderColor='var(--border)'" aria-label="Supprimer le fichier">
+                            <i class="fas fa-times text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            renderFileList();
+        }
+
+        function clearFiles() {
+            uploadedFiles = [];
+            renderFileList();
+            showToast('Fichiers supprimes', 'info');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' o';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' Ko';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
+        }
+
+        // ===== CONVERSION =====
+        function startConversion() {
+            if (uploadedFiles.length === 0 || isConverting) return;
+            isConverting = true;
+
+            const modal = document.getElementById('conversionModal');
+            const progress = document.getElementById('modalProgress');
+            const percent = document.getElementById('modalPercent');
+            const icon = document.getElementById('modalIcon');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+
+            // Reset modal
+            icon.innerHTML = '<i class="fas fa-cog spin-slow" style="color:var(--accent)"></i><div class="pulse-ring"></div>';
+            title.textContent = 'Conversion en cours...';
+            subtitle.textContent = `Conversion de ${uploadedFiles.length} fichier(s) vers ${selectedFormat.toUpperCase()}`;
+            progress.style.width = '0%';
+            percent.textContent = '0%';
+
+            modal.classList.add('active');
+
+            let currentProgress = 0;
+            const steps = [
+                { at: 15, text: 'Lecture du fichier PDF...' },
+                { at: 35, text: 'Analyse de la structure...' },
+                { at: 55, text: 'Extraction du contenu...' },
+                { at: 75, text: 'Generation du fichier de sortie...' },
+                { at: 90, text: 'Optimisation finale...' },
+                { at: 100, text: 'Termine !' },
+            ];
+
+            const interval = setInterval(() => {
+                const increment = Math.random() * 4 + 1;
+                currentProgress = Math.min(currentProgress + increment, 100);
+
+                progress.style.width = currentProgress + '%';
+                percent.textContent = Math.round(currentProgress) + '%';
+
+                // Mettre à jour le texte d'étape
+                for (let i = steps.length - 1; i >= 0; i--) {
+                    if (currentProgress >= steps[i].at) {
+                        subtitle.textContent = steps[i].text;
+                        break;
+                    }
+                }
+
+                if (currentProgress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        // Succès
+                        icon.innerHTML = '<i class="fas fa-check-circle" style="color:var(--success);font-size:36px;"></i>';
+                        title.textContent = 'Conversion terminee !';
+                        subtitle.textContent = `${uploadedFiles.length} fichier(s) pret(s) a etre telecharge(s)`;
+                        progress.style.width = '100%';
+                        percent.textContent = '100%';
+
+                        setTimeout(() => {
+                            modal.classList.remove('active');
+                            isConverting = false;
+                            downloadResults();
+                        }, 1500);
+                    }, 300);
+                }
+            }, 80);
+        }
+
+        function downloadResults() {
+            uploadedFiles.forEach(file => {
+                const ext = formatExtensions[selectedFormat] || '.pdf';
+                const baseName = file.name.replace(/\.pdf$/i, '');
+                const outputName = baseName + ext;
+
+                // Lire le fichier PDF et générer un fichier de sortie
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    let blob;
+                    if (selectedFormat === 'txt') {
+                        // Extraire un texte simulé du PDF (en pratique il faudrait pdf.js)
+                        const textContent = `Document converti depuis : ${file.name}\n\n` +
+                            `========================================\n` +
+                            `Ce fichier a ete converti avec DocFlow.\n` +
+                            `Format d'origine : PDF\n` +
+                            `Format de sortie : Texte brut\n` +
+                            `Taille originale : ${formatFileSize(file.size)}\n` +
+                            `Date de conversion : ${new Date().toLocaleString('fr-FR')}\n` +
+                            `========================================\n\n` +
+                            `[Le contenu texte extrait de votre PDF apparaitrait ici.\n` +
+                            `Pour une extraction complete, utilisez pdf.js en production.]\n`;
+                        blob = new Blob([textContent], { type: 'text/plain' });
+                    } else if (selectedFormat === 'jpg' || selectedFormat === 'png') {
+                        // Créer une image de placeholder représentant la page
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 800;
+                        canvas.height = 1100;
+                        const ctx = canvas.getContext('2d');
+
+                        // Fond
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, 800, 1100);
+
+                        // Bordure subtile
+                        ctx.strokeStyle = '#e0e0e0';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(20, 20, 760, 1060);
+
+                        // En-tête
+                        ctx.fillStyle = '#ff6b35';
+                        ctx.fillRect(20, 20, 760, 60);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 22px sans-serif';
+                        ctx.fillText('DocFlow — Conversion PDF', 40, 57);
+
+                        // Nom du fichier
+                        ctx.fillStyle = '#333333';
+                        ctx.font = '18px sans-serif';
+                        ctx.fillText(baseName, 40, 140);
+
+                        // Lignes de texte simulées
+                        ctx.fillStyle = '#999999';
+                        for (let i = 0; i < 30; i++) {
+                            const width = 300 + Math.random() * 400;
+                            ctx.fillRect(40, 180 + i * 28, width, 8);
+                        }
+
+                        // Pied de page
+                        ctx.fillStyle = '#cccccc';
+                        ctx.font = '12px sans-serif';
+                        ctx.fillText('Genere par DocFlow — ' + new Date().toLocaleDateString('fr-FR'), 40, 1070);
+
+                        const mimeType = selectedFormat === 'jpg' ? 'image/jpeg' : 'image/png';
+                        canvas.toBlob((b) => {
+                            if (b) triggerDownload(b, outputName);
+                        }, mimeType, 0.92);
+                        return;
+                    } else {
+                        // Pour Word, Excel, PPT — créer un fichier HTML renommé comme substitut
+                        const htmlContent = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>${baseName}</title>
+<style>body{font-family:Calibri,sans-serif;margin:40px;color:#333;line-height:1.6;}
+h1{color:#ff6b35;border-bottom:3px solid #ff6b35;padding-bottom:10px;}
+.meta{color:#888;font-size:13px;margin-bottom:30px;}</style></head>
+<body>
+<h1>${baseName}</h1>
+<div class="meta">
+<p>Fichier source : ${file.name}</p>
+<p>Taille : ${formatFileSize(file.size)}</p>
+<p>Converti le : ${new Date().toLocaleString('fr-FR')}</p>
+<p>Format de sortie : ${selectedFormat.toUpperCase()}</p>
+</div>
+<hr>
+<p><em>Ce fichier a ete converti depuis un PDF avec DocFlow.</em></p>
+<p>Le contenu complet de votre document apparaitrait ici. En production, un moteur de conversion complet comme pdf.js ou un service backend serait utilise pour extraire fidèlement le texte, les images et la mise en page.</p>
+</body></html>`;
+                        blob = new Blob([htmlContent], { type: 'text/html' });
+                    }
+                    if (blob) triggerDownload(blob, outputName);
+                };
+                reader.readAsArrayBuffer(file);
+            });
+
+            showToast(`${uploadedFiles.length} fichier(s) telecharge(s) avec succes`, 'success');
+        }
+
+        function triggerDownload(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        // ===== TOAST =====
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+            // Forcer le reflow
+            toast.offsetHeight;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        // ===== PARTICULES =====
+        function setupParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = (40 + Math.random() * 50) + '%';
+                p.style.animationDelay = (Math.random() * 6) + 's';
+                p.style.animationDuration = (4 + Math.random() * 4) + 's';
+                p.style.width = (2 + Math.random() * 4) + 'px';
+                p.style.height = p.style.width;
+                container.appendChild(p);
+            }
+        }
+
+        // ===== MENU MOBILE =====
+        function setupMobileMenu() {
+            const btn = document.getElementById('mobileMenuBtn');
+            const menu = document.getElementById('mobileMenu');
+            let open = false;
+            btn.addEventListener('click', () => {
+                open = !open;
+                menu.style.maxHeight = open ? '300px' : '0';
+                btn.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            });
+            // Fermer en cliquant sur un lien
+            menu.querySelectorAll('a').forEach(a => {
+                a.addEventListener('click', () => {
+                    open = false;
+                    menu.style.maxHeight = '0';
+                    btn.innerHTML = '<i class="fas fa-bars"></i>';
+                });
+            });
+        }
+
+        // ===== SCROLL =====
+        function scrollToUpload() {
+            document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth' });
+            // Fermer menu mobile si ouvert
+            const menu = document.getElementById('mobileMenu');
+            menu.style.maxHeight = '0';
+        }
+
+        // ===== ANIMATIONS AU SCROLL =====
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.tool-card').forEach((card, i) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = `all 0.5s cubic-bezier(0.4,0,0.2,1) ${i * 0.05}s`;
+                observer.observe(card);
+            });
+        }
+
+        // ===== COMPTEURS STATISTIQUES =====
+        function setupStatCounters() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const target = parseInt(el.dataset.target);
+                        animateCounter(el, target);
+                        observer.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            document.querySelectorAll('.stat-number').forEach(el => observer.observe(el));
+        }
+
+        function animateCounter(el, target) {
+            const duration = 2000;
+            const start = performance.now();
+            const suffix = target > 1000 ? '' : '';
+
+            function update(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                // Easing out cubic
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(eased * target);
+
+                if (target >= 1000) {
+                    el.textContent = current.toLocaleString('fr-FR');
+                } else {
+                    el.textContent = current + suffix;
+                }
+
+                if (progress < 1) requestAnimationFrame(update);
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // ===== NAVIGATION ACTIVE AU SCROLL =====
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
+            } else {
+                nav.style.boxShadow = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
