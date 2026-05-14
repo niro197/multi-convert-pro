@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DocFlow — Convertisseur PDF Gratuit</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
+        :root{
             --blue:#0B3C7D;--blue-l:#2E6BC6;--blue-bg:#E8F0FE;
             --green:#34A853;--green-bg:#E6F4EA;
             --red:#EA4335;--red-bg:#FCE8E6;
@@ -17,439 +18,390 @@
             --teal:#0D9488;--teal-bg:#CCFBF1;
             --pink:#E91E63;--pink-bg:#FCE4EC;
             --indigo:#3F51B5;--indigo-bg:#E8EAF6;
-            --bg:#FFFFFF;--bg-s:#F7F8FA;--border:#E3E5EA;--border-l:#F0F1F3;
+            --brown:#795548;--brown-bg:#EFEBE9;
+            --grey:#607D8B;--grey-bg:#ECEFF1;
+            --bg:#fff;--bg-s:#F7F8FA;--border:#E3E5EA;--border-l:#F0F1F3;
             --text:#1A1A2E;--text2:#5F6368;--text3:#9AA0A6;
             --r:12px;--rl:16px;--rxl:24px;
         }
         *{margin:0;padding:0;box-sizing:border-box;}
         body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
 
-        /* === NAV SMALLPDF STYLE === */
-        .site-nav{
-            position:sticky;top:0;z-index:100;
-            background:var(--bg);
-            border-bottom:1px solid var(--border-l);
-            height:56px;
-        }
-        .nav-inner{
-            max-width:100%;margin:0 auto;padding:0 20px;height:56px;
-            display:flex;align-items:center;justify-content:space-between;gap:8px;
-        }
+        /* === LIQUID SHAPES === */
+        .liquid-shapes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+        .liquid-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;will-change:transform;}
+        .liquid-blob.b1{width:500px;height:500px;background:var(--blue-l);top:-15%;left:-10%;animation:lbFloat1 14s ease-in-out infinite;}
+        .liquid-blob.b2{width:400px;height:400px;background:var(--purple);bottom:-10%;right:-8%;animation:lbFloat2 18s ease-in-out infinite;}
+        .liquid-blob.b3{width:300px;height:300px;background:var(--teal);top:40%;left:55%;animation:lbFloat3 16s ease-in-out infinite;}
+        .liquid-blob.b4{width:250px;height:250px;background:var(--orange);top:20%;right:30%;animation:lbFloat4 20s ease-in-out infinite;opacity:.2;}
+        @keyframes lbFloat1{0%,100%{transform:translate(0,0) scale(1) rotate(0deg);}25%{transform:translate(60px,40px) scale(1.1) rotate(5deg);}50%{transform:translate(30px,80px) scale(.95) rotate(-3deg);}75%{transform:translate(-20px,30px) scale(1.05) rotate(2deg);}}
+        @keyframes lbFloat2{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(-50px,-40px) scale(1.15);}66%{transform:translate(30px,-60px) scale(.9);}}
+        @keyframes lbFloat3{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-70px,50px) scale(1.1);}}
+        @keyframes lbFloat4{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,-30px) scale(1.2);}}
+
+        /* Liquid mesh overlay */
+        .liquid-mesh{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");opacity:.5;pointer-events:none;}
+
+        /* === NAV === */
+        .site-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-l);height:56px;}
+        .nav-inner{max-width:100%;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
         .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text);flex-shrink:0;}
-        .nav-logo-ic{
-            width:30px;height:30px;border-radius:8px;
-            background:linear-gradient(135deg,#2E6BC6,#0B3C7D);
-            display:flex;align-items:center;justify-content:center;
-            color:#fff;font-size:13px;
-        }
-        .nav-logo-t{font-weight:800;font-size:18px;letter-spacing:-.3px;}
-        .nav-logo-t span{color:var(--blue-l);}
-
-        .nav-tools{display:flex;align-items:center;gap:4px;flex:1;justify-content:center;overflow-x:auto;}
+        .nav-logo-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2E6BC6,#0B3C7D);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;}
+        .nav-logo-t{font-weight:800;font-size:18px;letter-spacing:-.3px;}.nav-logo-t span{color:var(--blue-l);}
+        .nav-tools{display:flex;align-items:center;gap:3px;flex:1;justify-content:center;overflow-x:auto;}
         .nav-tools::-webkit-scrollbar{display:none;}
-        .nav-tool-btn{
-            display:inline-flex;align-items:center;gap:5px;
-            padding:7px 14px;border-radius:8px;
-            font-family:inherit;font-size:13px;font-weight:600;
-            color:var(--text2);background:transparent;
-            border:none;cursor:pointer;white-space:nowrap;
-            transition:all .2s;position:relative;
-        }
+        .nav-tool-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;}
         .nav-tool-btn:hover{color:var(--blue);background:var(--blue-bg);}
-        .nav-tool-btn i{font-size:14px;}
-        .nav-tool-btn .dot{
-            width:8px;height:8px;border-radius:50%;flex-shrink:0;
-        }
+        .nav-tool-btn i{font-size:14px;}.nav-tool-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
         .nav-tool-btn .caret{font-size:10px;color:var(--text3);margin-left:1px;}
-
         .nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-        .nav-cta{
-            display:inline-flex;align-items:center;gap:6px;
-            padding:7px 16px;border-radius:8px;
-            background:var(--blue);color:#fff;
-            font-family:inherit;font-size:13px;font-weight:600;
-            border:none;cursor:pointer;
-            box-shadow:0 2px 6px rgba(11,60,125,.2);
-            transition:all .2s;white-space:nowrap;
-        }
+        .nav-cta{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:var(--blue);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(11,60,125,.2);transition:all .2s;white-space:nowrap;}
         .nav-cta:hover{background:var(--blue-l);transform:translateY(-1px);}
+        .nav-more{display:none;position:relative;}
+        .nav-more-menu{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:1px solid var(--border);border-radius:var(--rl);box-shadow:0 12px 48px rgba(0,0,0,.12);padding:8px;min-width:320px;opacity:0;pointer-events:none;transition:all .25s cubic-bezier(.4,0,.2,1);z-index:200;max-height:420px;overflow-y:auto;}
+        .nav-more-menu.open{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0);}
+        .nav-more-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+        .nav-more-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
+        .nav-more-item:hover{background:var(--blue-bg);color:var(--blue);}
+        .nav-more-item i{width:16px;text-align:center;font-size:13px;}.nav-more-item .dot{width:7px;height:7px;border-radius:50%;}
 
-        /* === HERO === */
-        .hero{background:linear-gradient(180deg,var(--blue-bg) 0%,var(--bg) 100%);padding:48px 24px 72px;}
-        .hero-in{max-width:720px;margin:0 auto;text-align:center;}
-        .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:100px;background:#fff;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--green);margin-bottom:18px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-        .hero-badge i{font-size:9px;}
-        .hero h1{font-size:36px;font-weight:800;line-height:1.15;letter-spacing:-.5px;margin-bottom:8px;}
-        .hero>p{font-size:15px;color:var(--text2);margin-bottom:32px;line-height:1.6;}
+        /* === HERO (style Smallpdf) === */
+        .hero{position:relative;padding:0 24px;overflow:hidden;min-height:520px;display:flex;align-items:center;}
+        .hero-inner{max-width:1200px;margin:0 auto;width:100%;display:flex;align-items:center;gap:60px;padding:64px 0;}
+        .hero-text{flex:1;position:relative;z-index:2;}
+        .hero-text h1{font-size:44px;font-weight:800;line-height:1.1;letter-spacing:-.8px;margin-bottom:16px;}
+        .hero-text h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue),var(--blue-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-text p{font-size:17px;color:var(--text2);line-height:1.65;margin-bottom:32px;max-width:460px;}
+        .hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);text-decoration:none;white-space:nowrap;}
+        .btn-p{background:var(--blue);color:#fff;padding:14px 28px;box-shadow:0 4px 14px rgba(11,60,125,.25);}.btn-p:hover{background:var(--blue-l);transform:translateY(-2px);box-shadow:0 8px 24px rgba(11,60,125,.3);}
+        .btn-o{background:transparent;color:var(--blue);padding:14px 28px;border:2px solid var(--blue);}.btn-o:hover{background:var(--blue-bg);}
+        .btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;}.btn-d{background:transparent;color:var(--text3);padding:10px 14px;border:none;}.btn-d:hover{color:var(--red);background:var(--red-bg);}
 
-        /* Format chips */
-        .fmt-sel{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;margin-bottom:22px;}
-        .fmt-chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:100px;font-size:12px;font-weight:600;background:#fff;border:1.5px solid var(--border);color:var(--text2);cursor:pointer;transition:all .2s;}
-        .fmt-chip:hover{border-color:var(--blue-l);color:var(--blue);}
-        .fmt-chip.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(11,60,125,.2);}
-        .fmt-chip i{font-size:13px;}
+        /* Hero mockup */
+        .hero-mockup{flex:1;position:relative;z-index:2;max-width:480px;}
+        .mockup-card{background:#fff;border-radius:var(--rxl);box-shadow:0 20px 60px rgba(0,0,0,.1),0 0 0 1px var(--border-l);overflow:hidden;transform:perspective(800px) rotateY(-4deg) rotateX(2deg);transition:transform .6s cubic-bezier(.4,0,.2,1);}
+        .mockup-card:hover{transform:perspective(800px) rotateY(0deg) rotateX(0deg);}
+        .mockup-toolbar{background:var(--bg-s);border-bottom:1px solid var(--border-l);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+        .mockup-dot{width:10px;height:10px;border-radius:50%;}
+        .mockup-body{padding:28px;min-height:280px;position:relative;}
+        .mockup-line{height:8px;border-radius:4px;margin-bottom:10px;}
+        .mockup-sig{position:absolute;bottom:24px;right:24px;font-size:28px;color:var(--blue);opacity:.6;font-family:cursive;}
+        .mockup-stamp{position:absolute;top:20px;right:20px;width:60px;height:60px;border:3px solid var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--green);transform:rotate(-12deg);opacity:.5;}
 
-        /* Drop zone */
-        .drop-zone{position:relative;background:#fff;border:2px dashed var(--border);border-radius:var(--rxl);padding:48px 32px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 16px rgba(0,0,0,.05);}
-        .drop-zone:hover{border-color:var(--blue-l);box-shadow:0 8px 28px rgba(0,0,0,.07);}
-        .drop-zone.drag-over{border-color:var(--blue);background:var(--blue-bg);transform:scale(1.01);box-shadow:0 0 0 4px rgba(11,60,125,.1),0 16px 48px rgba(0,0,0,.1);}
-        .drop-ic{width:64px;height:64px;margin:0 auto 16px;background:var(--blue-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue);transition:transform .3s;}
-        .drop-zone:hover .drop-ic{transform:translateY(-3px);}
-        .drop-zone.drag-over .drop-ic{transform:scale(1.1);background:var(--blue);color:#fff;}
-        .drop-t{font-size:16px;font-weight:700;margin-bottom:5px;}
-        .drop-sub{font-size:13px;color:var(--text3);margin-bottom:16px;}
-        .drop-hint{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);background:var(--bg-s);padding:4px 10px;border-radius:5px;}
-        .drop-zone input[type="file"]{display:none;}
+        /* === TOOLS PANEL (style Smallpdf) === */
+        .tools-panel{position:fixed;inset:0;top:56px;z-index:90;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s;}
+        .tools-panel.open{opacity:1;pointer-events:all;}
+        .tools-panel-inner{position:absolute;top:56px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 16px 48px rgba(0,0,0,.1);transform:translateY(-20px);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:calc(100vh - 56px);overflow-y:auto;}
+        .tools-panel.open .tools-panel-inner{transform:translateY(0);}
+        .tools-panel-grid{max-width:1200px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+        .tp-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--r);cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
+        .tp-item:hover{background:var(--blue-bg);}
+        .tp-item-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+        .tp-item-text h4{font-size:13px;font-weight:700;margin-bottom:1px;}.tp-item-text p{font-size:11px;color:var(--text3);}
+
+        /* === CONVERSION PAGE === */
+        .conv-page{max-width:900px;margin:0 auto;padding:48px 24px 80px;}
+        .conv-header{text-align:center;margin-bottom:36px;}
+        .conv-header h1{font-size:30px;font-weight:800;margin-bottom:8px;}
+        .conv-header p{font-size:15px;color:var(--text2);}
+        .conv-benefits{display:flex;align-items:flex-start;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap;}
+        .conv-benefit{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2);}
+        .conv-benefit i{color:var(--green);margin-top:2px;font-size:14px;}
+
+        /* Drop zone style Smallpdf */
+        .drop-zone-s{position:relative;border-radius:var(--rxl);padding:56px 32px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);overflow:hidden;text-align:center;}
+        .drop-zone-s:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.12);}
+        .drop-zone-s.drag-over{transform:scale(1.01);}
+        .drop-zone-s input[type="file"]{display:none;}
+        .drop-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-family:inherit;font-size:15px;font-weight:700;border:none;cursor:pointer;color:#fff;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:all .25s;}
+        .drop-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2);}
+        .drop-or{font-size:13px;color:var(--text3);margin:16px 0 4px;}
+        .drop-sub{font-size:13px;color:var(--text3);}
 
         /* File list */
         .fl{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
         .fi{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:0 1px 3px rgba(0,0,0,.04);animation:fiIn .35s cubic-bezier(.4,0,.2,1);}
         @keyframes fiIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
         .fi-ic{width:38px;height:38px;border-radius:10px;background:var(--red-bg);display:flex;align-items:center;justify-content:center;color:var(--red);font-size:16px;flex-shrink:0;}
-        .fi-info{flex:1;min-width:0;}
-        .fi-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-        .fi-meta{font-size:11px;color:var(--text3);margin-top:1px;}
-        .fi-meta .arr{color:var(--blue);margin:0 3px;}
-        .fi-meta .tgt{color:var(--blue);font-weight:600;}
-        .fi-rm{width:30px;height:30px;border-radius:7px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:13px;}
-        .fi-rm:hover{background:var(--red-bg);color:var(--red);}
-
+        .fi-info{flex:1;min-width:0;}.fi-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.fi-meta{font-size:11px;color:var(--text3);margin-top:1px;}
+        .fi-rm{width:30px;height:30px;border-radius:7px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:13px;}.fi-rm:hover{background:var(--red-bg);color:var(--red);}
         .cv-act{margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;}
 
-        /* === RESULTAT === */
-        .result-area{display:none;animation:fiIn .5s cubic-bezier(.4,0,.2,1);}
-        .result-area.show{display:block;}
-        .result-card{background:#fff;border:1px solid var(--border);border-radius:var(--rxl);padding:44px 36px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.05);max-width:500px;margin:0 auto;}
-        .result-ok{width:72px;height:72px;border-radius:50%;background:var(--green-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:32px;color:var(--green);}
-        .result-card h2{font-size:22px;font-weight:800;margin-bottom:6px;}
-        .result-card .sub{font-size:14px;color:var(--text2);margin-bottom:28px;line-height:1.5;}
-        .result-file{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-s);border-radius:var(--r);margin-bottom:28px;text-align:left;}
-        .result-file-ic{width:42px;height:42px;border-radius:11px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:18px;flex-shrink:0;}
-        .result-file-info{flex:1;min-width:0;}
-        .result-file-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-        .result-file-size{font-size:11px;color:var(--text3);margin-top:1px;}
-        .result-actions{display:flex;flex-direction:column;gap:10px;align-items:center;}
-        .result-again{font-size:13px;color:var(--text3);cursor:pointer;text-decoration:underline;margin-top:6px;transition:color .2s;background:none;border:none;font-family:inherit;}
-        .result-again:hover{color:var(--blue);}
+        /* Conversion animée */
+        .conv-area{display:none;animation:fiIn .5s;}.conv-area.show{display:block;}
+        .conv-card{background:#fff;border:1px solid var(--border);border-radius:var(--rxl);padding:48px 32px 40px;box-shadow:0 8px 32px rgba(0,0,0,.05);max-width:560px;margin:0 auto;text-align:center;}
+        .conv-icons{display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:28px;}
+        .conv-file-icon{display:flex;flex-direction:column;align-items:center;gap:10px;}
+        .conv-file-icon-circle{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.08);}
+        .conv-file-icon-circle .face{font-size:36px;position:absolute;bottom:-2px;right:-2px;}
+        .conv-file-label{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;color:#fff;}
+        .conv-arrow{display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .conv-arrow-icon{font-size:28px;animation:arrowB 1.2s ease-in-out infinite;color:var(--text3);}
+        @keyframes arrowB{0%,100%{transform:translateX(0);opacity:.5;}50%{transform:translateX(6px);opacity:1;}}
+        .conv-loader{width:100px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px;}
+        .conv-loader-fill{height:100%;border-radius:2px;width:0%;transition:width .15s;position:relative;}
+        .conv-loader-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:shimmer 1s infinite;}
+        @keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+        .conv-filename{font-size:14px;font-weight:600;margin-bottom:4px;word-break:break-all;}.conv-status{font-size:13px;font-weight:500;}
 
-        /* === PROGRESS CIRCLE === */
-        .progress-area{display:none;animation:fiIn .5s;}
-        .progress-area.show{display:block;}
-        .progress-card{background:#fff;border:1px solid var(--border);border-radius:var(--rxl);padding:48px 36px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.05);max-width:420px;margin:0 auto;}
-        .circle-wrap{position:relative;width:110px;height:110px;margin:0 auto 24px;}
-        .circle-svg{width:110px;height:110px;transform:rotate(-90deg);}
-        .circle-bg{fill:none;stroke:var(--border);stroke-width:5;}
-        .circle-fill{fill:none;stroke:var(--blue);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .3s ease;}
-        .circle-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:var(--blue);}
-        .progress-card h3{font-size:18px;font-weight:700;margin-bottom:4px;}
-        .progress-card .p-sub{font-size:13px;color:var(--text3);}
-        .progress-steps{margin-top:24px;display:flex;flex-direction:column;gap:8px;text-align:left;}
-        .p-step{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);transition:color .3s;}
-        .p-step.done{color:var(--green);}
-        .p-step.active{color:var(--blue);font-weight:600;}
-        .p-step i{width:16px;text-align:center;font-size:11px;}
+        /* Résultat */
+        .result-area{display:none;animation:fiIn .5s;}.result-area.show{display:block;}
+        .result-card{background:#fff;border:1px solid var(--border);border-radius:var(--rxl);box-shadow:0 8px 32px rgba(0,0,0,.05);max-width:680px;margin:0 auto;display:flex;min-height:340px;}
+        .result-left{flex:1;padding:32px;border-right:1px solid var(--border-l);display:flex;flex-direction:column;}
+        .result-left-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:16px;}
+        .result-left-content{flex:1;font-size:13px;color:var(--text2);line-height:1.7;overflow-y:auto;max-height:240px;}
+        .rl-line{margin-bottom:6px;}
+        .result-right{width:300px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+        .result-done{font-size:32px;font-weight:800;margin-bottom:8px;}
+        .result-target-icon{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.08);}
+        .result-target-icon .face{font-size:32px;position:absolute;bottom:-2px;right:-2px;}
+        .result-target-label{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;color:#fff;margin-bottom:12px;}
+        .result-file-name{font-size:14px;font-weight:700;margin-bottom:4px;word-break:break-all;}.result-file-size{font-size:13px;color:var(--text3);margin-bottom:24px;}
+        .result-actions{display:flex;flex-direction:column;gap:10px;width:100%;}
+        .result-again{font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline;margin-top:8px;transition:color .2s;background:none;border:none;font-family:inherit;text-align:center;}.result-again:hover{color:var(--blue);}
 
-        /* === TOOLS GRID === */
-        .tools-sec{max-width:1200px;margin:0 auto;padding:64px 24px;}
-        .sec-hdr{text-align:center;margin-bottom:40px;}
-        .sec-hdr h2{font-size:28px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;}
-        .sec-hdr p{font-size:14px;color:var(--text2);}
+        /* === SECTIONS === */
+        .tools-sec{max-width:1200px;margin:0 auto;padding:72px 24px;}
+        .sec-hdr{text-align:center;margin-bottom:44px;}.sec-hdr h2{font-size:28px;font-weight:800;letter-spacing:-.3px;margin-bottom:6px;}.sec-hdr p{font-size:14px;color:var(--text2);}
         .t-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
         .t-card{background:var(--bg);border:1px solid var(--border-l);border-radius:var(--rl);padding:24px 18px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block;}
         .t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .3s;}
-        .t-card:hover{border-color:var(--border);box-shadow:0 8px 28px rgba(0,0,0,.06);transform:translateY(-3px);}
-        .t-card:hover::before{opacity:1;}
-        .t-card-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px;transition:transform .3s;}
-        .t-card:hover .t-card-ic{transform:scale(1.08);}
-        .t-card h3{font-size:13px;font-weight:700;margin-bottom:3px;}
-        .t-card p{font-size:11px;color:var(--text3);line-height:1.5;}
-        .t-card-arr{position:absolute;top:24px;right:16px;width:24px;height:24px;border-radius:50%;background:var(--bg-s);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);opacity:0;transform:translateX(-4px);transition:all .3s;}
-        .t-card:hover .t-card-arr{opacity:1;transform:translateX(0);}
+        .t-card:hover{border-color:var(--border);box-shadow:0 8px 28px rgba(0,0,0,.06);transform:translateY(-3px);}.t-card:hover::before{opacity:1;}
+        .t-card-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px;transition:transform .3s;}.t-card:hover .t-card-ic{transform:scale(1.08);}
+        .t-card h3{font-size:13px;font-weight:700;margin-bottom:3px;}.t-card p{font-size:11px;color:var(--text3);line-height:1.5;}
+        .t-card-arr{position:absolute;top:24px;right:16px;width:24px;height:24px;border-radius:50%;background:var(--bg-s);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);opacity:0;transform:translateX(-4px);transition:all .3s;}.t-card:hover .t-card-arr{opacity:1;transform:translateX(0);}
 
-        /* === STEPS === */
-        .steps-sec{background:var(--bg-s);padding:64px 24px;}
-        .steps-in{max-width:860px;margin:0 auto;}
+        .steps-sec{background:var(--bg-s);padding:64px 24px;}.steps-in{max-width:860px;margin:0 auto;}
         .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px;}
         .step{text-align:center;position:relative;}
         .step:not(:last-child)::after{content:'';position:absolute;top:26px;left:calc(50% + 32px);width:calc(100% - 64px);height:2px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);}
         .step-n{width:52px;height:52px;border-radius:50%;background:var(--blue);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 14px rgba(11,60,125,.2);}
-        .step h3{font-size:14px;font-weight:700;margin-bottom:5px;}
-        .step p{font-size:12px;color:var(--text2);line-height:1.5;}
+        .step h3{font-size:14px;font-weight:700;margin-bottom:5px;}.step p{font-size:12px;color:var(--text2);line-height:1.5;}
 
-        /* === FEATURES === */
-        .feat-sec{max-width:1200px;margin:0 auto;padding:64px 24px;}
-        .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-        .feat-card{padding:28px;border-radius:var(--rl);border:1px solid var(--border-l);transition:all .3s;}
-        .feat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:var(--border);}
+        .feat-sec{max-width:1200px;margin:0 auto;padding:64px 24px;}.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+        .feat-card{padding:28px;border-radius:var(--rl);border:1px solid var(--border-l);transition:all .3s;}.feat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.05);border-color:var(--border);}
         .feat-ic{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px;}
-        .feat-card h3{font-size:14px;font-weight:700;margin-bottom:5px;}
-        .feat-card p{font-size:12px;color:var(--text2);line-height:1.6;}
+        .feat-card h3{font-size:14px;font-weight:700;margin-bottom:5px;}.feat-card p{font-size:12px;color:var(--text2);line-height:1.6;}
 
-        /* === CTA === */
         .cta-ban{max-width:1200px;margin:0 auto 64px;padding:0 24px;}
         .cta-in{background:var(--blue);border-radius:var(--rxl);padding:44px 44px;display:flex;align-items:center;justify-content:space-between;gap:28px;position:relative;overflow:hidden;}
         .cta-in::before{content:'';position:absolute;top:-40%;right:-10%;width:400px;height:400px;background:rgba(255,255,255,.05);border-radius:50%;}
-        .cta-t{position:relative;z-index:1;}
-        .cta-t h2{font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;}
-        .cta-t p{font-size:14px;color:rgba(255,255,255,.7);}
+        .cta-t{position:relative;z-index:1;}.cta-t h2{font-size:24px;font-weight:800;color:#fff;margin-bottom:4px;}.cta-t p{font-size:14px;color:rgba(255,255,255,.7);}
         .cta-bw{position:relative;z-index:1;flex-shrink:0;}
+        .btn-w{background:#fff;color:var(--blue);padding:14px 28px;font-weight:700;font-size:15px;border-radius:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}.btn-w:hover{background:var(--bg-s);transform:translateY(-2px);}
+        .btn-green{background:var(--green);color:#fff;padding:14px 44px;font-size:16px;border-radius:11px;box-shadow:0 4px 14px rgba(52,168,83,.25);}.btn-green:hover{background:#2d9249;transform:translateY(-2px);}
 
-        /* === FOOTER === */
         .site-footer{background:var(--bg-s);border-top:1px solid var(--border-l);padding:40px 24px 24px;}
         .footer-in{max-width:1200px;margin:0 auto;}
         .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;}
         .footer-brand p{font-size:12px;color:var(--text3);line-height:1.6;margin-top:8px;}
         .footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:12px;}
-        .footer-col a{display:block;font-size:12px;color:var(--text2);text-decoration:none;padding:2px 0;transition:color .2s;}
-        .footer-col a:hover{color:var(--blue);}
+        .footer-col a{display:block;font-size:12px;color:var(--text2);text-decoration:none;padding:2px 0;transition:color .2s;}.footer-col a:hover{color:var(--blue);}
         .footer-bottom{border-top:1px solid var(--border-l);padding-top:18px;display:flex;align-items:center;justify-content:space-between;}
         .footer-bottom p{font-size:11px;color:var(--text3);}
         .footer-soc{display:flex;gap:10px;}
         .footer-soc a{width:32px;height:32px;border-radius:7px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);text-decoration:none;font-size:12px;transition:all .2s;}
         .footer-soc a:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
 
-        /* === TOAST === */
         .toast-c{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
         .toast{padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);min-width:260px;background:#fff;}
         .toast.show{transform:translateX(0);opacity:1;}
-        .toast-success{border:1px solid var(--green);color:var(--green);}
-        .toast-error{border:1px solid var(--red);color:var(--red);}
-        .toast-info{border:1px solid var(--blue);color:var(--blue);}
+        .toast-success{border:1px solid var(--green);color:var(--green);}.toast-error{border:1px solid var(--red);color:var(--red);}.toast-info{border:1px solid var(--blue);color:var(--blue);}
+        .reveal{opacity:0;transform:translateY(20px);transition:all .6s cubic-bezier(.4,0,.2,1);}.reveal.visible{opacity:1;transform:translateY(0);}
 
-        /* === REVEAL === */
-        .reveal{opacity:0;transform:translateY(20px);transition:all .6s cubic-bezier(.4,0,.2,1);}
-        .reveal.visible{opacity:1;transform:translateY(0);}
-
-        /* === BTN GEN === */
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);text-decoration:none;white-space:nowrap;}
-        .btn-p{background:var(--blue);color:#fff;padding:10px 22px;box-shadow:0 2px 8px rgba(11,60,125,.2);}
-        .btn-p:hover{background:var(--blue-l);transform:translateY(-1px);}
-        .btn-d{background:transparent;color:var(--text3);padding:10px 14px;}
-        .btn-d:hover{color:var(--red);background:var(--red-bg);}
-        .btn-o{background:transparent;color:var(--text2);padding:10px 20px;border:1.5px solid var(--border);}
-        .btn-o:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
-        .btn-lg{padding:14px 36px;font-size:15px;border-radius:11px;}
-        .btn-green{background:var(--green);color:#fff;padding:14px 44px;font-size:16px;border-radius:11px;box-shadow:0 4px 14px rgba(52,168,83,.25);}
-        .btn-green:hover{background:#2d9249;transform:translateY(-2px);box-shadow:0 8px 20px rgba(52,168,83,.3);}
-        .btn-w{background:#fff;color:var(--blue);padding:12px 28px;font-weight:700;font-size:15px;border-radius:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
-        .btn-w:hover{background:var(--bg-s);transform:translateY(-2px);}
-
-        /* === MOBILE NAV DROPDOWN === */
-        .nav-more{display:none;position:relative;}
-        .nav-more-menu{
-            position:absolute;top:calc(100% + 8px);right:0;
-            background:#fff;border:1px solid var(--border);border-radius:var(--rl);
-            box-shadow:0 12px 40px rgba(0,0,0,.12);
-            padding:8px;min-width:200px;
-            opacity:0;pointer-events:none;transform:translateY(-8px);
-            transition:all .25s cubic-bezier(.4,0,.2,1);z-index:200;
-        }
-        .nav-more-menu.open{opacity:1;pointer-events:all;transform:translateY(0);}
-        .nav-more-item{
-            display:flex;align-items:center;gap:10px;
-            padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;
-            color:var(--text2);cursor:pointer;transition:all .15s;border:none;background:none;
-            width:100%;text-align:left;font-family:inherit;
-        }
-        .nav-more-item:hover{background:var(--blue-bg);color:var(--blue);}
-        .nav-more-item i{width:18px;text-align:center;font-size:14px;}
-        .nav-more-item .dot{width:8px;height:8px;border-radius:50%;}
-
-        /* === RESPONSIVE === */
-        @media(max-width:1024px){
-            .nav-tool-btn.hide-md{display:none;}
-            .nav-more{display:block;}
-            .t-grid{grid-template-columns:repeat(3,1fr);}
-            .feat-grid{grid-template-columns:repeat(2,1fr);}
-            .footer-grid{grid-template-columns:2fr 1fr 1fr;}
-        }
+        @media(max-width:1024px){.nav-more{display:block;}.nav-tool-btn.hide-md{display:none;}.t-grid{grid-template-columns:repeat(3,1fr);}.feat-grid{grid-template-columns:repeat(2,1fr);}.footer-grid{grid-template-columns:2fr 1fr 1fr;}.hero-inner{gap:40px;}.tools-panel-grid{grid-template-columns:repeat(3,1fr);}}
         @media(max-width:768px){
-            .nav-tool-btn.hide-sm{display:none;}
-            .t-grid{grid-template-columns:repeat(2,1fr);}
-            .feat-grid{grid-template-columns:1fr;}
-            .steps-grid{grid-template-columns:1fr;gap:24px;}
-            .step:not(:last-child)::after{display:none;}
-            .cta-in{flex-direction:column;text-align:center;padding:32px 20px;}
-            .footer-grid{grid-template-columns:1fr 1fr;}
-            .footer-bottom{flex-direction:column;gap:12px;text-align:center;}
-            .hero h1{font-size:24px;}.hero>p{font-size:13px;}
-            .fmt-sel{gap:5px;}.fmt-chip{padding:5px 10px;font-size:11px;}
-            .result-card{padding:32px 20px;}.progress-card{padding:36px 20px;}
+            .nav-tool-btn.hide-sm{display:none;}.hero-inner{flex-direction:column;text-align:center;padding:40px 0;}.hero-text p{margin-left:auto;margin-right:auto;}.hero-btns{justify-content:center;}.hero-mockup{max-width:360px;}.t-grid{grid-template-columns:repeat(2,1fr);}.feat-grid{grid-template-columns:1fr;}.steps-grid{grid-template-columns:1fr;gap:24px;}.step:not(:last-child)::after{display:none;}.cta-in{flex-direction:column;text-align:center;padding:32px 20px;}.footer-grid{grid-template-columns:1fr 1fr;}.footer-bottom{flex-direction:column;gap:12px;text-align:center;}.tools-panel-grid{grid-template-columns:1fr 1fr;}.conv-icons{gap:16px;}.conv-file-icon-circle{width:64px;height:64px;font-size:24px;}.conv-file-icon-circle .face{font-size:28px;}.result-card{flex-direction:column;}.result-left{border-right:none;border-bottom:1px solid var(--border-l);max-height:160px;}.result-right{width:100%;}.result-actions{flex-direction:row;justify-content:center;}.conv-header h1{font-size:24px;}
         }
-        @media(max-width:480px){.t-grid{grid-template-columns:1fr;}}
+        @media(max-width:480px){.t-grid{grid-template-columns:1fr;}.tools-panel-grid{grid-template-columns:1fr;}.result-actions{flex-direction:column;}}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
-        ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg-s);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:var(--text3);}
+        ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg-s);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
     </style>
 </head>
 <body>
 
 <div class="toast-c" id="toastC"></div>
 
-<!-- NAV SMALLPDF STYLE -->
-<nav class="site-nav">
+<!-- NAV -->
+<nav class="site-nav" id="siteNav">
     <div class="nav-inner">
-        <a href="#" class="nav-logo">
-            <div class="nav-logo-ic"><i class="fas fa-file-pdf"></i></div>
-            <div class="nav-logo-t">Doc<span>Flow</span></div>
-        </a>
-
-        <div class="nav-tools" id="navTools">
-            <!-- Outils (dropdown sur mobile) -->
-            <button class="nav-tool-btn" onclick="toggleMore()">
-                Outils <i class="fas fa-chevron-down caret"></i>
-            </button>
-            <button class="nav-tool-btn hide-sm" onclick="pickTool('compress')">
-                <span class="dot" style="background:#34A853;"></span> Compresser
-            </button>
-            <button class="nav-tool-btn" onclick="pickTool('word')">
-                <span class="dot" style="background:#2b579a;"></span> Convertir
-            </button>
-            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('merge')">
-                <span class="dot" style="background:#8430CE;"></span> Fusionner
-            </button>
-            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('edit')">
-                <span class="dot" style="background:#FF5722;"></span> Modifier
-            </button>
-            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('sign')">
-                <span class="dot" style="background:#0B3C7D;"></span> Signer
-            </button>
+        <a href="#" class="nav-logo" onclick="goHome();return false;"><div class="nav-logo-ic"><i class="fas fa-file-pdf"></i></div><div class="nav-logo-t">Doc<span>Flow</span></div></a>
+        <div class="nav-tools">
+            <button class="nav-tool-btn" id="toolsToggle" onclick="toggleToolsPanel()"><i class="fas fa-th-large" style="font-size:13px;"></i> Outils <i class="fas fa-chevron-down caret"></i></button>
+            <button class="nav-tool-btn hide-sm" onclick="pickTool('compress')"><span class="dot" style="background:#34A853;"></span> Compresser</button>
+            <button class="nav-tool-btn" onclick="pickTool('word')"><span class="dot" style="background:#2b579a;"></span> Convertir</button>
+            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('merge')"><span class="dot" style="background:#8430CE;"></span> Fusionner</button>
+            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('edit')"><span class="dot" style="background:#FF5722;"></span> Modifier</button>
+            <button class="nav-tool-btn hide-sm hide-md" onclick="pickTool('sign')"><span class="dot" style="background:#0B3C7D;"></span> Signer</button>
         </div>
-
-        <div class="nav-right">
-            <button class="nav-cta" onclick="pickTool('word')">
-                <i class="fas fa-upload"></i> Convertir
-            </button>
-        </div>
-    </div>
-
-    <!-- Dropdown "Outils" -->
-    <div class="nav-more-menu" id="moreMenu">
-        <button class="nav-more-item" onclick="pickTool('compress');closeMore()"><span class="dot" style="background:#34A853;"></span> Compresser PDF</button>
-        <button class="nav-more-item" onclick="pickTool('word');closeMore()"><span class="dot" style="background:#2b579a;"></span> Convertir PDF</button>
-        <button class="nav-more-item" onclick="pickTool('merge');closeMore()"><span class="dot" style="background:#8430CE;"></span> Fusionner PDF</button>
-        <button class="nav-more-item" onclick="pickTool('split');closeMore()"><span class="dot" style="background:#E91E63;"></span> Diviser PDF</button>
-        <button class="nav-more-item" onclick="pickTool('edit');closeMore()"><span class="dot" style="background:#FF5722;"></span> Modifier PDF</button>
-        <button class="nav-more-item" onclick="pickTool('sign');closeMore()"><span class="dot" style="background:#0B3C7D;"></span> Signer PDF</button>
-        <button class="nav-more-item" onclick="pickTool('protect');closeMore()"><span class="dot" style="background:#F9AB00;"></span> Protéger PDF</button>
-        <button class="nav-more-item" onclick="pickTool('jpg');closeMore()"><span class="dot" style="background:#e67e22;"></span> PDF vers JPG</button>
-        <button class="nav-more-item" onclick="pickTool('excel');closeMore()"><span class="dot" style="background:#217346;"></span> PDF vers Excel</button>
-        <button class="nav-more-item" onclick="pickTool('ppt');closeMore()"><span class="dot" style="background:#d24726;"></span> PDF vers PPT</button>
-        <button class="nav-more-item" onclick="pickTool('word2pdf');closeMore()"><span class="dot" style="background:#1565C0;"></span> Word vers PDF</button>
-        <button class="nav-more-item" onclick="pickTool('watermark');closeMore()"><span class="dot" style="background:#9C27B0;"></span> Filigrane</button>
-        <button class="nav-more-item" onclick="pickTool('pagenums');closeMore()"><span class="dot" style="background:#607D8B;"></span> Numéros de page</button>
-        <button class="nav-more-item" onclick="pickTool('rotate');closeMore()"><span class="dot" style="background:#2196F3;"></span> Rotation</button>
+        <div class="nav-right"><button class="nav-cta" onclick="pickTool('word')"><i class="fas fa-upload"></i> Convertir</button></div>
     </div>
 </nav>
 
+<!-- TOOLS PANEL (dropdown) -->
+<div class="tools-panel" id="toolsPanel">
+    <div class="tools-panel-inner">
+        <div class="tools-panel-grid" id="toolsPanelGrid"></div>
+    </div>
+</div>
+
 <main>
-    <!-- Hero / Upload -->
-    <section class="hero" id="upload-section">
-        <div class="hero-in">
-            <div class="hero-badge"><i class="fas fa-circle"></i> 100% Gratuit — Aucune inscription</div>
-            <h1>Convertissez vos PDF<br>en quelques secondes</h1>
-            <p>Transformez vos documents PDF en Word, Excel, PowerPoint, images et bien plus.</p>
-
-            <!-- Upload view -->
-            <div id="uploadView">
-                <div class="fmt-sel" id="fmtSel">
-                    <button class="fmt-chip active" data-fmt="word"><i class="fas fa-file-word" style="color:#2b579a;"></i> Word</button>
-                    <button class="fmt-chip" data-fmt="excel"><i class="fas fa-file-excel" style="color:#217346;"></i> Excel</button>
-                    <button class="fmt-chip" data-fmt="ppt"><i class="fas fa-file-powerpoint" style="color:#d24726;"></i> PPT</button>
-                    <button class="fmt-chip" data-fmt="jpg"><i class="fas fa-file-image" style="color:#e67e22;"></i> JPG</button>
-                    <button class="fmt-chip" data-fmt="png"><i class="fas fa-image" style="color:#0d9488;"></i> PNG</button>
-                    <button class="fmt-chip" data-fmt="txt"><i class="fas fa-file-alt" style="color:#6b7280;"></i> TXT</button>
+    <!-- === HOME VIEW === -->
+    <div id="homeView">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="liquid-shapes">
+                <div class="liquid-blob b1"></div>
+                <div class="liquid-blob b2"></div>
+                <div class="liquid-blob b3"></div>
+                <div class="liquid-blob b4"></div>
+                <div class="liquid-mesh"></div>
+            </div>
+            <div class="hero-inner">
+                <div class="hero-text" id="heroText">
+                    <h1 id="heroTitle">Nous simplifions<br>la gestion de <em>PDF</em>.</h1>
+                    <p id="heroDesc">Nos outils boostent votre productivité et facilitent la gestion de vos documents au quotidien. Rapide, gratuit, sans inscription.</p>
+                    <div class="hero-btns">
+                        <button class="btn btn-p" onclick="pickTool('word')">Commencer l'essai gratuit</button>
+                        <button class="btn btn-o" onclick="toggleToolsPanel()">Parcourir tous les outils PDF</button>
+                    </div>
                 </div>
+                <div class="hero-mockup" id="heroMockup">
+                    <div class="mockup-card">
+                        <div class="mockup-toolbar">
+                            <div class="mockup-dot" style="background:#FF5F57;"></div>
+                            <div class="mockup-dot" style="background:#FEBC2E;"></div>
+                            <div class="mockup-dot" style="background:#28C840;"></div>
+                            <span style="flex:1;text-align:center;font-size:12px;color:var(--text3);font-weight:600;">DocFlow</span>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mockup-line" style="width:35%;background:var(--blue);height:12px;border-radius:6px;"></div>
+                            <div style="height:16px;"></div>
+                            <div class="mockup-line" style="width:100%;background:var(--border);"></div>
+                            <div class="mockup-line" style="width:90%;background:var(--border);"></div>
+                            <div class="mockup-line" style="width:75%;background:var(--border);"></div>
+                            <div class="mockup-line" style="width:95%;background:var(--border);"></div>
+                            <div style="height:12px;"></div>
+                            <div class="mockup-line" style="width:100%;background:var(--border);"></div>
+                            <div class="mockup-line" style="width:60%;background:var(--border);"></div>
+                            <div class="mockup-line" style="width:85%;background:var(--border);"></div>
+                            <div class="mockup-sig">DocFlow</div>
+                            <div class="mockup-stamp">VALIDÉ</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="Deposez votre PDF">
-                    <div class="drop-ic"><i class="fas fa-cloud-upload-alt"></i></div>
-                    <p class="drop-t">Glissez votre PDF ici</p>
-                    <p class="drop-sub">ou cliquez pour sélectionner un fichier</p>
-                    <div class="drop-hint"><i class="fas fa-info-circle"></i> PDF uniquement — Max 50 Mo</div>
+        <!-- Outils grid -->
+        <section class="tools-sec" id="toolsSection">
+            <div class="sec-hdr reveal"><h2>Tous nos outils PDF</h2><p>Sélectionnez l'outil adapté à votre besoin</p></div>
+            <div class="t-grid" id="tGrid"></div>
+        </section>
+
+        <!-- Comment ça marche -->
+        <section class="steps-sec" id="how">
+            <div class="steps-in">
+                <div class="sec-hdr reveal"><h2>Comment ça marche ?</h2><p>Trois étapes simples</p></div>
+                <div class="steps-grid">
+                    <div class="step reveal"><div class="step-n">1</div><h3>Déposez votre PDF</h3><p>Glissez-déposez ou cliquez</p></div>
+                    <div class="step reveal"><div class="step-n">2</div><h3>Choisissez le format</h3><p>Sélectionnez le format de sortie</p></div>
+                    <div class="step reveal"><div class="step-n">3</div><h3>Téléchargez</h3><p>Récupérez votre fichier converti</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Avantages -->
+        <section class="feat-sec" id="features">
+            <div class="sec-hdr reveal"><h2>Pourquoi choisir DocFlow ?</h2><p>Un convertisseur conçu pour vous</p></div>
+            <div class="feat-grid">
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--green-bg);color:var(--green);"><i class="fas fa-shield-alt"></i></div><h3>Sécurisé et privé</h3><p>Fichiers traités localement.</p></div>
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--orange-bg);color:var(--orange);"><i class="fas fa-bolt"></i></div><h3>Rapide et efficace</h3><p>Conversion instantanée.</p></div>
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--blue-bg);color:var(--blue);"><i class="fas fa-infinity"></i></div><h3>Totalement gratuit</h3><p>Aucune limite ni inscription.</p></div>
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--red-bg);color:var(--red);"><i class="fas fa-magic"></i></div><h3>Qualité préservée</h3><p>Mise en page conservée.</p></div>
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--purple-bg);color:var(--purple);"><i class="fas fa-mobile-alt"></i></div><h3>Multi-appareils</h3><p>PC, tablette, mobile.</p></div>
+                <div class="feat-card reveal"><div class="feat-ic" style="background:var(--teal-bg);color:var(--teal);"><i class="fas fa-layer-group"></i></div><h3>22 outils en un</h3><p>Convertir, fusionner, signer...</p></div>
+            </div>
+        </section>
+
+        <div class="cta-ban reveal">
+            <div class="cta-in">
+                <div class="cta-t"><h2>Prêt à convertir vos PDF ?</h2><p>Rejoignez des milliers d'utilisateurs.</p></div>
+                <div class="cta-bw"><a href="#" class="btn btn-w" onclick="pickTool('word');return false;"><i class="fas fa-rocket"></i> Commencer</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === CONVERSION VIEW === -->
+    <div id="convView" style="display:none;">
+        <div class="conv-page">
+            <!-- Upload -->
+            <div id="uploadStage">
+                <div class="conv-header" id="convHeader">
+                    <h1 id="convTitle">Convertir PDF en Word</h1>
+                    <p id="convDesc">Convertissez gratuitement vos PDF en documents Word modifiables en ligne. Sans inscription, sans filigrane.</p>
+                    <div class="conv-benefits">
+                        <div class="conv-benefit"><i class="fas fa-check-circle"></i> Conversion rapide</div>
+                        <div class="conv-benefit"><i class="fas fa-check-circle"></i> Accessible sur tous les appareils</div>
+                        <div class="conv-benefit"><i class="fas fa-check-circle"></i> Des millions d'utilisateurs</div>
+                    </div>
+                </div>
+                <div class="drop-zone-s" id="dropZone" tabindex="0" role="button" aria-label="Choisir un fichier">
+                    <button class="drop-btn" id="dropBtn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> CHOISIR LES FICHIERS
+                    </button>
+                    <p class="drop-or">ou déposer les fichiers ici</p>
+                    <p class="drop-sub">PDF uniquement — Max 50 Mo</p>
                     <input type="file" id="fileInput" accept=".pdf">
                 </div>
-
                 <div class="fl" id="fileList"></div>
-
                 <div class="cv-act" id="cvAct" style="display:none;">
-                    <button class="btn btn-p btn-lg" onclick="startConversion()"><i class="fas fa-bolt"></i> Convertir maintenant</button>
-                    <button class="btn btn-d btn-lg" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Effacer</button>
+                    <button class="btn btn-green" onclick="startConversion()"><i class="fas fa-bolt"></i> Convertir maintenant</button>
+                    <button class="btn btn-d" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Effacer</button>
                 </div>
             </div>
 
             <!-- Progress -->
-            <div class="progress-area" id="progressView">
-                <div class="progress-card">
-                    <div class="circle-wrap">
-                        <svg class="circle-svg" viewBox="0 0 110 110">
-                            <circle class="circle-bg" cx="55" cy="55" r="48"/>
-                            <circle class="circle-fill" id="circleFill" cx="55" cy="55" r="48" stroke-dasharray="301.59" stroke-dashoffset="301.59"/>
-                        </svg>
-                        <div class="circle-pct" id="circlePct">0%</div>
+            <div class="conv-area" id="progressStage">
+                <div class="conv-card">
+                    <div class="conv-icons">
+                        <div class="conv-file-icon">
+                            <div class="conv-file-icon-circle" style="background:var(--red-bg);color:var(--red);"><i class="fas fa-file-pdf"></i><span class="face">😊</span></div>
+                            <div class="conv-file-label" style="background:var(--red);">PDF</div>
+                        </div>
+                        <div class="conv-arrow"><i class="fas fa-arrow-right conv-arrow-icon"></i><div class="conv-loader"><div class="conv-loader-fill" id="convLoaderFill"></div></div></div>
+                        <div class="conv-file-icon">
+                            <div class="conv-file-icon-circle" id="dstIcon"><i class="fas fa-file-word"></i><span class="face">🤓</span></div>
+                            <div class="conv-file-label" id="dstLabel" style="background:var(--blue);">Word</div>
+                        </div>
                     </div>
-                    <h3 id="pTitle">Conversion en cours...</h3>
-                    <p class="p-sub" id="pSub">Veuillez patienter</p>
-                    <div class="progress-steps" id="pSteps">
-                        <div class="p-step" data-step="0"><i class="fas fa-circle"></i> Lecture du fichier PDF</div>
-                        <div class="p-step" data-step="1"><i class="fas fa-circle"></i> Analyse de la structure</div>
-                        <div class="p-step" data-step="2"><i class="fas fa-circle"></i> Extraction du contenu</div>
-                        <div class="p-step" data-step="3"><i class="fas fa-circle"></i> Génération du fichier de sortie</div>
-                        <div class="p-step" data-step="4"><i class="fas fa-circle"></i> Optimisation finale</div>
-                    </div>
+                    <div class="conv-filename" id="convFilename"></div>
+                    <div class="conv-status" id="convStatus"></div>
                 </div>
             </div>
 
             <!-- Result -->
-            <div class="result-area" id="resultView">
+            <div class="result-area" id="resultStage">
                 <div class="result-card">
-                    <div class="result-ok"><i class="fas fa-check"></i></div>
-                    <h2>Votre fichier est prêt</h2>
-                    <p class="sub">La conversion a été effectuée avec succès.</p>
-                    <div class="result-file" id="resultFile"></div>
-                    <div class="result-actions">
-                        <button class="btn btn-green" onclick="downloadResult()"><i class="fas fa-download"></i> Télécharger le fichier</button>
-                        <button class="btn btn-o" onclick="convertAnother()"><i class="fas fa-redo"></i> Convertir un autre fichier</button>
+                    <div class="result-left">
+                        <div class="result-left-tag">Aperçu</div>
+                        <div class="result-left-content" id="resultPreview"></div>
+                    </div>
+                    <div class="result-right">
+                        <div class="result-done" id="resultDone">C'est fait !</div>
+                        <div class="result-target-icon" id="resultIcon"><i class="fas fa-file-word"></i><span class="face">🤓</span></div>
+                        <div class="result-target-label" id="resultLabel" style="background:var(--blue);">Word</div>
+                        <div class="result-file-name" id="resultName"></div>
+                        <div class="result-file-size" id="resultSize"></div>
+                        <div class="result-actions">
+                            <button class="btn btn-p" style="width:100%;" onclick="downloadResult()"><i class="fas fa-download"></i> Télécharger</button>
+                            <button class="btn btn-o btn-sm" style="width:100%;" onclick="convertAnother()"><i class="fas fa-redo"></i> Convertir un autre fichier</button>
+                        </div>
+                        <button class="result-again" onclick="goHome()">Retour à l'accueil</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Outils -->
-    <section class="tools-sec" id="tools">
-        <div class="sec-hdr reveal"><h2>Tous nos outils PDF</h2><p>Sélectionnez l'outil adapté à votre besoin</p></div>
-        <div class="t-grid" id="tGrid"></div>
-    </section>
-
-    <!-- Comment ça marche -->
-    <section class="steps-sec" id="how">
-        <div class="steps-in">
-            <div class="sec-hdr reveal"><h2>Comment ça marche ?</h2><p>Trois étapes simples</p></div>
-            <div class="steps-grid">
-                <div class="step reveal"><div class="step-n">1</div><h3>Déposez votre PDF</h3><p>Glissez-déposez ou cliquez pour parcourir</p></div>
-                <div class="step reveal"><div class="step-n">2</div><h3>Choisissez le format</h3><p>Sélectionnez le format de sortie</p></div>
-                <div class="step reveal"><div class="step-n">3</div><h3>Téléchargez</h3><p>Récupérez votre fichier converti</p></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Avantages -->
-    <section class="feat-sec" id="features">
-        <div class="sec-hdr reveal"><h2>Pourquoi choisir DocFlow ?</h2><p>Un convertisseur conçu pour vous</p></div>
-        <div class="feat-grid">
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--green-bg);color:var(--green);"><i class="fas fa-shield-alt"></i></div><h3>Sécurisé et privé</h3><p>Fichiers traités localement, rien envoyé sur un serveur.</p></div>
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--orange-bg);color:var(--orange);"><i class="fas fa-bolt"></i></div><h3>Rapide et efficace</h3><p>Conversion instantanée grâce au traitement natif.</p></div>
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--blue-bg);color:var(--blue);"><i class="fas fa-infinity"></i></div><h3>Totalement gratuit</h3><p>Aucune limite, aucun abonnement, aucune inscription.</p></div>
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--red-bg);color:var(--red);"><i class="fas fa-magic"></i></div><h3>Qualité préservée</h3><p>Mise en page, polices et images conservées.</p></div>
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--purple-bg);color:var(--purple);"><i class="fas fa-mobile-alt"></i></div><h3>Multi-appareils</h3><p>PC, tablette, mobile. Aucune installation.</p></div>
-            <div class="feat-card reveal"><div class="feat-ic" style="background:var(--teal-bg);color:var(--teal);"><i class="fas fa-layer-group"></i></div><h3>22 outils en un</h3><p>Convertir, fusionner, diviser, compresser, signer.</p></div>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <div class="cta-ban reveal">
-        <div class="cta-in">
-            <div class="cta-t"><h2>Prêt à convertir vos PDF ?</h2><p>Rejoignez des milliers d'utilisateurs.</p></div>
-            <div class="cta-bw"><a href="#upload-section" class="btn btn-w"><i class="fas fa-rocket"></i> Commencer</a></div>
         </div>
     </div>
 </main>
@@ -467,106 +419,191 @@
 </footer>
 
 <script>
-// ===== TOOLS =====
-const tools=[
-    {n:'PDF vers Word',d:'Convertir en document Word éditable',ic:'fa-file-word',c:'#2b579a',bg:'rgba(43,87,154,.08)',fmt:'word'},
+// === COULEURS PAR OUTIL ===
+const TC={
+    word:{c:'#2b579a',bg:'rgba(43,87,154,.1)',label:'Word',icon:'fa-file-word',face:'🤓',title:'Convertir PDF en Word',desc:'Convertissez gratuitement vos PDF en documents Word modifiables en ligne. Sans inscription, sans filigrane.'},
+    excel:{c:'#217346',bg:'rgba(33,115,70,.1)',label:'Excel',icon:'fa-file-excel',face:'📊',title:'Convertir PDF en Excel',desc:'Transformez vos tableaux PDF en feuilles de calcul Excel modifiables. Rapide et gratuit.'},
+    ppt:{c:'#d24726',bg:'rgba(210,71,38,.1)',label:'PPT',icon:'fa-file-powerpoint',face:'🎯',title:'Convertir PDF en PowerPoint',desc:'Transformez vos PDF en présentations PowerPoint éditables. Gratuit et sans inscription.'},
+    jpg:{c:'#e67e22',bg:'rgba(230,126,34,.1)',label:'JPG',icon:'fa-file-image',face:'🖼️',title:'Convertir PDF en JPG',desc:'Exportez chaque page de votre PDF en image JPG haute définition.'},
+    png:{c:'#009688',bg:'rgba(0,150,136,.1)',label:'PNG',icon:'fa-image',face:'🖼️',title:'Convertir PDF en PNG',desc:'Conversion PNG haute résolution avec transparence pour chaque page.'},
+    txt:{c:'#6b7280',bg:'rgba(107,114,128,.1)',label:'TXT',icon:'fa-file-alt',face:'📝',title:'Convertir PDF en TXT',desc:'Extrayez le texte brut de vos documents PDF rapidement.'},
+    jpg2pdf:{c:'#EA4335',bg:'rgba(234,67,53,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Convertir JPG en PDF',desc:'Transformez vos images JPG en documents PDF professionnels.'},
+    merge:{c:'#8430CE',bg:'rgba(132,48,206,.1)',label:'PDF',icon:'fa-object-group',face:'🔗',title:'Fusionner des PDF',desc:'Combinez plusieurs fichiers PDF en un seul document. Simple et rapide.'},
+    split:{c:'#E91E63',bg:'rgba(233,30,99,.1)',label:'PDF',icon:'fa-cut',face:'✂️',title:'Diviser un PDF',desc:'Séparez un PDF en plusieurs fichiers individuels.'},
+    compress:{c:'#34A853',bg:'rgba(52,168,83,.1)',label:'PDF',icon:'fa-compress-arrows-alt',face:'📦',title:'Compresser un PDF',desc:'Réduisez la taille de vos fichiers PDF sans perdre en qualité.'},
+    ocr:{c:'#3F51B5',bg:'rgba(63,81,181,.1)',label:'Word',icon:'fa-eye',face:'👁️',title:'PDF vers Word (OCR)',desc:'Reconnaissance optique de caractères pour les PDF scannés.'},
+    edit:{c:'#FF5722',bg:'rgba(255,87,34,.1)',label:'PDF',icon:'fa-edit',face:'✏️',title:'Éditer un PDF',desc:'Modifiez le texte et les images de vos PDF directement en ligne.'},
+    sign:{c:'#0B3C7D',bg:'rgba(11,60,125,.1)',label:'PDF',icon:'fa-signature',face:'✍️',title:'Signer un PDF',desc:'Ajoutez votre signature électronique à vos documents PDF.'},
+    protect:{c:'#F9AB00',bg:'rgba(249,171,0,.1)',label:'PDF',icon:'fa-lock',face:'🔒',title:'Protéger un PDF',desc:'Ajoutez un mot de passe pour sécuriser votre document PDF.'},
+    pdfa:{c:'#795548',bg:'rgba(121,85,72,.1)',label:'PDF/A',icon:'fa-archive',face:'📚',title:'Convertir en PDF/A',desc:'Archivez vos PDF pour un stockage à long terme conforme.'},
+    rotate:{c:'#2196F3',bg:'rgba(33,150,243,.1)',label:'PDF',icon:'fa-sync-alt',face:'🔄',title:'Rotation PDF',desc:'Faire pivoter les pages de votre document PDF facilement.'},
+    pagenums:{c:'#607D8B',bg:'rgba(96,125,139,.1)',label:'PDF',icon:'fa-list-ol',face:'#️⃣',title:'Ajouter des numéros de page',desc:'Insérez automatiquement des numéros de page dans votre PDF.'},
+    watermark:{c:'#9C27B0',bg:'rgba(156,39,176,.1)',label:'PDF',icon:'fa-tint',face:'💧',title:'Ajouter un filigrane',desc:'Protégez vos documents avec un filigrane personnalisé.'},
+    unlock:{c:'#4CAF50',bg:'rgba(76,175,80,.1)',label:'PDF',icon:'fa-unlock-alt',face:'🔓',title:'Déverrouiller un PDF',desc:'Supprimez la protection d\'un PDF pour le modifier.'},
+    word2pdf:{c:'#1565C0',bg:'rgba(21,101,192,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Convertir Word en PDF',desc:'Transformez vos documents Word en PDF professionnels.'},
+    excel2pdf:{c:'#2E7D32',bg:'rgba(46,125,50,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Convertir Excel en PDF',desc:'Convertissez vos feuilles de calcul Excel en PDF.'},
+    ppt2pdf:{c:'#C62828',bg:'rgba(198,40,40,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Convertir PowerPoint en PDF',desc:'Transformez vos présentations PowerPoint en PDF.'},
+};
+const fmtExt={word:'.docx',excel:'.xlsx',ppt:'.pptx',jpg:'.jpg',png:'.png',txt:'.txt',jpg2pdf:'.pdf',merge:'_fusionne.pdf',split:'_page.pdf',compress:'_compressé.pdf',ocr:'.docx',edit:'_édité.pdf',sign:'_signé.pdf',protect:'_protégé.pdf',pdfa:'_PDF-A.pdf',rotate:'_rotaté.pdf',pagenums:'_paginé.pdf',watermark:'_filigrane.pdf',unlock:'_déverrouillé.pdf',word2pdf:'.pdf',excel2pdf:'.pdf',ppt2pdf:'.pdf'};
+
+const toolsList=[
+    {n:'PDF vers Word',d:'Convertir en document Word',ic:'fa-file-word',c:'#2b579a',bg:'rgba(43,87,154,.08)',fmt:'word'},
     {n:'PDF vers Excel',d:'Transformer en feuille de calcul',ic:'fa-file-excel',c:'#217346',bg:'rgba(33,115,70,.08)',fmt:'excel'},
     {n:'PDF vers PowerPoint',d:'Créer une présentation',ic:'fa-file-powerpoint',c:'#d24726',bg:'rgba(210,71,38,.08)',fmt:'ppt'},
-    {n:'PDF vers JPG',d:'Exporter chaque page en image',ic:'fa-file-image',c:'#e67e22',bg:'rgba(230,126,34,.08)',fmt:'jpg'},
-    {n:'JPG vers PDF',d:'Convertir des images en PDF',ic:'fa-image',c:'#0d9488',bg:'rgba(13,148,136,.08)',fmt:'jpg2pdf'},
-    {n:'PDF vers PNG',d:'Conversion PNG haute résolution',ic:'fa-file-image',c:'#009688',bg:'rgba(0,150,136,.08)',fmt:'png'},
-    {n:'Fusionner PDF',d:'Combiner plusieurs PDF en un',ic:'fa-object-group',c:'#8430CE',bg:'rgba(132,48,206,.08)',fmt:'merge'},
-    {n:'Diviser PDF',d:'Séparer un PDF en plusieurs fichiers',ic:'fa-cut',c:'#E91E63',bg:'rgba(233,30,99,.08)',fmt:'split'},
-    {n:'Compresser PDF',d:'Réduire la taille du fichier',ic:'fa-compress-arrows-alt',c:'#34A853',bg:'rgba(52,168,83,.08)',fmt:'compress'},
+    {n:'PDF vers JPG',d:'Exporter en image HD',ic:'fa-file-image',c:'#e67e22',bg:'rgba(230,126,34,.08)',fmt:'jpg'},
+    {n:'JPG vers PDF',d:'Images en PDF',ic:'fa-image',c:'#0d9488',bg:'rgba(13,148,136,.08)',fmt:'jpg2pdf'},
+    {n:'PDF vers PNG',d:'Conversion PNG',ic:'fa-file-image',c:'#009688',bg:'rgba(0,150,136,.08)',fmt:'png'},
+    {n:'Fusionner PDF',d:'Combiner plusieurs PDF',ic:'fa-object-group',c:'#8430CE',bg:'rgba(132,48,206,.08)',fmt:'merge'},
+    {n:'Diviser PDF',d:'Séparer un PDF',ic:'fa-cut',c:'#E91E63',bg:'rgba(233,30,99,.08)',fmt:'split'},
+    {n:'Compresser PDF',d:'Réduire la taille',ic:'fa-compress-arrows-alt',c:'#34A853',bg:'rgba(52,168,83,.08)',fmt:'compress'},
     {n:'PDF vers Word (OCR)',d:'Reconnaissance optique',ic:'fa-eye',c:'#3F51B5',bg:'rgba(63,81,181,.08)',fmt:'ocr'},
-    {n:'Éditer PDF',d:'Modifier le texte et les images',ic:'fa-edit',c:'#FF5722',bg:'rgba(255,87,34,.08)',fmt:'edit'},
-    {n:'Signer PDF',d:'Ajouter votre signature',ic:'fa-signature',c:'#0B3C7D',bg:'rgba(11,60,125,.08)',fmt:'sign'},
+    {n:'Éditer PDF',d:'Modifier texte et images',ic:'fa-edit',c:'#FF5722',bg:'rgba(255,87,34,.08)',fmt:'edit'},
+    {n:'Signer PDF',d:'Ajouter une signature',ic:'fa-signature',c:'#0B3C7D',bg:'rgba(11,60,125,.08)',fmt:'sign'},
     {n:'Protéger PDF',d:'Ajouter un mot de passe',ic:'fa-lock',c:'#F9AB00',bg:'rgba(249,171,0,.08)',fmt:'protect'},
-    {n:'PDF vers PDF/A',d:'Archivage à long terme',ic:'fa-archive',c:'#795548',bg:'rgba(121,85,72,.08)',fmt:'pdfa'},
+    {n:'PDF vers PDF/A',d:'Archivage long terme',ic:'fa-archive',c:'#795548',bg:'rgba(121,85,72,.08)',fmt:'pdfa'},
     {n:'Rotation PDF',d:'Faire pivoter les pages',ic:'fa-sync-alt',c:'#2196F3',bg:'rgba(33,150,243,.08)',fmt:'rotate'},
     {n:'Numéros de page',d:'Ajouter des numéros',ic:'fa-list-ol',c:'#607D8B',bg:'rgba(96,125,139,.08)',fmt:'pagenums'},
-    {n:'Filigrane',d:'Ajouter un filigrane',ic:'fa-tint',c:'#9C27B0',bg:'rgba(156,39,176,.08)',fmt:'watermark'},
+    {n:'Filigrane',d:'Filigrane personnalisé',ic:'fa-tint',c:'#9C27B0',bg:'rgba(156,39,176,.08)',fmt:'watermark'},
     {n:'Déverrouiller PDF',d:'Supprimer la protection',ic:'fa-unlock-alt',c:'#4CAF50',bg:'rgba(76,175,80,.08)',fmt:'unlock'},
-    {n:'Word vers PDF',d:'Convertir un document Word',ic:'fa-file-word',c:'#1565C0',bg:'rgba(21,101,192,.08)',fmt:'word2pdf'},
-    {n:'Excel vers PDF',d:'Convertir une feuille Excel',ic:'fa-file-excel',c:'#2E7D32',bg:'rgba(46,125,50,.08)',fmt:'excel2pdf'},
-    {n:'PowerPoint vers PDF',d:'Convertir une présentation',ic:'fa-file-powerpoint',c:'#C62828',bg:'rgba(198,40,40,.08)',fmt:'ppt2pdf'},
+    {n:'Word vers PDF',d:'Convertir Word en PDF',ic:'fa-file-word',c:'#1565C0',bg:'rgba(21,101,192,.08)',fmt:'word2pdf'},
+    {n:'Excel vers PDF',d:'Convertir Excel en PDF',ic:'fa-file-excel',c:'#2E7D32',bg:'rgba(46,125,50,.08)',fmt:'excel2pdf'},
+    {n:'PowerPoint vers PDF',d:'Convertir PPT en PDF',ic:'fa-file-powerpoint',c:'#C62828',bg:'rgba(198,40,40,.08)',fmt:'ppt2pdf'},
     {n:'PDF vers TXT',d:'Extraire le texte brut',ic:'fa-file-alt',c:'#6b7280',bg:'rgba(107,114,128,.08)',fmt:'txt'},
 ];
-const fmtExt={word:'.docx',excel:'.xlsx',ppt:'.pptx',jpg:'.jpg',png:'.png',txt:'.txt',jpg2pdf:'.pdf',merge:'_fusionne.pdf',split:'_page.pdf',compress:'_compressé.pdf',ocr:'.docx',edit:'_édité.pdf',sign:'_signé.pdf',protect:'_protégé.pdf',pdfa:'_PDF-A.pdf',rotate:'_rotaté.pdf',pagenums:'_paginé.pdf',watermark:'_filigrane.pdf',unlock:'_déverrouillé.pdf',word2pdf:'.pdf',excel2pdf:'.pdf',ppt2pdf:'.pdf'};
 
 let selFmt='word',files=[],converting=false,resultBlobs=[];
 
 document.addEventListener('DOMContentLoaded',()=>{
-    renderTools();setupDrop();setupChips();setupReveal();setupMoreClose();
+    renderAllTools();setupDrop();setupReveal();initLiquidGSAP();
 });
 
-// ===== NAV DROPDOWN =====
-function toggleMore(){
-    document.getElementById('moreMenu').classList.toggle('open');
-}
-function closeMore(){
-    document.getElementById('moreMenu').classList.remove('open');
-}
-function setupMoreClose(){
-    document.addEventListener('click',e=>{
-        const menu=document.getElementById('moreMenu');
-        if(menu.classList.contains('open')&&!e.target.closest('.nav-more')&&!e.target.closest('#moreMenu')){
-            menu.classList.remove('open');
-        }
+// === LIQUID GSAP ===
+function initLiquidGSAP(){
+    if(!window.gsap)return;
+    gsap.utils.toArray('.liquid-blob').forEach((b,i)=>{
+        gsap.to(b,{
+            x:()=>gsap.utils.random(-80,80),
+            y:()=>gsap.utils.random(-60,60),
+            scale:()=>gsap.utils.random(.85,1.2),
+            rotation:()=>gsap.utils.random(-8,8),
+            duration:()=>gsap.utils.random(6,14),
+            ease:'sine.inOut',
+            repeat:-1,
+            yoyo:true,
+            delay:i*1.5
+        });
     });
+    // Mockup parallax
+    gsap.to('#heroMockup',{y:-15,scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}});
+    gsap.from('#heroTitle',{opacity:0,y:40,duration:1,ease:'power3.out',delay:.2});
+    gsap.from('#heroDesc',{opacity:0,y:30,duration:1,ease:'power3.out',delay:.5});
+    gsap.from('.hero-btns',{opacity:0,y:20,duration:.8,ease:'power3.out',delay:.8});
+    gsap.from('#heroMockup',{opacity:0,x:60,rotation:4,duration:1.2,ease:'power3.out',delay:.3});
 }
 
-// ===== TOOLS RENDER =====
-function renderTools(){
-    const g=document.getElementById('tGrid');
-    g.innerHTML=tools.map((t,i)=>`
+// === TOOLS PANEL ===
+function toggleToolsPanel(){
+    const p=document.getElementById('toolsPanel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open')){
+        gsap.fromTo('#toolsPanelGrid .tp-item',{opacity:0,y:15},{opacity:1,y:0,stagger:.03,duration:.35,ease:'power2.out'});
+    }
+}
+
+function renderAllTools(){
+    const g1=document.getElementById('toolsPanelGrid');
+    const g2=document.getElementById('tGrid');
+    const panelHTML=toolsList.map(t=>`
+        <button class="tp-item" onclick="pickTool('${t.fmt}')">
+            <div class="tp-item-ic" style="background:${t.bg};color:${t.c};"><i class="fas ${t.ic}"></i></div>
+            <div class="tp-item-text"><h4>${t.n}</h4><p>${t.d}</p></div>
+        </button>`).join('');
+    g1.innerHTML=panelHTML;
+    g2.innerHTML=toolsList.map((t,i)=>`
         <div class="t-card reveal" onclick="pickTool('${t.fmt}')" style="transition-delay:${i*.025}s;" tabindex="0">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${t.c};border-radius:3px 3px 0 0;opacity:0;transition:opacity .3s;" class="cbar"></div>
             <div class="t-card-ic" style="background:${t.bg};color:${t.c};"><i class="fas ${t.ic}"></i></div>
             <div class="t-card-arr"><i class="fas fa-arrow-right"></i></div>
             <h3>${t.n}</h3><p>${t.d}</p>
         </div>`).join('');
-    g.querySelectorAll('.t-card').forEach(c=>{
+    g2.querySelectorAll('.t-card').forEach(c=>{
         c.addEventListener('mouseenter',()=>c.querySelector('.cbar').style.opacity='1');
         c.addEventListener('mouseleave',()=>c.querySelector('.cbar').style.opacity='0');
     });
 }
 
+// === NAVIGATION ===
 function pickTool(f){
     selFmt=f;
-    document.querySelectorAll('.fmt-chip').forEach(c=>c.classList.toggle('active',c.dataset.fmt===f));
-    closeMore();
-    document.getElementById('upload-section').scrollIntoView({behavior:'smooth'});
+    closeToolsPanel();
+    showConvPage(f);
 }
 
-// ===== CHIPS =====
-function setupChips(){
-    document.getElementById('fmtSel').addEventListener('click',e=>{
-        const c=e.target.closest('.fmt-chip');if(!c)return;
-        document.querySelectorAll('.fmt-chip').forEach(x=>x.classList.remove('active'));
-        c.classList.add('active');selFmt=c.dataset.fmt;renderFL();
-    });
+function goHome(){
+    document.getElementById('homeView').style.display='';
+    document.getElementById('convView').style.display='none';
+    window.scrollTo({top:0,behavior:'smooth'});
+    files=[];resultBlobs=[];
 }
 
-// ===== DROP =====
+function showConvPage(f){
+    document.getElementById('homeView').style.display='none';
+    document.getElementById('convView').style.display='';
+    files=[];resultBlobs=[];
+
+    const tc=TC[f]||TC.word;
+
+    // Header
+    document.getElementById('convTitle').textContent=tc.title;
+    document.getElementById('convDesc').textContent=tc.desc;
+
+    // Drop zone couleur
+    const dz=document.getElementById('dropZone');
+    dz.style.background=`linear-gradient(135deg,${tc.bg},${tc.bg.replace('.1','.05')})`;
+    dz.style.border=`2px solid ${tc.c}33`;
+    document.getElementById('dropBtn').style.background=tc.c;
+
+    // Reset stages
+    showStage('upload');
+    renderFL();
+    window.scrollTo({top:0,behavior:'smooth'});
+
+    // Animer l'entrée
+    if(window.gsap){
+        gsap.from('#convHeader',{opacity:0,y:20,duration:.6,ease:'power2.out'});
+        gsap.from('#dropZone',{opacity:0,scale:.96,duration:.5,ease:'power2.out',delay:.15});
+    }
+}
+
+function showStage(s){
+    document.getElementById('uploadStage').style.display=s==='upload'?'block':'none';
+    document.getElementById('progressStage').classList.toggle('show',s==='progress');
+    document.getElementById('resultStage').classList.toggle('show',s==='result');
+}
+
+function closeToolsPanel(){document.getElementById('toolsPanel').classList.remove('open');}
+document.addEventListener('click',e=>{
+    const p=document.getElementById('toolsPanel');
+    if(p.classList.contains('open')&&!e.target.closest('#toolsToggle')&&!e.target.closest('#toolsPanel'))p.classList.remove('open');
+});
+
+// === DROP ===
 function setupDrop(){
     const z=document.getElementById('dropZone'),inp=document.getElementById('fileInput');
-    z.addEventListener('click',()=>inp.click());
-    z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inp.click();}});
-    z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over');});
-    z.addEventListener('dragleave',()=>z.classList.remove('drag-over'));
-    z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('drag-over');addF(e.dataTransfer.files);});
+    z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('drag-over');z.style.transform='scale(1.02)';z.style.boxShadow=`0 16px 48px rgba(0,0,0,.15)`;});
+    z.addEventListener('dragleave',()=>{z.classList.remove('drag-over');z.style.transform='';z.style.boxShadow='';});
+    z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('drag-over');z.style.transform='';z.style.boxShadow='';addF(e.dataTransfer.files);});
     inp.addEventListener('change',e=>{addF(e.target.files);inp.value='';});
 }
 
 function addF(list){
     const arr=Array.from(list).filter(f=>{
-        if(!f.name.toLowerCase().endsWith('.pdf')&&f.type!=='application/pdf'){toast('Seuls les fichiers PDF sont acceptés','error');return false;}
-        if(f.size>50*1024*1024){toast('Le fichier dépasse 50 Mo','error');return false;}
+        if(!f.name.toLowerCase().endsWith('.pdf')&&f.type!=='application/pdf'){toast('Seuls les PDF sont acceptés','error');return false;}
+        if(f.size>50*1024*1024){toast('Fichier trop volumineux (max 50 Mo)','error');return false;}
         return true;
     });
     if(!arr.length)return;
-    if(files.length+arr.length>5){toast('Maximum 5 fichiers à la fois','info');return;}
+    if(files.length+arr.length>5){toast('Maximum 5 fichiers','info');return;}
     files.push(...arr);renderFL();toast(`${arr.length} fichier(s) ajouté(s)`,'success');
 }
 
@@ -578,7 +615,7 @@ function renderFL(){
     c.innerHTML=files.map((f,i)=>`
         <div class="fi">
             <div class="fi-ic"><i class="fas fa-file-pdf"></i></div>
-            <div class="fi-info"><div class="fi-name">${f.name}</div><div class="fi-meta">${fmtS(f.size)} <span class="arr">→</span> <span class="tgt">${ext}</span></div></div>
+            <div class="fi-info"><div class="fi-name">${f.name}</div><div class="fi-meta">${fmtS(f.size)} → <span style="color:${(TC[selFmt]||TC.word).c};font-weight:600;">${ext}</span></div></div>
             <button class="fi-rm" onclick="rmF(${i})" aria-label="Supprimer"><i class="fas fa-times"></i></button>
         </div>`).join('');
 }
@@ -587,119 +624,72 @@ function rmF(i){files.splice(i,1);renderFL();}
 function clearAll(){files=[];renderFL();toast('Fichiers supprimés','info');}
 function fmtS(b){if(b<1024)return b+' o';if(b<1048576)return(b/1024).toFixed(1)+' Ko';return(b/1048576).toFixed(1)+' Mo';}
 
-// ===== VUES =====
-function showView(v){
-    document.getElementById('uploadView').style.display=v==='upload'?'block':'none';
-    document.getElementById('progressView').classList.toggle('show',v==='progress');
-    document.getElementById('resultView').classList.toggle('show',v==='result');
-}
-
-// ===== CONVERSION CERCLE =====
+// === CONVERSION ===
 function startConversion(){
     if(!files.length||converting)return;
-    converting=true;resultBlobs=[];
-    showView('progress');
+    converting=true;resultBlobs=[];showStage('progress');
+    const dst=TC[selFmt]||TC.word;const file=files[0];
 
-    const circle=document.getElementById('circleFill');
-    const pctEl=document.getElementById('circlePct');
-    const title=document.getElementById('pTitle');
-    const sub=document.getElementById('pSub');
-    const steps=document.querySelectorAll('#pSteps .p-step');
-    const circ=2*Math.PI*48;
+    const di=document.getElementById('dstIcon');
+    di.style.background=dst.bg;di.style.color=dst.c;
+    di.innerHTML=`<i class="fas ${dst.icon}"></i><span class="face">${dst.face}</span>`;
+    document.getElementById('dstLabel').style.background=dst.c;
+    document.getElementById('dstLabel').textContent=dst.label;
+    document.getElementById('convLoaderFill').style.background=dst.c;
+    document.getElementById('convFilename').textContent=`${file.name} (${fmtS(file.size)})`;
+    document.getElementById('convStatus').textContent=`Conversion en ${dst.label}...`;
+    document.getElementById('convStatus').style.color=dst.c;
 
-    circle.style.strokeDashoffset=circ;
-    pctEl.textContent='0%';
-    title.textContent='Conversion en cours...';
-    sub.textContent='Veuillez patienter';
-    steps.forEach(s=>{s.className='p-step';s.querySelector('i').className='fas fa-circle';});
+    if(window.gsap){gsap.from('.conv-card',{opacity:0,scale:.95,duration:.5,ease:'power2.out'});}
 
-    const thresh=[0,20,40,60,80];
     let cur=0;
-
     const iv=setInterval(()=>{
-        cur=Math.min(cur+Math.random()*3+1.5,100);
-        circle.style.strokeDashoffset=circ-(cur/100)*circ;
-        pctEl.textContent=Math.round(cur)+'%';
-
-        let cs=-1;
-        for(let i=thresh.length-1;i>=0;i--){if(cur>=thresh[i]){cs=i;break;}}
-
-        steps.forEach((s,i)=>{
-            if(i<cs){s.className='p-step done';s.querySelector('i').className='fas fa-check-circle';}
-            else if(i===cs){s.className='p-step active';s.querySelector('i').className='fas fa-spinner fa-spin';}
-            else{s.className='p-step';s.querySelector('i').className='fas fa-circle';}
-        });
-
-        const subs=['Lecture du fichier PDF...','Analyse de la structure...','Extraction du contenu...','Génération du fichier de sortie...','Optimisation finale...'];
-        if(cs>=0&&cs<subs.length)sub.textContent=subs[cs];
-
-        if(cur>=100){
-            clearInterval(iv);
-            steps.forEach(s=>{s.className='p-step done';s.querySelector('i').className='fas fa-check-circle';});
-            sub.textContent='Terminé !';pctEl.textContent='100%';circle.style.strokeDashoffset=0;
-            setTimeout(()=>{converting=false;prepareResult();showView('result');},800);
-        }
-    },60);
+        cur=Math.min(cur+Math.random()*4+1.5,100);
+        document.getElementById('convLoaderFill').style.width=cur+'%';
+        if(cur>=100){clearInterval(iv);document.getElementById('convStatus').textContent='Terminé !';setTimeout(()=>{converting=false;prepareResult();showStage('result');},600);}
+    },55);
 }
 
-// ===== RESULTAT =====
+// === RÉSULTAT ===
 function prepareResult(){
-    resultBlobs=[];
-    const ext=fmtExt[selFmt]||'.pdf';
-    files.forEach(file=>{
-        const base=file.name.replace(/\.pdf$/i,''),outName=base+ext;
-        if(selFmt==='txt'){
-            const txt=`Document converti depuis : ${file.name}\n${'='.repeat(50)}\nFormat : Texte brut\nTaille : ${fmtS(file.size)}\nDate : ${new Date().toLocaleString('fr-FR')}\n${'='.repeat(50)}\n\n[Le contenu extrait apparaîtrait ici en production.]\n`;
-            resultBlobs.push({blob:new Blob([txt],{type:'text/plain'}),name:outName,size:txt.length});
-        }else if(selFmt==='jpg'||selFmt==='png'){
-            const cv=document.createElement('canvas');cv.width=794;cv.height=1123;
-            const ctx=cv.getContext('2d');
-            ctx.fillStyle='#fff';ctx.fillRect(0,0,794,1123);
-            ctx.fillStyle='#0B3C7D';ctx.fillRect(0,0,794,70);
-            ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.fillText('DocFlow — '+base,32,44);
-            ctx.fillStyle='#333';ctx.font='16px sans-serif';ctx.fillText(base,32,120);
-            ctx.fillStyle='#bbb';for(let i=0;i<32;i++)ctx.fillRect(32,150+i*28,200+Math.random()*500,6);
-            ctx.fillStyle='#ccc';ctx.font='11px sans-serif';ctx.fillText('Généré par DocFlow — '+new Date().toLocaleDateString('fr-FR'),32,1095);
-            cv.toBlob(b=>{if(b)resultBlobs.push({blob:b,name:outName,size:b.size});},selFmt==='jpg'?'image/jpeg':'image/png',.92);
-        }else{
-            const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${base}</title><style>body{font-family:Calibri,sans-serif;margin:48px;color:#222;line-height:1.7;}h1{color:#0B3C7D;border-bottom:2px solid #0B3C7D;padding-bottom:10px;}.meta{color:#888;font-size:13px;margin:16px 0 32px;}</style></head><body><h1>${base}</h1><div class="meta"><p>Source : ${file.name} (${fmtS(file.size)})</p><p>Converti : ${new Date().toLocaleString('fr-FR')}</p></div><hr><p><em>Converti avec DocFlow.</em></p></body></html>`;
-            const b=new Blob([html],{type:'text/html'});
-            resultBlobs.push({blob:b,name:outName,size:b.size});
-        }
-    });
-    const rf=document.getElementById('resultFile');
-    if(resultBlobs.length===1){
-        const r=resultBlobs[0];
-        rf.innerHTML=`<div class="result-file-ic"><i class="fas fa-file-alt"></i></div><div class="result-file-info"><div class="result-file-name">${r.name}</div><div class="result-file-size">${fmtS(r.size)}</div></div>`;
-    }else{
-        rf.innerHTML=`<div class="result-file-ic"><i class="fas fa-files"></i></div><div class="result-file-info"><div class="result-file-name">${resultBlobs.length} fichiers prêts</div><div class="result-file-size">Cliquez pour tout télécharger</div></div>`;
-    }
+    resultBlobs=[];const dst=TC[selFmt]||TC.word;const ext=fmtExt[selFmt]||'.pdf';
+    const file=files[0];const base=file.name.replace(/\.pdf$/i,'');const outName=base+ext;
+
+    const ri=document.getElementById('resultIcon');ri.style.background=dst.bg;ri.style.color=dst.c;
+    ri.innerHTML=`<i class="fas ${dst.icon}"></i><span class="face">${dst.face}</span>`;
+    document.getElementById('resultLabel').style.background=dst.c;document.getElementById('resultLabel').textContent=dst.label;
+    document.getElementById('resultDone').style.color=dst.c;
+    document.getElementById('resultDone').textContent="C'est fait !";
+    document.getElementById('resultName').textContent=outName;
+
+    const lines=[`Fichier source : ${file.name}`,`Format : PDF → ${dst.label}`,`Taille : ${fmtS(file.size)}`,`Date : ${new Date().toLocaleString('fr-FR')}`,'','— — — — — — — — — —','','Contenu converti :','Votre texte extrait apparaîtrait ici.','Lorem ipsum dolor sit amet.','Sed do eiusmod tempor incididunt.','Ut enim ad minim veniam.'];
+    document.getElementById('resultPreview').innerHTML=lines.map(l=>`<div class="rl-line">${l||'&nbsp;'}</div>`).join('');
+
+    if(selFmt==='txt'){const t=lines.join('\n');resultBlobs.push({blob:new Blob([t],{type:'text/plain'}),name:outName,size:t.length});}
+    else if(selFmt==='jpg'||selFmt==='png'){const cv=document.createElement('canvas');cv.width=794;cv.height=1123;const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,794,1123);ctx.fillStyle=dst.c;ctx.fillRect(0,0,794,70);ctx.fillStyle='#fff';ctx.font='bold 20px sans-serif';ctx.fillText('DocFlow — '+base,32,44);ctx.fillStyle='#bbb';for(let i=0;i<32;i++)ctx.fillRect(32,150+i*28,200+Math.random()*500,6);cv.toBlob(b=>{if(b)resultBlobs.push({blob:b,name:outName,size:b.size});},selFmt==='jpg'?'image/jpeg':'image/png',.92);}
+    else{const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${base}</title><style>body{font-family:Calibri,sans-serif;margin:48px;color:#222;line-height:1.7;}h1{color:${dst.c};border-bottom:2px solid ${dst.c};padding-bottom:10px;}.meta{color:#888;font-size:13px;margin:16px 0 32px;}</style></head><body><h1>${base}</h1><div class="meta"><p>Source : ${file.name}</p><p>Converti : ${new Date().toLocaleString('fr-FR')}</p></div><hr><p><em>Converti avec DocFlow.</em></p></body></html>`;const b=new Blob([html],{type:'text/html'});resultBlobs.push({blob:b,name:outName,size:b.length});}
+
+    setTimeout(()=>{if(resultBlobs.length)document.getElementById('resultSize').textContent=fmtS(resultBlobs[0].size);},selFmt==='jpg'||selFmt==='png'?300:10);
+    if(window.gsap){gsap.from('.result-card',{opacity:0,y:20,duration:.5,ease:'power2.out'});}
 }
 
 function downloadResult(){
-    resultBlobs.forEach(r=>{
-        const u=URL.createObjectURL(r.blob);
-        const a=document.createElement('a');a.href=u;a.download=r.name;
-        document.body.appendChild(a);a.click();document.body.removeChild(a);
-        setTimeout(()=>URL.revokeObjectURL(u),5000);
-    });
+    resultBlobs.forEach(r=>{const u=URL.createObjectURL(r.blob);const a=document.createElement('a');a.href=u;a.download=r.name;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(u),5000);});
     toast(`${resultBlobs.length} fichier(s) téléchargé(s)`,'success');
 }
 
-function convertAnother(){files=[];resultBlobs=[];renderFL();showView('upload');}
+function convertAnother(){files=[];resultBlobs=[];renderFL();showStage('upload');}
 
-// ===== TOAST =====
+// === TOAST ===
 function toast(msg,type='info'){
     const c=document.getElementById('toastC'),el=document.createElement('div');
     const icons={success:'fa-check-circle',error:'fa-exclamation-circle',info:'fa-info-circle'};
-    el.className=`toast toast-${type}`;
-    el.innerHTML=`<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
-    c.appendChild(el);
-    requestAnimationFrame(()=>el.classList.add('show'));
+    el.className=`toast toast-${type}`;el.innerHTML=`<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+    c.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
     setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),400);},3200);
 }
 
-// ===== REVEAL =====
+// === REVEAL ===
 function setupReveal(){
     const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('visible');obs.unobserve(x.target);}});},{threshold:.06,rootMargin:'0px 0px -20px 0px'});
     document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
