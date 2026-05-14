@@ -1,21 +1,1321 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>TEST</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocFlow — Convertisseur PDF Gratuit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{--blue:#0B3C7D;--blue-l:#2E6BC6;--blue-bg:#E8F0FE;--green:#34A853;--green-bg:#E6F4EA;--red:#EA4335;--red-bg:#FCE8E6;--orange:#F9AB00;--orange-bg:#FEF7E0;--purple:#8430CE;--purple-bg:#F3E8FD;--teal:#0D9488;--teal-bg:#CCFBF1;--pink:#E91E63;--pink-bg:#FCE4EC;--indigo:#3F51B5;--indigo-bg:#E8EAF6;--brown:#795548;--brown-bg:#EFEBE9;--grey:#607D8B;--grey-bg:#ECEFF1;--bg:#fff;--bg-s:#F7F8FA;--border:#E3E5EA;--border-l:#F0F1F3;--text:#1A1A2E;--text2:#5F6368;--text3:#9AA0A6;--r:12px;--rl:16px;--rxl:24px;}
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+        .liquid-shapes{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+        .liquid-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.25;will-change:transform;}
+        .liquid-mesh{position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");pointer-events:none;}
+        .hero .b1{width:550px;height:550px;background:var(--blue-l);top:-18%;left:-12%;}
+        .hero .b2{width:420px;height:420px;background:var(--purple);bottom:-12%;right:-6%;}
+        .hero .b3{width:320px;height:320px;background:var(--teal);top:35%;left:52%;}
+        .hero .b4{width:260px;height:260px;background:var(--orange);top:15%;right:25%;opacity:.18;}
+        .hero .b5{width:200px;height:200px;background:var(--pink);bottom:20%;left:20%;opacity:.15;}
+        .hero .b6{width:180px;height:180px;background:var(--indigo);top:60%;left:15%;opacity:.12;}
+        .tools-sec .b1{width:400px;height:400px;background:var(--teal);top:-10%;right:-5%;opacity:.18;}
+        .tools-sec .b2{width:350px;height:350px;background:var(--orange);bottom:-8%;left:-5%;opacity:.15;}
+        .tools-sec .b3{width:280px;height:280px;background:var(--purple);top:40%;left:50%;opacity:.12;}
+        .tools-sec .b4{width:220px;height:220px;background:var(--pink);top:10%;left:20%;opacity:.1;}
+        .steps-sec .b1{width:300px;height:300px;background:var(--blue-l);top:10%;right:10%;opacity:.12;}
+        .steps-sec .b2{width:250px;height:250px;background:var(--teal);bottom:5%;left:15%;opacity:.1;}
+        .feat-sec .b1{width:350px;height:350px;background:var(--green);top:-5%;left:60%;opacity:.1;}
+        .feat-sec .b2{width:250px;height:250px;background:var(--pink);bottom:5%;left:-3%;opacity:.1;}
+        .feat-sec .b3{width:200px;height:200px;background:var(--orange);top:30%;right:10%;opacity:.08;}
+        .cta-ban .b1{width:300px;height:300px;background:rgba(255,255,255,.15);top:-20%;right:10%;opacity:1;}
+        .footer-sec .b1{width:300px;height:300px;background:var(--blue-l);bottom:-15%;right:-5%;opacity:.08;}
+        .conv-liquid .lb{position:absolute;border-radius:50%;filter:blur(60px);}
+        .conv-liquid .lb1{width:500px;height:500px;background:var(--blue-l);top:-30%;left:-20%;opacity:.15;}
+        .conv-liquid .lb2{width:400px;height:400px;background:var(--purple);bottom:-25%;right:-15%;opacity:.12;}
+        .conv-liquid .lb3{width:300px;height:300px;background:var(--teal);top:50%;left:50%;opacity:.1;}
+        .result-liquid .lb{position:absolute;border-radius:50%;filter:blur(60px);}
+        .result-liquid .lb1{width:400px;height:400px;background:var(--green);top:-20%;right:-10%;opacity:.1;}
+        .result-liquid .lb2{width:300px;height:300px;background:var(--blue-l);bottom:-15%;left:-10%;opacity:.08;}
+
+        .site-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-l);height:56px;}
+        .nav-inner{max-width:100%;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+        .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text);flex-shrink:0;cursor:pointer;}
+        .nav-logo-ic{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2E6BC6,#0B3C7D);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;}
+        .nav-logo-t{font-weight:800;font-size:18px;letter-spacing:-.3px;}.nav-logo-t span{color:var(--blue-l);}
+        .nav-tools{display:flex;align-items:center;gap:3px;flex:1;justify-content:center;overflow-x:auto;scrollbar-width:none;}
+        .nav-tools::-webkit-scrollbar{display:none;}
+        .nav-tool-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;white-space:nowrap;transition:all .2s;}
+        .nav-tool-btn:hover{color:var(--blue);background:var(--blue-bg);}
+        .nav-tool-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;}
+        .nav-tool-btn .caret{font-size:10px;color:var(--text3);margin-left:1px;}
+        .nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+        .nav-cta{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;background:var(--blue);color:#fff;font-family:inherit;font-size:13px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(11,60,125,.2);transition:all .2s;white-space:nowrap;}
+        .nav-cta:hover{background:var(--blue-l);transform:translateY(-1px);}
+
+        .tools-panel{position:fixed;inset:0;top:56px;z-index:90;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s;}
+        .tools-panel.open{opacity:1;pointer-events:all;}
+        .tools-panel-inner{position:absolute;top:56px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);box-shadow:0 16px 48px rgba(0,0,0,.1);transform:translateY(-20px);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:calc(100vh - 56px);overflow-y:auto;}
+        .tools-panel.open .tools-panel-inner{transform:translateY(0);}
+        .tools-panel-grid{max-width:1200px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+        .tp-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r);cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:inherit;}
+        .tp-item:hover{background:var(--blue-bg);}
+        .tp-item-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+        .tp-item-text h4{font-size:12px;font-weight:700;margin-bottom:1px;}.tp-item-text p{font-size:10px;color:var(--text3);}
+
+        .hero{position:relative;padding:0 24px;overflow:hidden;min-height:560px;display:flex;align-items:center;}
+        .hero-inner{max-width:1200px;margin:0 auto;width:100%;display:flex;align-items:center;gap:60px;padding:72px 0 64px;}
+        .hero-text{flex:1;position:relative;z-index:2;}
+        .hero-text h1{font-size:46px;font-weight:800;line-height:1.08;letter-spacing:-.8px;margin-bottom:18px;}
+        .hero-text h1 em{font-style:normal;background:linear-gradient(135deg,var(--blue),var(--blue-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-text>p{font-size:17px;color:var(--text2);line-height:1.65;margin-bottom:36px;max-width:460px;}
+        .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+        .hero-stats{display:flex;gap:28px;margin-top:40px;}
+        .hero-stat{text-align:left;}
+        .hero-stat-n{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--blue-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-stat-l{font-size:12px;color:var(--text3);margin-top:2px;}
+        .hero-mockup{flex:1;position:relative;z-index:2;max-width:500px;}
+        .mockup-float{animation:mockFloat 6s ease-in-out infinite;}
+        @keyframes mockFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+        .mockup-card{background:#fff;border-radius:var(--rxl);box-shadow:0 24px 64px rgba(0,0,0,.1),0 0 0 1px var(--border-l);overflow:hidden;transform:perspective(800px) rotateY(-4deg) rotateX(2deg);transition:transform .6s cubic-bezier(.4,0,.2,1);}
+        .mockup-card:hover{transform:perspective(800px) rotateY(0deg) rotateX(0deg);}
+        .mockup-toolbar{background:var(--bg-s);border-bottom:1px solid var(--border-l);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+        .mockup-dot{width:10px;height:10px;border-radius:50%;}
+        .mockup-body{padding:28px;min-height:300px;position:relative;}
+        .mockup-line{height:8px;border-radius:4px;margin-bottom:10px;}
+        .mockup-sig{position:absolute;bottom:28px;right:28px;font-size:30px;color:var(--blue);opacity:.5;font-family:Georgia,serif;font-style:italic;}
+        .mockup-stamp{position:absolute;top:24px;right:24px;width:56px;height:56px;border:3px solid var(--green);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--green);transform:rotate(-12deg);opacity:.4;}
+        .mockup-badge{position:absolute;bottom:24px;left:24px;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;background:var(--green-bg);font-size:10px;font-weight:700;color:var(--green);}
+        .mockup-shape1{position:absolute;top:60px;left:30px;width:40px;height:40px;border-radius:8px;background:var(--blue-bg);border:2px solid var(--blue);opacity:.4;transform:rotate(15deg);}
+        .mockup-shape2{position:absolute;top:80px;right:60px;width:24px;height:24px;border-radius:50%;background:var(--orange-bg);border:2px solid var(--orange);opacity:.4;}
+
+        .conv-page{max-width:960px;margin:0 auto;padding:48px 24px 80px;position:relative;}
+        .conv-header{text-align:center;margin-bottom:36px;position:relative;z-index:1;}
+        .conv-header h1{font-size:30px;font-weight:800;margin-bottom:8px;}
+        .conv-header p{font-size:15px;color:var(--text2);}
+        .conv-benefits{display:flex;align-items:flex-start;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap;}
+        .conv-benefit{display:flex;align-items:flex-start;gap:7px;font-size:13px;color:var(--text2);}.conv-benefit i{color:var(--green);margin-top:2px;font-size:13px;}
+        
+        /* Zone de dépôt améliorée */
+        .drop-zone-s{position:relative;border-radius:var(--rxl);padding:56px 32px;cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);overflow:hidden;text-align:center;border:2px dashed var(--border);z-index:1;background:linear-gradient(135deg, rgba(46,107,198,0.03), rgba(46,107,198,0.01));}
+        .drop-zone-s:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.1);border-color:var(--blue-l);}
+        .drop-zone-s.drag-over{transform:scale(1.02);box-shadow:0 16px 48px rgba(11,60,125,.2);border-color:var(--blue);background:linear-gradient(135deg, rgba(46,107,198,0.08), rgba(46,107,198,0.04));}
+        .drop-zone-s input[type="file"]{display:none;}
+        .drop-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:12px;font-family:inherit;font-size:15px;font-weight:700;border:none;cursor:pointer;color:#fff;box-shadow:0 4px 16px rgba(11,60,125,.25);transition:all .25s;background:var(--blue);}
+        .drop-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 8px 24px rgba(11,60,125,.35);}
+        .drop-btn:active{transform:scale(0.98);}
+        .drop-or{font-size:13px;color:var(--text3);margin:14px 0 4px;}.drop-sub{font-size:12px;color:var(--text3);}
+        
+        .fl{margin-top:16px;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+        .fi{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 2px 8px rgba(0,0,0,.06);animation:fiIn .35s cubic-bezier(.4,0,.2,1);}
+        @keyframes fiIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+        .fi-ic{width:38px;height:38px;border-radius:10px;background:var(--red-bg);display:flex;align-items:center;justify-content:center;color:var(--red);font-size:16px;flex-shrink:0;}
+        .fi-info{flex:1;min-width:0;}.fi-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.fi-meta{font-size:11px;color:var(--text3);margin-top:1px;}
+        .fi-rm{width:30px;height:30px;border-radius:7px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;font-size:13px;}.fi-rm:hover{background:var(--red-bg);color:var(--red);}
+        .cv-act{margin-top:20px;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;z-index:1;}
+
+        .conv-area{display:none;position:relative;z-index:1;}
+        .conv-area.show{display:block;animation:fiIn .5s;}
+        .conv-visual{display:flex;align-items:center;justify-content:center;gap:0;margin:0 auto 28px;max-width:680px;position:relative;}
+        .conv-file-card{width:200px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid var(--border-l);border-radius:var(--rl);padding:28px 20px;text-align:center;position:relative;z-index:2;box-shadow:0 8px 32px rgba(0,0,0,.06);}
+        .conv-file-card-icon{width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;position:relative;transition:transform .4s;}
+        .conv-file-card-icon .emoji{position:absolute;bottom:-6px;right:-6px;font-size:28px;}
+        .conv-file-card-name{font-size:12px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .conv-file-card-meta{font-size:11px;color:var(--text3);}
+        .conv-file-card-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:700;color:#fff;margin-top:12px;}
+        .conv-pipe-wrap{width:120px;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
+        .conv-pipe{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative;}
+        .conv-pipe-fill{height:100%;border-radius:3px;width:0%;position:relative;overflow:hidden;transition:width .1s linear;}
+        .conv-pipe-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:shimmer 1s infinite;}
+        @keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+        .conv-pipe-particles{position:absolute;top:50%;left:0;right:0;height:20px;transform:translateY(-50%);pointer-events:none;overflow:hidden;}
+        .conv-particle{position:absolute;width:6px;height:6px;border-radius:50%;top:50%;opacity:0;}
+        .conv-pipe-status{font-size:11px;font-weight:600;margin-top:10px;text-align:center;white-space:nowrap;}
+        .conv-pipe-arrow{font-size:16px;margin-bottom:6px;animation:pipeArrow 1.5s ease-in-out infinite;}
+        @keyframes pipeArrow{0%,100%{transform:translateX(0);opacity:.4;}50%{transform:translateX(5px);opacity:1;}}
+        .conv-filename{text-align:center;font-size:14px;font-weight:600;margin-bottom:4px;word-break:break-all;position:relative;z-index:1;}
+        .conv-status{text-align:center;font-size:13px;font-weight:500;position:relative;z-index:1;}
+
+        .result-area{display:none;position:relative;z-index:1;}
+        .result-area.show{display:block;animation:fiIn .5s;}
+        .result-card{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:1px solid var(--border-l);border-radius:var(--rxl);box-shadow:0 8px 32px rgba(0,0,0,.05);max-width:680px;margin:0 auto;display:flex;min-height:340px;position:relative;z-index:1;}
+        .result-left{flex:1;padding:32px;border-right:1px solid var(--border-l);display:flex;flex-direction:column;}
+        .result-left-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:16px;}
+        .result-left-content{flex:1;font-size:13px;color:var(--text2);line-height:1.7;overflow-y:auto;max-height:240px;}
+        .rl-line{margin-bottom:6px;}
+        .result-right{width:300px;padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+        .result-done{font-size:32px;font-weight:800;margin-bottom:12px;}
+        .result-target-icon{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.08);}
+        .result-target-icon .face{font-size:32px;position:absolute;bottom:-2px;right:-2px;}
+        .result-target-label{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;color:#fff;margin-bottom:12px;}
+        .result-file-name{font-size:14px;font-weight:700;margin-bottom:4px;word-break:break-all;}
+        .result-file-size{font-size:13px;color:var(--text3);margin-bottom:24px;}
+        .result-actions{display:flex;flex-direction:column;gap:10px;width:100%;}
+        .result-again{font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline;margin-top:8px;transition:color .2s;background:none;border:none;font-family:inherit;text-align:center;}
+        .result-again:hover{color:var(--blue);}
+
+        .tools-sec{max-width:1200px;margin:0 auto;padding:80px 24px;position:relative;overflow:hidden;}
+        .sec-hdr{text-align:center;margin-bottom:48px;position:relative;z-index:1;}
+        .sec-hdr h2{font-size:30px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px;}
+        .sec-hdr p{font-size:15px;color:var(--text2);}
+        .t-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative;z-index:1;}
+        .t-card{background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border:1px solid var(--border-l);border-radius:var(--rl);padding:26px 20px;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;text-decoration:none;color:inherit;display:block;}
+        .t-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity .3s;}
+        .t-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 120%,var(--card-glow,transparent) 0%,transparent 70%);opacity:0;transition:opacity .4s;}
+        .t-card:hover{border-color:var(--border);box-shadow:0 12px 36px rgba(0,0,0,.08);transform:translateY(-6px);}
+        .t-card:hover::before{opacity:1;}.t-card:hover::after{opacity:1;}
+        .t-card-ic{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px;transition:all .35s;position:relative;z-index:1;}
+        .t-card:hover .t-card-ic{transform:scale(1.12) rotate(-3deg);}
+        .t-card h3{font-size:13px;font-weight:700;margin-bottom:4px;position:relative;z-index:1;}
+        .t-card p{font-size:11px;color:var(--text3);line-height:1.5;position:relative;z-index:1;}
+        .t-card-arr{position:absolute;top:26px;right:18px;width:26px;height:26px;border-radius:50%;background:var(--bg-s);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text3);opacity:0;transform:translateX(-6px);transition:all .35s;z-index:1;}
+        .t-card:hover .t-card-arr{opacity:1;transform:translateX(0);}
+
+        .steps-sec{background:var(--bg-s);padding:80px 24px;position:relative;overflow:hidden;}
+        .steps-in{max-width:860px;margin:0 auto;position:relative;z-index:1;}
+        .steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:44px;}
+        .step{text-align:center;position:relative;}
+        .step:not(:last-child)::after{content:'';position:absolute;top:28px;left:calc(50% + 34px);width:calc(100% - 68px);height:2px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 6px,transparent 6px,transparent 12px);}
+        .step-n{width:56px;height:56px;border-radius:50%;background:var(--blue);color:#fff;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 6px 18px rgba(11,60,125,.25);transition:transform .3s;}
+        .step:hover .step-n{transform:scale(1.1);}
+        .step h3{font-size:15px;font-weight:700;margin-bottom:6px;}.step p{font-size:13px;color:var(--text2);line-height:1.5;}
+
+        .feat-sec{max-width:1200px;margin:0 auto;padding:80px 24px;position:relative;overflow:hidden;}
+        .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;position:relative;z-index:1;}
+        .feat-card{padding:30px;border-radius:var(--rl);border:1px solid var(--border-l);background:rgba(255,255,255,.8);backdrop-filter:blur(8px);transition:all .35s;position:relative;overflow:hidden;}
+        .feat-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,var(--feat-glow,transparent) 0%,transparent 50%);opacity:0;transition:opacity .5s;pointer-events:none;}
+        .feat-card:hover{box-shadow:0 12px 36px rgba(0,0,0,.06);border-color:var(--border);transform:translateY(-4px);}.feat-card:hover::before{opacity:1;}
+        .feat-ic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px;transition:transform .3s;position:relative;z-index:1;}
+        .feat-card:hover .feat-ic{transform:scale(1.1) rotate(-5deg);}
+        .feat-card h3{font-size:15px;font-weight:700;margin-bottom:6px;position:relative;z-index:1;}
+        .feat-card p{font-size:13px;color:var(--text2);line-height:1.6;position:relative;z-index:1;}
+
+        .cta-ban{max-width:1200px;margin:0 auto 72px;padding:0 24px;position:relative;}
+        .cta-in{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-l) 100%);border-radius:var(--rxl);padding:52px 48px;display:flex;align-items:center;justify-content:space-between;gap:32px;position:relative;overflow:hidden;}
+        .cta-in::before{content:'';position:absolute;top:-40%;right:-10%;width:400px;height:400px;background:rgba(255,255,255,.06);border-radius:50%;animation:ctaP 8s ease-in-out infinite;}
+        .cta-in::after{content:'';position:absolute;bottom:-60%;left:15%;width:300px;height:300px;background:rgba(255,255,255,.04);border-radius:50%;animation:ctaP 10s ease-in-out infinite reverse;}
+        @keyframes ctaP{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.3);opacity:.5;}}
+        .cta-t{position:relative;z-index:1;}.cta-t h2{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;}.cta-t p{font-size:15px;color:rgba(255,255,255,.7);}
+        .cta-bw{position:relative;z-index:1;flex-shrink:0;}
+
+        .footer-sec{background:var(--bg-s);border-top:1px solid var(--border-l);padding:44px 24px 28px;position:relative;overflow:hidden;}
+        .footer-inner{max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;}
+        .footer-brand p{font-size:12px;color:var(--text3);line-height:1.6;margin-top:8px;}
+        .footer-col h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:12px;}
+        .footer-col a{display:block;font-size:12px;color:var(--text2);text-decoration:none;padding:2px 0;transition:color .2s;}.footer-col a:hover{color:var(--blue);}
+        .footer-bottom{border-top:1px solid var(--border-l);padding-top:18px;display:flex;align-items:center;justify-content:space-between;}
+        .footer-bottom p{font-size:11px;color:var(--text3);}
+        .footer-soc{display:flex;gap:10px;}
+        .footer-soc a{width:32px;height:32px;border-radius:7px;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text3);text-decoration:none;font-size:12px;transition:all .2s;}
+        .footer-soc a:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-bg);}
+
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:inherit;font-weight:600;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);text-decoration:none;white-space:nowrap;}
+        .btn-p{background:var(--blue);color:#fff;padding:14px 28px;box-shadow:0 4px 14px rgba(11,60,125,.25);}.btn-p:hover{background:var(--blue-l);transform:translateY(-2px);}
+        .btn-o{background:transparent;color:var(--blue);padding:14px 28px;border:2px solid var(--blue);}.btn-o:hover{background:var(--blue-bg);}
+        .btn-sm{padding:8px 16px;font-size:13px;border-radius:8px;}
+        .btn-d{background:transparent;color:var(--text3);padding:10px 14px;border:none;}.btn-d:hover{color:var(--red);background:var(--red-bg);}
+        .btn-w{background:#fff;color:var(--blue);padding:14px 28px;font-weight:700;font-size:15px;border-radius:11px;box-shadow:0 4px 14px rgba(0,0,0,.12);}.btn-w:hover{background:var(--bg-s);transform:translateY(-2px);}
+        .btn-green{background:var(--green);color:#fff;padding:14px 44px;font-size:16px;border-radius:11px;box-shadow:0 4px 14px rgba(52,168,83,.25);transition:all .3s;}.btn-green:hover{background:#2d9249;transform:translateY(-2px) scale(1.02);}.btn-green:active{transform:scale(0.98);}
+
+        .toast-c{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+        .toast{padding:12px 18px;border-radius:var(--r);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);min-width:260px;background:#fff;}
+        .toast.show{transform:translateX(0);opacity:1;}
+        .toast-success{border:1px solid var(--green);color:var(--green);}.toast-error{border:1px solid var(--red);color:var(--red);}.toast-info{border:1px solid var(--blue);color:var(--blue);}
+
+        @media(max-width:1024px){.nav-tool-btn.hide-md{display:none;}.t-grid{grid-template-columns:repeat(3,1fr);}.feat-grid{grid-template-columns:repeat(2,1fr);}.footer-grid{grid-template-columns:2fr 1fr 1fr;}.hero-inner{gap:36px;}.tools-panel-grid{grid-template-columns:repeat(3,1fr);}}
+        @media(max-width:768px){.nav-tool-btn.hide-sm{display:none;}.hero-inner{flex-direction:column;text-align:center;padding:48px 0;}.hero-text>p{margin-left:auto;margin-right:auto;}.hero-btns{justify-content:center;}.hero-stats{justify-content:center;}.hero-mockup{max-width:360px;}.t-grid{grid-template-columns:repeat(2,1fr);}.feat-grid{grid-template-columns:1fr;}.steps-grid{grid-template-columns:1fr;gap:28px;}.step:not(:last-child)::after{display:none;}.cta-in{flex-direction:column;text-align:center;padding:36px 24px;}.footer-grid{grid-template-columns:1fr 1fr;}.footer-bottom{flex-direction:column;gap:12px;text-align:center;}.tools-panel-grid{grid-template-columns:1fr 1fr;}.conv-visual{flex-direction:column;gap:20px;}.conv-file-card{width:100%;max-width:280px;}.conv-pipe-wrap{width:100%;max-width:280px;}.result-card{flex-direction:column;}.result-left{border-right:none;border-bottom:1px solid var(--border-l);max-height:160px;}.result-right{width:100%;}.result-actions{flex-direction:row;justify-content:center;}.conv-header h1{font-size:24px;}.hero-text h1{font-size:30px;}}
+        @media(max-width:480px){.t-grid{grid-template-columns:1fr;}.tools-panel-grid{grid-template-columns:1fr;}.result-actions{flex-direction:column;}}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+        ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg-s);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+    </style>
 </head>
 <body>
-    <h1>Test Sélection Fichier</h1>
+<div class="toast-c" id="toastC"></div>
+
+<nav class="site-nav"><div class="nav-inner">
+    <div class="nav-logo" id="logoHome"><div class="nav-logo-ic"><i class="fas fa-file-pdf"></i></div><div class="nav-logo-t">Doc<span>Flow</span></div></div>
+    <div class="nav-tools">
+        <button class="nav-tool-btn" id="toolsToggleBtn"><i class="fas fa-th-large" style="font-size:13px;"></i> Outils <i class="fas fa-chevron-down caret"></i></button>
+        <button class="nav-tool-btn hide-sm" data-tool="compress"><span class="dot" style="background:#34A853;"></span> Compresser</button>
+        <button class="nav-tool-btn" data-tool="word"><span class="dot" style="background:#2b579a;"></span> Convertir</button>
+        <button class="nav-tool-btn hide-sm hide-md" data-tool="merge"><span class="dot" style="background:#8430CE;"></span> Fusionner</button>
+        <button class="nav-tool-btn hide-sm hide-md" data-tool="edit"><span class="dot" style="background:#FF5722;"></span> Modifier</button>
+        <button class="nav-tool-btn hide-sm hide-md" data-tool="sign"><span class="dot" style="background:#0B3C7D;"></span> Signer</button>
+    </div>
+    <div class="nav-right"><button class="nav-cta" id="navConvertBtn"><i class="fas fa-upload"></i> Convertir</button></div>
+</div></nav>
+
+<div class="tools-panel" id="toolsPanel"><div class="tools-panel-inner"><div class="tools-panel-grid" id="toolsPanelGrid"></div></div></div>
+
+<main>
+<div id="homeView">
+    <section class="hero">
+        <div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-blob b2"></div><div class="liquid-blob b3"></div><div class="liquid-blob b4"></div><div class="liquid-blob b5"></div><div class="liquid-blob b6"></div><div class="liquid-mesh"></div></div>
+        <div class="hero-inner">
+            <div class="hero-text"><h1 id="heroTitle">Nous simplifions<br>la gestion de <em>PDF</em>.</h1><p id="heroDesc">Nos outils boostent votre productivité et facilitent la gestion de vos documents au quotidien.</p>
+                <div class="hero-btns"><button class="btn btn-p" id="heroStartBtn">Commencer l'essai gratuit</button><button class="btn btn-o" id="heroToolsBtn">Parcourir tous les outils PDF</button></div>
+                <div class="hero-stats"><div class="hero-stat"><div class="hero-stat-n" data-count="284000">0</div><div class="hero-stat-l">Fichiers convertis</div></div><div class="hero-stat"><div class="hero-stat-n" data-count="47000">0</div><div class="hero-stat-l">Utilisateurs actifs</div></div><div class="hero-stat"><div class="hero-stat-n" data-count="22">0</div><div class="hero-stat-l">Outils disponibles</div></div></div>
+            </div>
+            <div class="hero-mockup"><div class="mockup-float"><div class="mockup-card"><div class="mockup-toolbar"><div class="mockup-dot" style="background:#FF5F57;"></div><div class="mockup-dot" style="background:#FEBC2E;"></div><div class="mockup-dot" style="background:#28C840;"></div><span style="flex:1;text-align:center;font-size:12px;color:var(--text3);font-weight:600;">DocFlow</span></div><div class="mockup-body"><div class="mockup-shape1"></div><div class="mockup-shape2"></div><div class="mockup-line" style="width:40%;background:var(--blue);height:14px;border-radius:7px;"></div><div style="height:18px;"></div><div class="mockup-line" style="width:100%;background:var(--border);"></div><div class="mockup-line" style="width:88%;background:var(--border);"></div><div class="mockup-line" style="width:72%;background:var(--border);"></div><div style="height:14px;"></div><div class="mockup-line" style="width:95%;background:var(--border);"></div><div class="mockup-line" style="width:55%;background:var(--border);"></div><div class="mockup-line" style="width:82%;background:var(--border);"></div><div class="mockup-line" style="width:68%;background:var(--border);"></div><div class="mockup-sig">DocFlow</div><div class="mockup-stamp">VALIDÉ</div><div class="mockup-badge"><i class="fas fa-check-circle"></i> Converti</div></div></div></div></div>
+        </div>
+    </section>
+
+    <section class="tools-sec"><div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-blob b2"></div><div class="liquid-blob b3"></div><div class="liquid-blob b4"></div><div class="liquid-mesh"></div></div><div class="sec-hdr"><h2>Tous nos outils PDF</h2><p>Sélectionnez l'outil adapté</p></div><div class="t-grid" id="tGrid"></div></section>
+
+    <section class="steps-sec"><div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-blob b2"></div><div class="liquid-mesh"></div></div><div class="steps-in"><div class="sec-hdr"><h2>Comment ça marche ?</h2><p>Trois étapes simples</p></div><div class="steps-grid"><div class="step"><div class="step-n">1</div><h3>Déposez votre PDF</h3><p>Glissez-déposez ou cliquez</p></div><div class="step"><div class="step-n">2</div><h3>Choisissez le format</h3><p>Sélectionnez le format de sortie</p></div><div class="step"><div class="step-n">3</div><h3>Téléchargez</h3><p>Récupérez votre fichier converti</p></div></div></div></section>
+
+    <section class="feat-sec"><div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-blob b2"></div><div class="liquid-blob b3"></div><div class="liquid-mesh"></div></div><div class="sec-hdr"><h2>Pourquoi choisir DocFlow ?</h2><p>Un convertisseur conçu pour vous</p></div><div class="feat-grid" id="featGrid"></div></section>
+
+    <div class="cta-ban"><div class="liquid-shapes"><div class="liquid-blob b1"></div></div><div class="cta-in"><div class="cta-t"><h2>Prêt à convertir vos PDF ?</h2><p>Rejoignez des milliers d'utilisateurs.</p></div><div class="cta-bw"><button class="btn btn-w" id="ctaStartBtn"><i class="fas fa-rocket"></i> Commencer</button></div></div></div>
+</div>
+
+<div id="convView" style="display:none;">
+<div class="conv-page">
+    <div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-blob b2"></div><div class="liquid-blob b3"></div><div class="liquid-mesh"></div></div>
+    <div id="uploadStage">
+        <div class="conv-header"><h1 id="convTitle">Convertir PDF en Word</h1><p id="convDesc">Convertissez vos PDF en documents Word modifiables.</p>
+            <div class="conv-benefits"><div class="conv-benefit"><i class="fas fa-check-circle"></i> Conversion rapide</div><div class="conv-benefit"><i class="fas fa-check-circle"></i> Tous appareils</div><div class="conv-benefit"><i class="fas fa-check-circle"></i> Millions d'utilisateurs</div></div>
+        </div>
+        <div class="drop-zone-s" id="dropZone" tabindex="0" role="button" aria-label="Zone de dépôt de fichiers">
+            <button class="drop-btn" id="dropBtn" type="button"><i class="fas fa-folder-open"></i> CHOISIR LES FICHIERS</button>
+            <p class="drop-or">ou glisser-déposer les fichiers ici</p>
+            <p class="drop-sub">PDF uniquement — Maximum 50 Mo par fichier</p>
+            <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple>
+        </div>
+        <div class="fl" id="fileList"></div>
+        <div class="cv-act" id="cvAct" style="display:none;">
+            <button class="btn btn-green" id="convertBtn" type="button"><i class="fas fa-bolt"></i> Convertir maintenant</button>
+            <button class="btn btn-d" id="clearBtn" type="button"><i class="fas fa-trash-alt"></i> Effacer tout</button>
+        </div>
+    </div>
+
+    <div class="conv-area" id="progressStage">
+        <div class="conv-liquid"><div class="lb lb1"></div><div class="lb lb2"></div><div class="lb lb3"></div></div>
+        <div class="conv-visual" id="convVisual">
+            <div class="conv-file-card" id="srcCard">
+                <div class="conv-file-card-icon" style="background:var(--red-bg);color:var(--red);">
+                    <i class="fas fa-file-pdf"></i>
+                    <span class="emoji">📄</span>
+                </div>
+                <div class="conv-file-card-name" id="srcName">fichier.pdf</div>
+                <div class="conv-file-card-meta" id="srcMeta">PDF — 1.2 Mo</div>
+                <div class="conv-file-card-badge" style="background:var(--red);">PDF</div>
+            </div>
+            <div class="conv-pipe-wrap">
+                <div class="conv-pipe-arrow"><i class="fas fa-angle-double-right" style="color:var(--text3);"></i></div>
+                <div class="conv-pipe">
+                    <div class="conv-pipe-fill" id="pipeFill"></div>
+                    <div class="conv-pipe-particles" id="pipeParticles"></div>
+                </div>
+                <div class="conv-pipe-status" id="pipeStatus">0%</div>
+            </div>
+            <div class="conv-file-card" id="dstCard">
+                <div class="conv-file-card-icon" id="dstCardIcon">
+                    <i class="fas fa-file-word"></i>
+                    <span class="emoji">🤓</span>
+                </div>
+                <div class="conv-file-card-name" id="dstName">fichier.docx</div>
+                <div class="conv-file-card-meta" id="dstMeta">Word</div>
+                <div class="conv-file-card-badge" id="dstBadge" style="background:var(--blue);">Word</div>
+            </div>
+        </div>
+        <div class="conv-filename" id="convFilename"></div>
+        <div class="conv-status" id="convStatus"></div>
+    </div>
+
+    <div class="result-area" id="resultStage">
+        <div class="result-liquid"><div class="lb lb1"></div><div class="lb lb2"></div></div>
+        <div class="result-card">
+            <div class="result-left">
+                <div class="result-left-tag">Aperçu du contenu</div>
+                <div class="result-left-content" id="resultPreview"></div>
+            </div>
+            <div class="result-right">
+                <div class="result-done" id="resultDone">✅ Conversion réussie !</div>
+                <div class="result-target-icon" id="resultIcon">
+                    <i class="fas fa-file-word"></i>
+                    <span class="face">🤓</span>
+                </div>
+                <div class="result-target-label" id="resultLabel" style="background:var(--blue);">Word</div>
+                <div class="result-file-name" id="resultName"></div>
+                <div class="result-file-size" id="resultSize"></div>
+                <div class="result-actions">
+                    <button class="btn btn-p" id="downloadBtn" type="button"><i class="fas fa-download"></i> Télécharger le fichier</button>
+                    <button class="btn btn-o btn-sm" id="anotherBtn" type="button"><i class="fas fa-redo"></i> Convertir un autre fichier</button>
+                </div>
+                <button class="result-again" id="backHomeBtn" type="button">← Retour à l'accueil</button>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+<footer class="footer-sec"><div class="liquid-shapes"><div class="liquid-blob b1"></div><div class="liquid-mesh"></div></div><div class="footer-inner"><div class="footer-grid"><div class="footer-brand"><div class="nav-logo"><div class="nav-logo-ic"><i class="fas fa-file-pdf"></i></div><div class="nav-logo-t">Doc<span>Flow</span></div></div><p>Convertisseur PDF gratuit, rapide et sécurisé.</p></div><div class="footer-col"><h4>Convertisseur</h4><a href="#">PDF vers Word</a><a href="#">PDF vers Excel</a><a href="#">PDF vers PPT</a><a href="#">PDF vers JPG</a></div><div class="footer-col"><h4>Outils</h4><a href="#">Fusionner PDF</a><a href="#">Diviser PDF</a><a href="#">Compresser PDF</a><a href="#">Signer PDF</a></div><div class="footer-col"><h4>Légal</h4><a href="#">Confidentialité</a><a href="#">Conditions</a><a href="#">Contact</a></div></div><div class="footer-bottom"><p>© 2025 DocFlow. Tous droits réservés.</p><div class="footer-soc"><a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a><a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a><a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a></div></div></div></footer>
+
+<script>
+// ============================================
+// CONFIGURATION DES OUTILS DE CONVERSION
+// ============================================
+var TC = {
+    word:{c:'#2b579a',bg:'rgba(43,87,154,.1)',label:'Word',icon:'fa-file-word',face:'🤓',title:'Convertir PDF en Word',desc:'Convertissez vos PDF en documents Word modifiables.'},
+    excel:{c:'#217346',bg:'rgba(33,115,70,.1)',label:'Excel',icon:'fa-file-excel',face:'📊',title:'Convertir PDF en Excel',desc:'Transformez vos tableaux PDF en Excel.'},
+    ppt:{c:'#d24726',bg:'rgba(210,71,38,.1)',label:'PPT',icon:'fa-file-powerpoint',face:'🎯',title:'Convertir PDF en PowerPoint',desc:'Transformez vos PDF en présentations.'},
+    jpg:{c:'#e67e22',bg:'rgba(230,126,34,.1)',label:'JPG',icon:'fa-file-image',face:'🖼️',title:'Convertir PDF en JPG',desc:'Exportez vos pages PDF en images HD.'},
+    png:{c:'#009688',bg:'rgba(0,150,136,.1)',label:'PNG',icon:'fa-image',face:'🖼️',title:'Convertir PDF en PNG',desc:'Conversion PNG haute résolution.'},
+    txt:{c:'#6b7280',bg:'rgba(107,114,128,.1)',label:'TXT',icon:'fa-file-alt',face:'📝',title:'Convertir PDF en TXT',desc:'Extrayez le texte brut de vos PDF.'},
+    jpg2pdf:{c:'#EA4335',bg:'rgba(234,67,53,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Convertir JPG en PDF',desc:'Transformez vos images JPG en document PDF.'},
+    merge:{c:'#8430CE',bg:'rgba(132,48,206,.1)',label:'PDF',icon:'fa-object-group',face:'📑',title:'Fusionner des PDF',desc:'Combinez plusieurs fichiers PDF en un seul.'},
+    split:{c:'#E91E63',bg:'rgba(233,30,99,.1)',label:'PDF',icon:'fa-cut',face:'✂️',title:'Diviser un PDF',desc:'Séparez un PDF en plusieurs documents.'},
+    compress:{c:'#34A853',bg:'rgba(52,168,83,.1)',label:'PDF',icon:'fa-compress-arrows-alt',face:'📦',title:'Compresser un PDF',desc:'Réduisez la taille de vos fichiers PDF.'},
+    ocr:{c:'#3F51B5',bg:'rgba(63,83,181,.1)',label:'Word',icon:'fa-eye',face:'👁️',title:'PDF vers Word (OCR)',desc:'Reconnaissance optique de caractères.'},
+    edit:{c:'#FF5722',bg:'rgba(255,87,34,.1)',label:'PDF',icon:'fa-edit',face:'✏️',title:'Éditer un PDF',desc:'Modifiez texte et images directement.'},
+    sign:{c:'#0B3C7D',bg:'rgba(11,60,125,.1)',label:'PDF',icon:'fa-signature',face:'✍️',title:'Signer un PDF',desc:'Ajoutez votre signature électronique.'},
+    protect:{c:'#F9AB00',bg:'rgba(249,171,0,.1)',label:'PDF',icon:'fa-lock',face:'🔒',title:'Protéger un PDF',desc:'Sécurisez avec un mot de passe.'},
+    pdfa:{c:'#795548',bg:'rgba(121,85,72,.1)',label:'PDF/A',icon:'fa-archive',face:'📚',title:'Convertir en PDF/A',desc:'Format d\'archivage long terme.'},
+    rotate:{c:'#2196F3',bg:'rgba(33,150,243,.1)',label:'PDF',icon:'fa-sync-alt',face:'🔄',title:'Rotation PDF',desc:'Pivoter les pages de votre PDF.'},
+    pagenums:{c:'#607D8B',bg:'rgba(96,125,139,.1)',label:'PDF',icon:'fa-list-ol',face:'#️⃣',title:'Numéros de page',desc:'Ajoutez des numéros automatiques.'},
+    watermark:{c:'#9C27B0',bg:'rgba(156,39,176,.1)',label:'PDF',icon:'fa-tint',face:'💧',title:'Filigrane',desc:'Ajoutez un filigrane personnalisé.'},
+    unlock:{c:'#4CAF50',bg:'rgba(76,175,80,.1)',label:'PDF',icon:'fa-unlock-alt',face:'🔓',title:'Déverrouiller PDF',desc:'Supprimez la protection du fichier.'},
+    word2pdf:{c:'#1565C0',bg:'rgba(21,101,192,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Word vers PDF',desc:'Convertissez vos documents Word en PDF.'},
+    excel2pdf:{c:'#2E7D32',bg:'rgba(46,125,50,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'Excel vers PDF',desc:'Transformez vos tableaux Excel en PDF.'},
+    ppt2pdf:{c:'#C62828',bg:'rgba(198,40,40,.1)',label:'PDF',icon:'fa-file-pdf',face:'📄',title:'PowerPoint vers PDF',desc:'Convertissez vos présentations PPT en PDF.'}
+};
+
+var fmtExt = {
+    word:'.docx', excel:'.xlsx', ppt:'.pptx', jpg:'.jpg', png:'.png', txt:'.txt',
+    jpg2pdf:'.pdf', merge:'_fusionne.pdf', split:'_page.pdf', compress:'_compressé.pdf',
+    ocr:'.docx', edit:'_édité.pdf', sign:'_signé.pdf', protect:'_protégé.pdf',
+    pdfa:'_PDF-A.pdf', rotate:'_rotaté.pdf', pagenums:'_paginé.pdf',
+    watermark:'_filigrane.pdf', unlock:'_déverrouillé.pdf',
+    word2pdf:'.pdf', excel2pdf:'.pdf', ppt2pdf:'.pdf'
+};
+
+var toolsList = [
+    {n:'PDF vers Word',d:'Convertir en Word',ic:'fa-file-word',c:'#2b579a',bg:'rgba(43,87,154,.08)',fmt:'word'},
+    {n:'PDF vers Excel',d:'Transformer en Excel',ic:'fa-file-excel',c:'#217346',bg:'rgba(33,115,70,.08)',fmt:'excel'},
+    {n:'PDF vers PowerPoint',d:'Créer une présentation',ic:'fa-file-powerpoint',c:'#d24726',bg:'rgba(210,71,38,.08)',fmt:'ppt'},
+    {n:'PDF vers JPG',d:'Exporter en image',ic:'fa-file-image',c:'#e67e22',bg:'rgba(230,126,34,.08)',fmt:'jpg'},
+    {n:'JPG vers PDF',d:'Images en PDF',ic:'fa-image',c:'#0d9488',bg:'rgba(13,148,136,.08)',fmt:'jpg2pdf'},
+    {n:'PDF vers PNG',d:'Conversion PNG',ic:'fa-file-image',c:'#009688',bg:'rgba(0,150,136,.08)',fmt:'png'},
+    {n:'Fusionner PDF',d:'Combiner des PDF',ic:'fa-object-group',c:'#8430CE',bg:'rgba(132,48,206,.08)',fmt:'merge'},
+    {n:'Diviser PDF',d:'Séparer un PDF',ic:'fa-cut',c:'#E91E63',bg:'rgba(233,30,99,.08)',fmt:'split'},
+    {n:'Compresser PDF',d:'Réduire la taille',ic:'fa-compress-arrows-alt',c:'#34A853',bg:'rgba(52,168,83,.08)',fmt:'compress'},
+    {n:'PDF vers Word (OCR)',d:'Reconnaissance optique',ic:'fa-eye',c:'#3F51B5',bg:'rgba(63,81,181,.08)',fmt:'ocr'},
+    {n:'Éditer PDF',d:'Modifier texte/images',ic:'fa-edit',c:'#FF5722',bg:'rgba(255,87,34,.08)',fmt:'edit'},
+    {n:'Signer PDF',d:'Ajouter signature',ic:'fa-signature',c:'#0B3C7D',bg:'rgba(11,60,125,.1)',fmt:'sign'},
+    {n:'Protéger PDF',d:'Mot de passe',ic:'fa-lock',c:'#F9AB00',bg:'rgba(249,171,0,.08)',fmt:'protect'},
+    {n:'PDF vers PDF/A',d:'Archivage',ic:'fa-archive',c:'#795548',bg:'rgba(121,85,72,.08)',fmt:'pdfa'},
+    {n:'Rotation PDF',d:'Pivoter pages',ic:'fa-sync-alt',c:'#2196F3',bg:'rgba(33,150,243,.08)',fmt:'rotate'},
+    {n:'Numéros de page',d:'Numéros auto',ic:'fa-list-ol',c:'#607D8B',bg:'rgba(96,125,139,.08)',fmt:'pagenums'},
+    {n:'Filigrane',d:'Filigrane',ic:'fa-tint',c:'#9C27B0',bg:'rgba(156,39,176,.08)',fmt:'watermark'},
+    {n:'Déverrouiller PDF',d:'Supprimer protection',ic:'fa-unlock-alt',c:'#4CAF50',bg:'rgba(76,175,80,.08)',fmt:'unlock'},
+    {n:'Word vers PDF',d:'Word en PDF',ic:'fa-file-word',c:'#1565C0',bg:'rgba(21,101,192,.08)',fmt:'word2pdf'},
+    {n:'Excel vers PDF',d:'Excel en PDF',ic:'fa-file-excel',c:'#2E7D32',bg:'rgba(46,125,50,.08)',fmt:'excel2pdf'},
+    {n:'PowerPoint vers PDF',d:'PPT en PDF',ic:'fa-file-powerpoint',c:'#C62828',bg:'rgba(198,40,40,.08)',fmt:'ppt2pdf'},
+    {n:'PDF vers TXT',d:'Extraire texte',ic:'fa-file-alt',c:'#6b7280',bg:'rgba(107,114,128,.08)',fmt:'txt'}
+];
+
+var feats = [
+    {t:'Sécurisé et privé',d:'Vos fichiers sont traités localement et ne sont jamais stockés.',ic:'fa-shield-alt',c:'#34A853',bg:'rgba(52,168,83,.1)',g:'rgba(52,168,83,.06)'},
+    {t:'Rapide et efficace',d:'Conversion en quelques secondes grâce à notre technologie.',ic:'fa-bolt',c:'#F9AB00',bg:'rgba(249,171,0,.1)',g:'rgba(249,171,0,.06)'},
+    {t:'Totalement gratuit',d:'Aucune limite de taille ni inscription requise.',ic:'fa-infinity',c:'#2E6BC6',bg:'rgba(46,107,198,.1)',g:'rgba(46,107,198,.06)'},
+    {t:'Qualité préservée',d:'La mise en page et le formatage sont conservés.',ic:'fa-magic',c:'#EA4335',bg:'rgba(234,67,53,.1)',g:'rgba(234,67,53,.06)'},
+    {t:'Multi-appareils',d:'Compatible PC, tablette et mobile.',ic:'fa-mobile-alt',c:'#8430CE',bg:'rgba(132,48,206,.1)',g:'rgba(132,48,206,.06)'},
+    {t:'22 outils en un',d:'Convertir, fusionner, signer, compresser...',ic:'fa-layer-group',c:'#0D9488',bg:'rgba(13,148,136,.1)',g:'rgba(13,148,136,.06)'}
+];
+
+// ============================================
+// VARIABLES GLOBALES
+// ============================================
+var selFmt = 'word';
+var files = [];
+var converting = false;
+var resultBlobs = [];
+
+// ============================================
+// FONCTIONS UTILITAIRES
+// ============================================
+function $(id){ return document.getElementById(id); }
+
+function fmtS(b){
+    if(b < 1024) return b + ' octets';
+    if(b < 1048576) return (b / 1024).toFixed(1) + ' Ko';
+    return (b / 1048576).toFixed(1) + ' Mo';
+}
+
+function toast(msg, type){
+    type = type || 'info';
+    var c = $('toastC');
+    var el = document.createElement('div');
+    var icons = {success:'✅', error:'❌', info:'ℹ️'};
+    el.className = 'toast toast-' + type;
+    el.innerHTML = '<span>' + (icons[type] || 'ℹ️') + '</span><span>' + msg + '</span>';
+    c.appendChild(el);
     
-    <button onclick="document.getElementById('f').click()" 
-            style="padding:20px;font-size:20px;background:#2563eb;color:#fff;border:none;cursor:pointer;">
-        📁 CLIQUEZ ICI POUR CHOISIR UN FICHIER
-    </button>
+    // Animation d'entrée
+    requestAnimationFrame(function(){
+        el.classList.add('show');
+    });
     
-    <input type="file" id="f" style="display:none;" 
-           onchange="alert('Fichier sélectionné: '+this.files[0].name)">
+    // Auto-suppression
+    setTimeout(function(){ 
+        el.classList.remove('show'); 
+        setTimeout(function(){ 
+            if(el.parentNode) el.remove(); 
+        }, 400); 
+    }, 3500);
+}
+
+// ============================================
+// RENDU DES COMPOSANTS
+// ============================================
+function renderTools(){
+    var ph = '', gh = '';
+    for(var i = 0; i < toolsList.length; i++){
+        var t = toolsList[i];
+        ph += '<button class="tp-item" data-fmt="' + t.fmt + '" type="button">' +
+              '<div class="tp-item-ic" style="background:' + t.bg + ';color:' + t.c + ';">' +
+              '<i class="fas ' + t.ic + '"></i></div>' +
+              '<div class="tp-item-text"><h4>' + t.n + '</h4><p>' + t.d + '</p></div></button>';
+              
+        gh += '<div class="t-card" data-fmt="' + t.fmt + '" style="--card-glow:' + t.bg + ';" tabindex="0" role="button">' +
+              '<div class="cbar" style="position:absolute;top:0;left:0;right:0;height:3px;background:' + t.c + ';border-radius:3px 3px 0 0;opacity:0;transition:opacity .3s;"></div>' +
+              '<div class="t-card-ic" style="background:' + t.bg + ';color:' + t.c + ';"><i class="fas ' + t.ic + '"></i></div>' +
+              '<div class="t-card-arr"><i class="fas fa-arrow-right"></i></div>' +
+              '<h3>' + t.n + '</h3><p>' + t.d + '</p></div>';
+    }
+    $('toolsPanelGrid').innerHTML = ph;
+    $('tGrid').innerHTML = gh;
+}
+
+function renderFeats(){
+    var h = '';
+    for(var i = 0; i < feats.length; i++){
+        var f = feats[i];
+        h += '<div class="feat-card" style="--feat-glow:' + f.g + ';">' +
+              '<div class="feat-ic" style="background:' + f.bg + ';color:' + f.c + ';"><i class="fas ' + f.ic + '"></i></div>' +
+              '<h3>' + f.t + '</h3><p>' + f.d + '</p></div>';
+    }
+    $('featGrid').innerHTML = h;
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+function toggleToolsPanel(){
+    var p = $('toolsPanel');
+    p.classList.toggle('open');
+    if(p.classList.contains('open') && window.gsap){
+        gsap.fromTo('#toolsPanelGrid .tp-item', 
+            {opacity:0, y:15}, 
+            {opacity:1, y:0, stagger:0.03, duration:0.35, ease:'power2.out'}
+        );
+    }
+}
+
+function closeToolsPanel(){
+    $('toolsPanel').classList.remove('open');
+}
+
+function goHome(){
+    $('homeView').style.display = '';
+    $('convView').style.display = 'none';
+    files = [];
+    resultBlobs = [];
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function pickTool(f){
+    selFmt = f;
+    closeToolsPanel();
+    showConvPage(f);
+}
+
+function showConvPage(f){
+    $('homeView').style.display = 'none';
+    $('convView').style.display = '';
+    files = [];
+    resultBlobs = [];
     
-    <script>
-        console.log('✅ Page chargée');
-    </script>
+    var tc = TC[f] || TC.word;
+    $('convTitle').textContent = tc.title;
+    $('convDesc').textContent = tc.desc;
+    
+    // Style dynamique de la zone de dépôt
+    var dz = $('dropZone');
+    dz.style.background = 'linear-gradient(135deg,' + tc.bg + ',' + tc.bg.replace('.1','.03)') + ')';
+    dz.style.borderColor = tc.c + '66';
+    dz.style.boxShadow = '0 4px 30px ' + tc.bg;
+    $('dropBtn').style.background = tc.c;
+    $('dropBtn').style.boxShadow = '0 4px 16px ' + tc.c + '44';
+    
+    showStage('upload');
+    renderFL();
+    window.scrollTo({top:0});
+    
+    // Animations d'entrée
+    if(window.gsap){
+        gsap.from('#convHeader', {opacity:0, y:30, duration:0.6, ease:'power3.out'});
+        gsap.from('#dropZone', {opacity:0, scale:0.96, duration:0.5, ease:'back.out(1.4)', delay:0.15});
+        gsap.from('.conv-benefit', {opacity:0, x:-20, stagger:0.08, duration:0.45, ease:'power2.out', delay:0.3});
+    }
+}
+
+function showStage(s){
+    $('uploadStage').style.display = s === 'upload' ? 'block' : 'none';
+    $('progressStage').classList.toggle('show', s === 'progress');
+    $('resultStage').classList.toggle('show', s === 'result');
+}
+
+// ============================================
+// GESTION DES FICHIERS
+// ============================================
+function setupDrop(){
+    var z = $('dropZone');
+    var inp = $('fileInput');
+    
+    // Clic sur la zone ou le bouton
+    z.addEventListener('click', function(e){
+        // Ne pas déclencher deux fois si on clique sur le bouton
+        if(e.target.id !== 'dropBtn'){
+            inp.click();
+        }
+    });
+    
+    // Clic direct sur le bouton
+    $('dropBtn').addEventListener('click', function(e){
+        e.stopPropagation();
+        inp.click();
+    });
+    
+    // Accessibilité clavier
+    z.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+            e.preventDefault();
+            inp.click();
+        }
+    });
+    
+    // Drag & Drop
+    z.addEventListener('dragover', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        z.classList.add('drag-over');
+    });
+    
+    z.addEventListener('dragleave', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        z.classList.remove('drag-over');
+    });
+    
+    z.addEventListener('drop', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        z.classList.remove('drag-over');
+        
+        if(e.dataTransfer && e.dataTransfer.files){
+            addFiles(e.dataTransfer.files);
+        }
+    });
+    
+    // Sélection de fichiers
+    inp.addEventListener('change', function(e){
+        if(e.target.files && e.target.files.length > 0){
+            addFiles(e.target.files);
+        }
+        // Reset pour permettre de sélectionner le même fichier
+        inp.value = '';
+    });
+}
+
+function addFiles(list){
+    if(!list || list.length === 0) return;
+    
+    var arr = [];
+    var errors = [];
+    
+    for(var i = 0; i < list.length; i++){
+        var f = list[i];
+        
+        // Validation du type de fichier
+        var isPdf = f.name.toLowerCase().endsWith('.pdf') || f.type === 'application/pdf';
+        var isImage = f.type.match(/^image\/(jpeg|png|gif)$/);
+        
+        // Accepter les PDF pour la plupart des outils
+        // Accepter les images pour jpg2pdf
+        var accepted = isPdf;
+        if(selFmt === 'jpg2pdf'){
+            accepted = isPdf || isImage;
+        }
+        
+        if(!accepted){
+            errors.push('"' + f.name + '" : format non supporté');
+            continue;
+        }
+        
+        // Validation de la taille (50 Mo max)
+        if(f.size > 50 * 1024 * 1024){
+            errors.push('"' + f.name + '" : trop volumineux (max 50 Mo)');
+            continue;
+        }
+        
+        arr.push(f);
+    }
+    
+    // Afficher les erreurs
+    if(errors.length > 0){
+        toast(errors[0], 'error');
+    }
+    
+    if(arr.length === 0) return;
+    
+    // Limite de 5 fichiers
+    if(files.length + arr.length > 5){
+        toast('Maximum 5 fichiers autorisés (' + (5 - files.length) + ' restants)', 'error');
+        arr = arr.slice(0, 5 - files.length);
+    }
+    
+    // Ajouter les fichiers
+    for(var j = 0; j < arr.length; j++){
+        files.push(arr[j]);
+    }
+    
+    renderFL();
+    
+    if(arr.length === 1){
+        toast('✅ Fichier "' + arr[0].name + '" ajouté', 'success');
+    } else {
+        toast('✅ ' + arr.length + ' fichiers ajoutés', 'success');
+    }
+}
+
+function renderFL(){
+    var c = $('fileList');
+    var a = $('cvAct');
+    
+    if(!files.length){
+        c.innerHTML = '';
+        a.style.display = 'none';
+        return;
+    }
+    
+    a.style.display = 'flex';
+    
+    var ext = fmtExt[selFmt] || '.pdf';
+    var color = (TC[selFmt] || TC.word).c;
+    var html = '';
+    
+    for(var i = 0; i < files.length; i++){
+        html += '<div class="fi" data-index="' + i + '">' +
+            '<div class="fi-ic"><i class="fas fa-file-pdf"></i></div>' +
+            '<div class="fi-info">' +
+                '<div class="fi-name" title="' + files[i].name + '">' + files[i].name + '</div>' +
+                '<div class="fi-meta">' + fmtS(files[i].size) + ' → <strong style="color:' + color + '">' + ext + '</strong></div>' +
+            '</div>' +
+            '<button class="fi-rm" data-index="' + i + '" type="button" title="Supprimer" aria-label="Supprimer le fichier">' +
+            '<i class="fas fa-times"></i></button></div>';
+    }
+    
+    c.innerHTML = html;
+    
+    // Attacher les événements de suppression
+    var rmbs = c.querySelectorAll('.fi-rm');
+    for(var j = 0; j < rmbs.length; j++){
+        rmbs[j].addEventListener('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var idx = parseInt(this.getAttribute('data-index'));
+            if(!isNaN(idx) && idx >= 0 && idx < files.length){
+                var removed = files.splice(idx, 1)[0];
+                renderFL();
+                toast('🗑️ "' + removed.name + '" supprimé', 'info');
+            }
+        });
+    }
+}
+
+function clearAll(){
+    var count = files.length;
+    files = [];
+    renderFL();
+    if(count > 0){
+        toast('🗑️ ' + count + ' fichier(s) supprimé(s)', 'info');
+    }
+}
+
+// ============================================
+// PROCESSUS DE CONVERSION
+// ============================================
+function startConversion(){
+    if(!files.length){
+        toast('⚠️ Veuillez d\'abord ajouter un fichier PDF', 'error');
+        return;
+    }
+    
+    if(converting){
+        toast('⏳ Conversion déjà en cours...', 'info');
+        return;
+    }
+    
+    converting = true;
+    resultBlobs = [];
+    showStage('progress');
+    
+    var dst = TC[selFmt] || TC.word;
+    var file = files[0];
+    
+    // Mettre à jour l'interface visuelle
+    updateConversionUI(dst, file);
+    
+    // Lancer la simulation de progression
+    simulateProgress(dst, file);
+}
+
+function updateConversionUI(dst, file){
+    // Icône de destination
+    var di = $('dstCardIcon');
+    di.style.background = dst.bg;
+    di.style.color = dst.c;
+    di.innerHTML = '<i class="fas ' + dst.icon + '"></i><span class="emoji">' + dst.face + '</span>';
+    
+    // Badge destination
+    $('dstBadge').style.background = dst.c;
+    $('dstBadge').textContent = dst.label;
+    $('dstMeta').textContent = dst.label;
+    
+    // Noms de fichiers
+    var base = file.name.replace(/\.pdf$/i, '');
+    var ext = fmtExt[selFmt] || '.pdf';
+    
+    $('srcName').textContent = file.name;
+    $('srcMeta').textContent = 'PDF — ' + fmtS(file.size);
+    $('dstName').textContent = base + ext;
+    
+    // Reset progression
+    $('pipeFill').style.width = '0%';
+    $('pipeFill').style.background = dst.c;
+    $('pipeStatus').textContent = '0%';
+    $('pipeStatus').style.color = dst.c;
+    $('convFilename').textContent = '📁 ' + file.name;
+    $('convStatus').textContent = '🔄 Préparation de la conversion...';
+    
+    // Animations
+    if(window.gsap){
+        gsap.from('#convVisual', {opacity:0, y:25, duration:0.5, ease:'power2.out'});
+        gsap.from('#srcCard', {opacity:0, x:-40, duration:0.5, ease:'power2.out', delay:0.1});
+        gsap.from('.conv-pipe-wrap', {opacity:0, scale:0.8, duration:0.45, ease:'back.out(1.5)', delay:0.25});
+        gsap.from('#dstCard', {opacity:0, x:40, duration:0.5, ease:'power2.out', delay:0.4});
+    }
+}
+
+function simulateProgress(dst, file){
+    var cur = 0;
+    var stages = [
+        {p:15, msg:'📖 Lecture du fichier...'},
+        {p:35, msg:'🔍 Analyse du contenu...'},
+        {p:55, msg:'⚙️ Conversion en cours...'},
+        {p:75, msg:'✨ Application du format...'},
+        {p:90, msg:'🔧 Finalisation...'},
+        {p:100, msg:'✅ Terminé !'}
+    ];
+    
+    var stageIdx = 0;
+    
+    var iv = setInterval(function(){
+        // Progression aléatoire réaliste
+        var increment = Math.random() * 4 + 0.5;
+        cur = Math.min(cur + increment, 100);
+        
+        // Mise à jour visuelle
+        $('pipeFill').style.width = cur + '%';
+        $('pipeStatus').textContent = Math.round(cur) + '%';
+        
+        // Particules
+        if(Math.random() > 0.6){
+            spawnParticle(dst.c);
+        }
+        
+        // Messages d'étape
+        while(stageIdx < stages.length && cur >= stages[stageIdx].p){
+            $('convStatus').textContent = stages[stageIdx].msg;
+            stageIdx++;
+        }
+        
+        // Fin de la progression
+        if(cur >= 100){
+            clearInterval(iv);
+            $('pipeStatus').textContent = '100%';
+            $('convStatus').textContent = '🎉 Conversion réussie ! Préparation du téléchargement...';
+            
+            // Délai avant affichage du résultat
+            setTimeout(function(){
+                converting = false;
+                prepareResult();
+                showStage('result');
+            }, 800);
+        }
+    }, 60);
+}
+
+function spawnParticle(color){
+    if(!window.gsap) return;
+    
+    var container = $('pipeParticles');
+    if(!container) return;
+    
+    var p = document.createElement('div');
+    p.className = 'conv-particle';
+    p.style.background = color;
+    p.style.left = (Math.random() * 80 + 5) + '%';
+    container.appendChild(p);
+    
+    gsap.fromTo(p,
+        {opacity:1, scale:0.5, y:0, x:0},
+        {
+            opacity:0,
+            scale:1.8,
+            y:(Math.random() - 0.5) * 30,
+            x:100,
+            duration:0.5 + Math.random() * 0.4,
+            ease:'power2.out',
+            onComplete:function(){ if(p.parentNode) p.remove(); }
+        }
+    );
+}
+
+// ============================================
+// PRÉPARATION DU RÉSULTAT
+// ============================================
+function prepareResult(){
+    resultBlobs = [];
+    
+    var dst = TC[selFmt] || TC.word;
+    var ext = fmtExt[selFmt] || '.pdf';
+    var file = files[0];
+    var base = file.name.replace(/\.pdf$/i, '');
+    var outName = base + ext;
+    
+    // Interface résultat
+    var ri = $('resultIcon');
+    ri.style.background = dst.bg;
+    ri.style.color = dst.c;
+    ri.innerHTML = '<i class="fas ' + dst.icon + '"></i><span class="face">' + dst.face + '</span>';
+    
+    $('resultLabel').style.background = dst.c;
+    $('resultLabel').textContent = dst.label;
+    $('resultDone').textContent = '✅ Conversion réussie !';
+    $('resultDone').style.color = dst.c;
+    $('resultName').textContent = outName;
+    
+    // Contenu de l'aperçu
+    var previewLines = generatePreviewContent(file, dst);
+    $('resultPreview').innerHTML = previewLines;
+    
+    // Générer le blob selon le format
+    generateResultBlob(outName, dst, base, file);
+}
+
+function generatePreviewContent(file, dst){
+    var now = new Date().toLocaleString('fr-FR');
+    var lines = [
+        '<div style="color:' + dst.c + ';font-weight:700;margin-bottom:12px;">📄 Rapport de conversion</div>',
+        '<div style="margin-bottom:6px;"><strong>Fichier source :</strong> ' + file.name + '</div>',
+        '<div style="margin-bottom:6px;"><strong>Format :</strong> PDF → ' + dst.label + '</div>',
+        '<div style="margin-bottom:6px;"><strong>Taille originale :</strong> ' + fmtS(file.size) + '</div>',
+        '<div style="margin-bottom:6px;"><strong>Date :</strong> ' + now + '</div>',
+        '<hr style="margin:16px 0;border:none;border-top:1px solid #eee;">',
+        '<div style="color:#666;font-size:12px;">Le contenu extrait apparaîtrait ici dans une vraie conversion.</div>',
+        '<div style="margin-top:12px;color:#888;font-style:italic;">— Généré par DocFlow —</div>'
+    ];
+    
+    return lines.join('');
+}
+
+function generateResultBlob(outName, dst, base, file){
+    try {
+        var content = '';
+        var mimeType = 'application/octet-stream';
+        
+        switch(selFmt){
+            case 'txt':
+                content = 'Contenu textuel extrait du PDF:\n\n' +
+                          'Source: ' + file.name + '\n' +
+                          'Date: ' + new Date().toISOString() + '\n\n' +
+                          '[Le contenu textuel apparaîtrait ici]\n';
+                mimeType = 'text/plain;charset=utf-8';
+                break;
+                
+            case 'jpg':
+            case 'png':
+                createImageResult(outName, dst.c, base);
+                return;
+                
+            default:
+                // Pour Word, Excel, PDF, etc.
+                content = generateDocumentContent(base, dst.label, file);
+                break;
+        }
+        
+        if(content){
+            var blob = new Blob([content], {type:mimeType});
+            resultBlobs.push({
+                blob: blob,
+                name: outName,
+                size: blob.size
+            });
+            updateDisplayedSize();
+        }
+        
+    } catch(err){
+        console.error('Erreur génération:', err);
+        // Créer un fallback simple
+        var fallback = new Blob(['DocFlow - ' + outName], {type:'text/plain'});
+        resultBlobs.push({blob:fallback, name:outName, size:fallback.size});
+        updateDisplayedSize();
+    }
+}
+
+function createImageResult(outName, color, base){
+    try {
+        var canvas = document.createElement('canvas');
+        canvas.width = 794;
+        canvas.height = 1123;
+        var ctx = canvas.getContext('2d');
+        
+        // Fond
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 794, 1123);
+        
+        // En-tête
+        ctx.fillStyle = color;
+        ctx.fillRect(0, 0, 794, 80);
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px DM Sans, sans-serif';
+        ctx.fillText('DocFlow — ' + base, 32, 50);
+        
+        // Lignes simulées
+        ctx.fillStyle = '#e0e0e0';
+        for(var j = 0; j < 35; j++){
+            var w = 150 + Math.random() * 500;
+            ctx.fillRect(32, 130 + j * 28, w, 8);
+        }
+        
+        // Pied de page
+        ctx.fillStyle = '#999';
+        ctx.font = '12px DM Sans, sans-serif';
+        ctx.fillText('Généré par DocFlow — ' + new Date().toLocaleDateString('fr-FR'), 32, 1090);
+        
+        var mime = selFmt === 'jpg' ? 'image/jpeg' : 'image/png';
+        canvas.toBlob(function(blob){
+            if(blob){
+                resultBlobs.push({blob:blob, name:outName, size:blob.size});
+                updateDisplayedSize();
+            }
+        }, mime, 0.92);
+        
+    } catch(err){
+        console.error('Erreur image:', err);
+    }
+}
+
+function generateDocumentContent(base, label, file){
+    return '<!DOCTYPE html>\n' +
+           '<html><head><meta charset="utf-8">\n' +
+           '<title>' + base + '</title>\n' +
+           '<style>\n' +
+           'body{font-family:Calibri,"Segoe UI",sans-serif;margin:48px;color:#222;line-height:1.8;}\n' +
+           'h1{color:#2E6BC6;border-bottom:3px solid #2E6BC6;padding-bottom:12px;}\n' +
+           '.meta{color:#777;font-size:14px;background:#f5f5f5;padding:12px;border-radius:8px;margin:20px 0;}\n' +
+           '.content{margin-top:32px;}\n' +
+           '.footer{text-align:center;color:#aaa;margin-top:48px;font-size:12px;}\n' +
+           '</style></head>\n' +
+           '<body>\n' +
+           '<h1>' + base + '</h1>\n' +
+           '<div class="meta">\n' +
+           '<strong>Format:</strong> ' + label + ' | \n' +
+           '<strong>Source:</strong> ' + file.name + ' | \n' +
+           '<strong>Date:</strong> ' + new Date().toLocaleString('fr-FR') + '\n' +
+           '</div>\n' +
+           '<div class="content">\n' +
+           '<p>Ce document a été généré par <strong>DocFlow</strong>.</p>\n' +
+           '<p>Dans une implémentation complète, le contenu réel du PDF apparaîtrait ici.</p>\n' +
+           '</div>\n' +
+           '<div class="footer">— Document créé avec DocFlow —</div>\n' +
+           '</body></html>';
+}
+
+function updateDisplayedSize(){
+    if(resultBlobs.length > 0 && $('resultSize')){
+        $('resultSize').textContent = fmtS(resultBlobs[0].size);
+    }
+}
+
+// ============================================
+// TÉLÉCHARGEMENT
+// ============================================
+function downloadResult(){
+    if(!resultBlobs || resultBlobs.length === 0){
+        toast('❌ Aucun fichier disponible au téléchargement', 'error');
+        return;
+    }
+    
+    var downloaded = 0;
+    
+    resultBlobs.forEach(function(r, index){
+        setTimeout(function(){
+            try {
+                var url = URL.createObjectURL(r.blob);
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = r.name;
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // Libérer l'URL après un délai
+                setTimeout(function(){
+                    URL.revokeObjectURL(url);
+                }, 5000);
+                
+                downloaded++;
+                
+                if(downloaded === resultBlobs.length){
+                    toast('📥 Téléchargement de "' + r.name + '" démarré', 'success');
+                }
+            } catch(err){
+                console.error('Erreur téléchargement:', err);
+                toast('❌ Erreur lors du téléchargement', 'error');
+            }
+        }, index * 200); // Délai entre les fichiers multiples
+    });
+}
+
+function convertAnother(){
+    files = [];
+    resultBlobs = [];
+    renderFL();
+    showStage('upload');
+    toast('🔄 Prêt pour une nouvelle conversion', 'info');
+}
+
+// ============================================
+// ANIMATIONS GSAP
+// ============================================
+function initAnimations(){
+    if(!window.gsap || !window.ScrollTrigger) return;
+    
+    gsap.registerPlugin(ScrollTrigger);
+    
+    // Blobs liquides animés
+    gsap.utils.toArray('.liquid-blob').forEach(function(blob, i){
+        gsap.to(blob, {
+            x:gsap.utils.random(-100, 100),
+            y:gsap.utils.random(-80, 80),
+            scale:gsap.utils.random(0.75, 1.3),
+            rotation:gsap.utils.random(-15, 15),
+            duration:gsap.utils.random(8, 18),
+            ease:'sine.inOut',
+            repeat:-1,
+            yoyo:true,
+            delay:i * 1.5
+        });
+    });
+    
+    // Timeline Hero
+    var heroTl = gsap.timeline({ease:'power3.out', delay:0.2});
+    heroTl
+        .from('#heroTitle', {opacity:0, y:60, duration:1.1})
+        .from('#heroDesc', {opacity:0, y:40, duration:0.9}, '-=0.7')
+        .from('#heroBtns', {opacity:0, y:30, duration:0.8}, '-=0.55')
+        .from('#heroStats', {opacity:0, y:25, duration:0.7}, '-=0.45')
+        .from('#heroMockup', {opacity:0, x:100, scale:0.92, duration:1.3}, '-=0.9');
+    
+    // Compteurs animés
+    document.querySelectorAll('[data-count]').forEach(function(counter){
+        var target = parseInt(counter.getAttribute('data-count')) || 0;
+        
+        ScrollTrigger.create({
+            trigger:counter,
+            start:'top 88%',
+            once:true,
+            onEnter:function(){
+                gsap.to({val:0}, {
+                    val:target,
+                    duration:2.5,
+                    ease:'power2.out',
+                    onUpdate:function(){
+                        counter.textContent = Math.round(this.targets()[0].val).toLocaleString('fr-FR');
+                    }
+                });
+            }
+        });
+    });
+    
+    // Mockup flottant au scroll
+    gsap.to('.mockup-float', {
+        y:-20,
+        scrollTrigger:{
+            trigger:'.hero',
+            start:'top top',
+            end:'bottom top',
+            scrub:1.2
+        }
+    });
+    
+    // Animations batch pour les grilles
+    animateBatch('.t-card', 'top 88%', {y:35, scale:0.97}, 0.05, 0.55);
+    animateBatch('.step', 'top 85%', {y:30}, 0.12, 0.65);
+    animateBatch('.feat-card', 'top 88%', {y:30, scale:0.98}, 0.08, 0.55);
+    
+    // Headers de section
+    gsap.utils.toArray('.sec-hdr').forEach(function(hdr){
+        gsap.from(hdr, {
+            opacity:0,
+            y:25,
+            duration:0.6,
+            scrollTrigger:{
+                trigger:hdr,
+                start:'top 85%',
+                once:true
+            }
+        });
+    });
+}
+
+function animateBatch(selector, startPoint, fromVars, stagger, duration){
+    ScrollTrigger.batch(selector, {
+        onEnter:function(elements){
+            gsap.fromTo(elements, 
+                Object.assign({opacity:0}, fromVars),
+                {opacity:1, y:0, scale:1, stagger:stagger, duration:duration, ease:'power2.out'}
+            );
+        },
+        start:startPoint,
+        once:true
+    });
+}
+
+// ============================================
+// ÉVÉNEMENTS
+// ============================================
+function setupEvents(){
+    // Navigation principale
+    $('logoHome').addEventListener('click', function(e){
+        e.preventDefault();
+        goHome();
+    });
+    
+    // Boutons d'outils rapides
+    document.querySelectorAll('.nav-tool-btn[data-tool]').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            pickTool(this.getAttribute('data-tool'));
+        });
+    });
+    
+    // Panel d'outils
+    $('toolsToggleBtn').addEventListener('click', function(e){
+        e.stopPropagation();
+        toggleToolsPanel();
+    });
+    
+    // Boutons principaux de conversion
+    $('navConvertBtn').addEventListener('click', function(){ pickTool('word'); });
+    $('heroStartBtn').addEventListener('click', function(){ pickTool('word'); });
+    $('heroToolsBtn').addEventListener('click', function(){ toggleToolsPanel(); });
+    $('ctaStartBtn').addEventListener('click', function(){ pickTool('word'); });
+    
+    // Fermeture du panel au clic extérieur
+    document.addEventListener('click', function(e){
+        var panel = $('toolsPanel');
+        if(panel.classList.contains('open') && 
+           !e.target.closest('#toolsToggleBtn') && 
+           !e.target.closest('#toolsPanel')){
+            panel.classList.remove('open');
+        }
+    });
+    
+    // Sélection depuis le panel
+    $('toolsPanelGrid').addEventListener('click', function(e){
+        var item = e.target.closest('.tp-item');
+        if(item && item.hasAttribute('data-fmt')){
+            pickTool(item.getAttribute('data-fmt'));
+        }
+    });
+    
+    // Grille d'outils
+    $('tGrid').addEventListener('click', function(e){
+        var card = e.target.closest('.t-card');
+        if(card && card.hasAttribute('data-fmt')){
+            pickTool(card.getAttribute('data-fmt'));
+        }
+    });
+    
+    // Hover effects sur les cartes
+    $('tGrid').addEventListener('mouseover', function(e){
+        var card = e.target.closest('.t-card');
+        if(card){
+            var bar = card.querySelector('.cbar');
+            if(bar) bar.style.opacity = '1';
+        }
+    });
+    
+    $('tGrid').addEventListener('mouseout', function(e){
+        var card = e.target.closest('.t-card');
+        if(card){
+            var bar = card.querySelector('.cbar');
+            if(bar) bar.style.opacity = '0';
+        }
+    });
+    
+    // Configuration de la zone de dépôt
+    setupDrop();
+    
+    // Actions de conversion
+    $('convertBtn').addEventListener('click', startConversion);
+    $('clearBtn').addEventListener('click', clearAll);
+    $('downloadBtn').addEventListener('click', downloadResult);
+    $('anotherBtn').addEventListener('click', convertAnother);
+    $('backHomeBtn').addEventListener('click', goHome);
+}
+
+// ============================================
+// INITIALISATION
+// ============================================
+document.addEventListener('DOMContentLoaded', function(){
+    console.log('🚀 Initialisation de DocFlow...');
+    
+    // Rendre les composants
+    renderTools();
+    renderFeats();
+    
+    // Configurer les événements
+    setupEvents();
+    
+    // Initialiser les animations
+    initAnimations();
+    
+    console.log('✅ DocFlow prêt !');
+});
+
+// Debug global pour accès console
+window.DocFlow = {
+    debug: function(){
+        console.log({
+            selFmt: selFmt,
+            filesCount: files.length,
+            converting: converting,
+            blobsCount: resultBlobs.length
+        });
+    }
+};
+</script>
 </body>
 </html>
